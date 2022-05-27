@@ -1,0 +1,10 @@
+useSwagger=true
+
+mail.domain=
+mail.port=
+mail.username=
+mail.password=
+mail.mailFrom=
+
+home_assistant.token=
+home_assistant.api_url=
