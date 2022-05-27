@@ -1,12 +1,10 @@
-# Backend Spring Boot Starter Kit
+# Homsai Engine
 
-A basic starter kit based on SpringBoot Framework v2.1.7
+The Homsai add-on for Home Assistant
 
 ## Features
 
 - DDD architecture
-- Authentication module using [JWT]
-- Authorization module (Spring security)
 - Central exception management
 - File storage module
 - Logging module (Log4j)
@@ -16,15 +14,6 @@ A basic starter kit based on SpringBoot Framework v2.1.7
 
 ## Setup
 
-### Docker
-
-- Go to /docker folder
-- Create the .env file from the right environment (for example .env.local for local machine development)
-- Run the command
-```
-   docker-compose up -d
-```
-- this will create all required machines
 
 ### Environment
 
@@ -32,9 +21,9 @@ A basic starter kit based on SpringBoot Framework v2.1.7
 - Create the application.yml file from the right environment (for example application.yml.local for local machine development)
 - Create the application.properties file from the right environment (for example application.properties.local for local machine development)
 
-### Dev server
+### Dev application
 
-To start the dev server to run 
+To start the dev application just run 
 ```
 gradlew bootRun
 ```
@@ -48,7 +37,7 @@ gradlew test
 
 ## Deploy
 
-- To create the .war first of all create the right application.yml depending on the environment
+- To create the .jar first of all create the right application.yml depending on the environment
 - Run
 ```
 gradlew build
