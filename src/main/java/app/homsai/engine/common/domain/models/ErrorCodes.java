@@ -14,6 +14,12 @@ public class ErrorCodes {
     public static final int USER_NOT_FOUND = 21;
 
     /*
+     * Entities
+     */
+    public static final int AREA_NOT_FOUND = 31;
+    public static final int HAENTITY_NOT_FOUND = 32;
+
+    /*
      * JWT / Validation
      */
     public static final int AUTHENTICATION_EXCEPTION = 100;
@@ -22,4 +28,6 @@ public class ErrorCodes {
     public static final int JWT_EXPIRED_TOKEN_EXCEPTION = 103;
     public static final int ACCESS_DENIED_EXCEPTION = 104;
     public static final int VALIDATION_FAILED_EXCEPTION = 105;
+
+
 }

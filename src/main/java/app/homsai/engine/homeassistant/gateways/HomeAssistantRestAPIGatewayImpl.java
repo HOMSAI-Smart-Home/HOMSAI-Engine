@@ -1,6 +1,6 @@
 package app.homsai.engine.homeassistant.gateways;
 
-import app.homsai.engine.homeassistant.application.http.dtos.HomeAssistantEntityDto;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -17,7 +17,7 @@ import java.util.List;
 import static app.homsai.engine.homeassistant.gateways.HomeAssistantAPIEndpoints.GET_ENTITIES_LIST;
 
 @Service
-public class HomeAssistantGatewayImpl implements HomeAssistantGateway {
+public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGateway {
 
     @Value("${home_assistant.api_url}")
     private String apiUrl;

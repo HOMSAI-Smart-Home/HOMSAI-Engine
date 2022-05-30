@@ -1,10 +1,10 @@
 package app.homsai.engine.homeassistant.gateways;
 
-import app.homsai.engine.homeassistant.application.http.dtos.HomeAssistantEntityDto;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 
 import java.util.List;
 
-public interface HomeAssistantGateway {
+public interface HomeAssistantRestAPIGateway {
 
     List<HomeAssistantEntityDto> getAllHomeAssistantEntities();
 }

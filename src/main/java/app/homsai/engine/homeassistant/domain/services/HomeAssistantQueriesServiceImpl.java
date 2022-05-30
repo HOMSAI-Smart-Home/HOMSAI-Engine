@@ -1,7 +1,8 @@
 package app.homsai.engine.homeassistant.domain.services;
 
-import app.homsai.engine.homeassistant.application.http.dtos.HomeAssistantEntityDto;
-import app.homsai.engine.homeassistant.gateways.HomeAssistantGateway;
+import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGatewayImpl;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
+import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,15 @@ import static app.homsai.engine.homeassistant.gateways.HomeAssistantDomains.CLIM
 public class HomeAssistantQueriesServiceImpl implements HomeAssistantQueriesService {
 
     @Autowired
-    HomeAssistantGateway homeAssistantGateway;
+    HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
+
+
+    @Autowired
+    HomeAssistantWSAPIGatewayImpl homeAssistantWSAPIGateway;
 
     @Override
     public List<HomeAssistantEntityDto> getHomeAssistantEntities(String domain) {
-        List<HomeAssistantEntityDto> entities = homeAssistantGateway.getAllHomeAssistantEntities();
+        List<HomeAssistantEntityDto> entities = homeAssistantRestAPIGateway.getAllHomeAssistantEntities();
         if(domain == null)
             return entities;
         return entities.stream().filter(e -> e.getEntityId().contains(domain)).collect(Collectors.toList());

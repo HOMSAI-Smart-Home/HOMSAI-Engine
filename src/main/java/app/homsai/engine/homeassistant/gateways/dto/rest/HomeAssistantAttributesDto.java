@@ -1,5 +1,5 @@
 
-package app.homsai.engine.homeassistant.application.http.dtos;
+package app.homsai.engine.homeassistant.gateways.dto.rest;
 
 import java.util.HashMap;
 import java.util.List;

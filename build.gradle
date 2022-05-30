@@ -26,6 +26,7 @@ sourceCompatibility = JavaVersion.VERSION_11
 repositories {
 	mavenCentral()
 	jcenter()
+	maven { url 'https://jitpack.io' }
 }
 
 springBoot {
@@ -75,7 +76,7 @@ dependencies {
 	implementation 'de.siegmar:logback-gelf:3.0.0'
 
 	implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.11'
-
+	compile group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.3'
 
 	//springfox-swagger dependencies
 	implementation('io.springfox:springfox-swagger2:2.9.2') {
