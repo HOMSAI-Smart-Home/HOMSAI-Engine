@@ -1,46 +1,30 @@
 package app.homsai.engine.entities.application.http.dtos;
 
 import app.homsai.engine.common.domain.models.BaseEntity;
-import app.homsai.engine.entities.domain.models.Area;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by Giacomo Agostini on 17/01/17.
  */
 
-public class HAEntityDto {
-
-    private String uuid;
+public class HomsaiEntityTypeDto {
 
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("entity_id")
-    private String entityId;
-
-    @JsonProperty("domain")
-    private String domain;
+    @JsonProperty("root_name")
+    private String rootName;
 
     @JsonProperty("unit_of_measurement")
     private String unitOfMeasurement;
 
     @JsonProperty("device_class")
     private String deviceClass;
-
-    private List<AreaDto> areas;
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 
     public String getName() {
         return name;
@@ -50,28 +34,12 @@ public class HAEntityDto {
         this.name = name;
     }
 
-    public String getEntityId() {
-        return entityId;
+    public String getRootName() {
+        return rootName;
     }
 
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public List<AreaDto> getAreas() {
-        return areas;
-    }
-
-    public void setAreas(List<AreaDto> areas) {
-        this.areas = areas;
+    public void setRootName(String rootName) {
+        this.rootName = rootName;
     }
 
     public String getUnitOfMeasurement() {

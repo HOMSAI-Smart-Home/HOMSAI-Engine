@@ -2,12 +2,15 @@ package app.homsai.engine.entities.domain.services;
 
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntityType;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
@@ -47,6 +50,32 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     @Override
     public void truncateHAEntities(){
         entitiesCommandsRepository.truncateHAEntities();
+    }
+
+    @Override
+    public void truncateHomsaiEntities(){
+        entitiesCommandsRepository.truncateHomsaiEntities();
+    }
+
+    @Override
+    public void syncHomsaiEntities() {
+        List<Area> areaList = entitiesQueriesRepository.findAllAreaList();
+        List<HomsaiEntityType> homsaiEntityTypes = entitiesQueriesRepository.findAllHomsaiEntityTypes();
+        for(HomsaiEntityType homsaiEntityType : homsaiEntityTypes) {
+            for (Area area : areaList) {
+                HomsaiEntity homsaiEntity = new HomsaiEntity();
+                homsaiEntity.setArea(area);
+                homsaiEntity.setType(homsaiEntityType);
+                homsaiEntity.setUnitOfMeasurement(homsaiEntityType.getUnitOfMeasurement());
+                homsaiEntity.setName(homsaiEntityType.getRootName()+area.getName());
+                homsaiEntity.setHaEntities(area.getEntities()
+                        .stream()
+                        .filter(h -> homsaiEntityType.getDeviceClass().equals(h.getDeviceClass()))
+                        .collect(Collectors.toList()));
+                if(homsaiEntity.getHaEntities().size() > 0)
+                    entitiesCommandsRepository.saveHomsaiEntity(homsaiEntity);
+            }
+        }
     }
 
 }

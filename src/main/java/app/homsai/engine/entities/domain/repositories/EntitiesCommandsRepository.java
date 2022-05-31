@@ -4,6 +4,7 @@ import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
 
 import java.util.List;
 
@@ -22,4 +23,8 @@ public interface EntitiesCommandsRepository {
     void truncateAreas();
 
     void truncateHAEntities();
+
+    void truncateHomsaiEntities();
+
+    HomsaiEntity saveHomsaiEntity(HomsaiEntity homsaiEntity);
 }

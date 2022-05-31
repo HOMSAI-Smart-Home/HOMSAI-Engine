@@ -2,6 +2,7 @@ package app.homsai.engine.entities.infrastructure.repositories;
 
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,9 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
     @Autowired
     AreaCommandsJpaRepository areaCommandsJpaRepository;
 
+    @Autowired
+    HomsaiEntityCommandsJpaRepository homsaiEntityCommandsJpaRepository;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 
@@ -35,7 +39,7 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
 
     @Override
     public HAEntity saveHAEntity(HAEntity haEntity) {
-        return haEntityCommandsJpaRepository.save(haEntity);
+        return haEntityCommandsJpaRepository.saveAndFlushNow(haEntity);
     }
 
     @Override
@@ -53,6 +57,16 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
     @Override
     public void truncateHAEntities(){
         haEntityCommandsJpaRepository.truncate();
+    }
+
+    @Override
+    public void truncateHomsaiEntities(){
+        homsaiEntityCommandsJpaRepository.truncate();
+    }
+
+    @Override
+    public HomsaiEntity saveHomsaiEntity(HomsaiEntity homsaiEntity) {
+        return homsaiEntityCommandsJpaRepository.save(homsaiEntity);
     }
 
 }

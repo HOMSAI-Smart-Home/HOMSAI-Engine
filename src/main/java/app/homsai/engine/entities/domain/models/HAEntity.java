@@ -12,7 +12,7 @@ import java.util.Set;
  */
 
 @Entity
-@Table(name = "entities")
+@Table(name = "ha_entities")
 public class HAEntity extends BaseEntity {
 
     @NotNull
@@ -30,13 +30,23 @@ public class HAEntity extends BaseEntity {
     @Column(name = "unit_of_measurement")
     private String unitOfMeasurement;
 
+    @Column(name = "device_class")
+    private String deviceClass;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "entities_areas",
             joinColumns = @JoinColumn(name = "entity_uuid", referencedColumnName = "uuid"),
             inverseJoinColumns = @JoinColumn(name = "area_uuid",
                     referencedColumnName = "uuid"))
     private Collection<Area> areas;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "ha_entities_homsai_entities",
+            joinColumns = @JoinColumn(name = "ha_entity_uuid", referencedColumnName = "uuid"),
+            inverseJoinColumns = @JoinColumn(name = "homsai_entiity_uuid",
+                    referencedColumnName = "uuid"))
+    private Collection<HomsaiEntity> homsaiEntities;
 
     public HAEntity(String name, String entityId, String domain) {
         this.name = name;
@@ -44,11 +54,12 @@ public class HAEntity extends BaseEntity {
         this.domain = domain;
     }
 
-    public HAEntity(String name, String entityId, String domain, String unitOfMeasurement) {
+    public HAEntity(String name, String entityId, String domain, String unitOfMeasurement, String deviceClass) {
         this.name = name;
         this.entityId = entityId;
         this.domain = domain;
         this.unitOfMeasurement = unitOfMeasurement;
+        this.deviceClass = deviceClass;
     }
 
     public HAEntity() {
@@ -92,6 +103,22 @@ public class HAEntity extends BaseEntity {
 
     public void setUnitOfMeasurement(String unitOfMeasurement) {
         this.unitOfMeasurement = unitOfMeasurement;
+    }
+
+    public Collection<HomsaiEntity> getHomsaiEntities() {
+        return homsaiEntities;
+    }
+
+    public void setHomsaiEntities(Collection<HomsaiEntity> homsaiEntities) {
+        this.homsaiEntities = homsaiEntities;
+    }
+
+    public String getDeviceClass() {
+        return deviceClass;
+    }
+
+    public void setDeviceClass(String deviceClass) {
+        this.deviceClass = deviceClass;
     }
 }
 

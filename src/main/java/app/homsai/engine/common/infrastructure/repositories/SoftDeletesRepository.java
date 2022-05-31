@@ -66,4 +66,5 @@ public interface SoftDeletesRepository<T, ID extends Serializable>
 
     boolean existsActive(ID id);
 
+    T saveAndFlushNow(T entity);
 }

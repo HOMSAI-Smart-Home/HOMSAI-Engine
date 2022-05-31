@@ -26,11 +26,17 @@ public class EntitiesQueriesController {
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 
-    @RequestMapping(value = "/entities", method = RequestMethod.GET)
-    public ResponseEntity getAllEntities(@PageableDefault(sort = {"uuid"}) Pageable pageRequest,
+    @RequestMapping(value = "/entities/hass", method = RequestMethod.GET)
+    public ResponseEntity getAllHomeAssistantEntities(@PageableDefault(sort = {"uuid"}) Pageable pageRequest,
                                          @RequestParam(value = "search", required = false) String search) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                entitiesQueriesApplicationService.getAllEntities(pageRequest, search));
+                entitiesQueriesApplicationService.getAllHomeAssistantEntities(pageRequest, search));
     }
 
+    @RequestMapping(value = "/entities/homsai", method = RequestMethod.GET)
+    public ResponseEntity getAllHomsaiEntities(@PageableDefault(sort = {"uuid"}) Pageable pageRequest,
+                                         @RequestParam(value = "search", required = false) String search) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                entitiesQueriesApplicationService.getAllHomsaiEntities(pageRequest, search));
+    }
 }

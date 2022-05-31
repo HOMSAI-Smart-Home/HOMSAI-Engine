@@ -12,7 +12,7 @@ import java.util.Set;
  */
 
 @Entity
-@Table(name = "areas")
+@Table(name = "ha_areas")
 public class Area extends BaseEntity {
 
     @NotNull
@@ -20,7 +20,7 @@ public class Area extends BaseEntity {
     private String name;
 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "entities_areas",
             joinColumns = @JoinColumn(name = "area_uuid", referencedColumnName = "uuid"),
             inverseJoinColumns = @JoinColumn(name = "entity_uuid",

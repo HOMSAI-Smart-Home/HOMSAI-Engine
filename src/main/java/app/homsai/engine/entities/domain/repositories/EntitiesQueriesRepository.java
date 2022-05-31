@@ -4,6 +4,8 @@ import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntityType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,4 +25,12 @@ public interface EntitiesQueriesRepository {
     Area findOneAreaByName(String name);
 
     HAEntity findOneHAEntity(String entityUuid) throws HAEntityNotFoundException;
+
+    List<HAEntity> findAllHAEntitiesList();
+
+    List<Area> findAllAreaList();
+
+    List<HomsaiEntityType> findAllHomsaiEntityTypes();
+
+    Page<HomsaiEntity> findAllHomsaiEntities(Pageable pageRequest, String search);
 }

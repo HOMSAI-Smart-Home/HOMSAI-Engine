@@ -4,6 +4,8 @@ import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntityType;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,12 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
 
     @Autowired
     AreaQueriesJpaRepository areaQueriesJpaRepository;
+
+    @Autowired
+    HomsaiEntityTypeQueriesJpaRepository homsaiEntityTypeQueriesJpaRepository;
+
+    @Autowired
+    HomsaiEntityQueriesJpaRepository homsaiEntityQueriesJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -58,6 +66,32 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
             throw new HAEntityNotFoundException(entityUuid);
         }
         return haEntity;
+    }
+
+    @Override
+    public List<HAEntity> findAllHAEntitiesList() {
+        List<HAEntity> haEntityList = new ArrayList<>();
+        haEntityQueriesJpaRepository.findAllActive().forEach(haEntityList::add);
+        return haEntityList;
+    }
+
+    @Override
+    public List<Area> findAllAreaList() {
+        List<Area> areaList = new ArrayList<>();
+        areaQueriesJpaRepository.findAllActive().forEach(areaList::add);
+        return areaList;
+    }
+
+    @Override
+    public List<HomsaiEntityType> findAllHomsaiEntityTypes() {
+        List<HomsaiEntityType> haEntityTypeList = new ArrayList<>();
+        homsaiEntityTypeQueriesJpaRepository.findAllActive().forEach(haEntityTypeList::add);
+        return haEntityTypeList;
+    }
+
+    @Override
+    public Page<HomsaiEntity> findAllHomsaiEntities(Pageable pageRequest, String search) {
+        return homsaiEntityQueriesJpaRepository.findAllActive(pageRequest, search);
     }
 
 }

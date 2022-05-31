@@ -6,16 +6,17 @@ package app.homsai.engine.entities.infrastructure.repositories;
 
 import app.homsai.engine.common.infrastructure.repositories.SoftDeletesRepository;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface HAEntityCommandsJpaRepository
-        extends SoftDeletesRepository<HAEntity, String> {
+public interface HomsaiEntityCommandsJpaRepository
+        extends SoftDeletesRepository<HomsaiEntity, String> {
 
     @Modifying
     @Query(
-            value = "TRUNCATE table entities_areas;" +
-                    "DELETE FROM ha_entities;",
+            value = "TRUNCATE table ha_entities_homsai_entities;" +
+                    "DELETE FROM homsai_entities;",
             nativeQuery = true
     )
     void truncate();

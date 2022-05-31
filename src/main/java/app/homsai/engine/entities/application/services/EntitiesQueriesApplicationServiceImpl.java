@@ -2,7 +2,9 @@ package app.homsai.engine.entities.application.services;
 
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
+import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
@@ -28,9 +30,16 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
 
 
     @Override
-    public Page<HAEntityDto> getAllEntities(Pageable pageRequest, String search) {
+    public Page<HAEntityDto> getAllHomeAssistantEntities(Pageable pageRequest, String search) {
         Page<HAEntity> haEntities = entitiesQueriesService.findAllEntities(pageRequest, search);
         List<HAEntityDto> haEntityDtos = entitiesMapper.convertToDto(haEntities);
         return new PageImpl<>(haEntityDtos, pageRequest, haEntities.getTotalElements());
+    }
+
+    @Override
+    public Page<HomsaiEntityDto> getAllHomsaiEntities(Pageable pageRequest, String search) {
+        Page<HomsaiEntity> homsaiEntities = entitiesQueriesService.findAllHomsaiEntities(pageRequest, search);
+        List<HomsaiEntityDto> homsaiEntityDtos = entitiesMapper.convertToHomsaiDto(homsaiEntities);
+        return new PageImpl<>(homsaiEntityDtos, pageRequest, homsaiEntities.getTotalElements());
     }
 }

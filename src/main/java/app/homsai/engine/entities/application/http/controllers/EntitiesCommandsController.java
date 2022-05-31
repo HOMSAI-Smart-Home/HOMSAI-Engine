@@ -23,7 +23,7 @@ public class EntitiesCommandsController {
 
 
     @RequestMapping(value = "/entities", method = RequestMethod.POST)
-    public ResponseEntity syncHomeAssistantEntities() {
+    public ResponseEntity syncHomeAssistantEntities() throws InterruptedException {
         entitiesCommandsApplicationService.syncHomeAssistantEntities();
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }

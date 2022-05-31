@@ -325,4 +325,9 @@ public class SoftDeletesRepositoryImpl<T, ID extends Serializable>
                 .and(specification1).and(specification2);
     }
 
+    @Override
+    public T saveAndFlushNow(T entity) {
+        return super.saveAndFlush(entity);
+    }
+
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static app.homsai.engine.homeassistant.gateways.dto.ws.HomeAssistantWSStatusList.*;
 
@@ -35,14 +36,21 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
     private int messages;
     private int status = STATUS_NOT_CONNECTED;
 
-    private HAEntity[] entityArray;
+    private List<HAEntity> entityList;
 
     private final int offset = 100;
     private int entityRegistryRequestId = -1;
 
+    private int requestsSent = 0;
+    private int answersReceive = 0;
+    private Object lock;
+
     @Override
-    public void syncEntityAreas(HAEntity[] entityArray){
-        this.entityArray = entityArray;
+    public void syncEntityAreas(List<HAEntity> entityList, Object lock){
+        this.entityList = entityList;
+        this.lock = lock;
+        requestsSent = 0;
+        answersReceive = 0;
         String wsUrl = apiUrl.replace("http", "ws")+"/api/websocket";
         connect(URI.create(wsUrl));
     }
@@ -78,6 +86,12 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
                                 onResult(getJackson(true).readValue(message, HomeAssistantWSResultResponseDto.class));
                             else
                                 onSearchRelated(getJackson(true).readValue(message, HomeAssistantWSSearchRelatedResponseDto.class));
+                            answersReceive += 1;
+                            if(answersReceive >= requestsSent) {
+                                synchronized (lock) {
+                                    lock.notifyAll();
+                                }
+                            }
                     }
                 } catch(Exception ex) {
                     System.err.println("onMessage:" + ex.getMessage());
@@ -114,24 +128,24 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
     }
 
     public void onAuthOk() throws JsonProcessingException {
-        for(int i = 0; i<entityArray.length; i++){
-            sendSearchRelatedRequest(entityArray[i].getEntityId(), i+offset);
+        for(int i = 0; i<entityList.size(); i++){
+            sendSearchRelatedRequest(entityList.get(i).getEntityId(), i+offset);
+            requestsSent += 1;
         }
         sendResultRequest();
+        requestsSent += 1;
     }
 
     public void onSearchRelated(HomeAssistantWSSearchRelatedResponseDto resultMessage) {
         if(resultMessage != null && resultMessage.getResult() != null){
             if(resultMessage.getResult().getArea() != null){
-                HAEntity entityToUpdate = entityArray[resultMessage.getId() - offset];
+                HAEntity entityToUpdate = entityList.get(resultMessage.getId() - offset);
                 if (entityToUpdate.getAreas() == null)
                     entityToUpdate.setAreas(new ArrayList<>());
                 for (String areaName : resultMessage.getResult().getArea()) {
                     Area area = entitiesCommandsService.getAreaByNameOrCreate(areaName);
                     entityToUpdate.getAreas().add(area);
-                    //System.out.println("id: "+entityToUpdate.getEntityId()+ ", area: "+area.getName());
                 }
-                entitiesCommandsService.updateHAEntity(entityToUpdate);
             }
         }
     }
@@ -141,7 +155,7 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
         if(resultMessage != null && resultMessage.getResult() != null){
             for(HomeAssistantWSResultResultDto h : resultMessage.getResult()){
                 if(h.getAreaId() != null) {
-                    HAEntity haEntity = Arrays.stream(entityArray)
+                    HAEntity haEntity = entityList.stream()
                             .filter(ha -> ha.getEntityId().equals(h.getEntityId()))
                             .findAny()
                             .orElse(null);
@@ -150,7 +164,6 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
                             haEntity.setAreas(new ArrayList<>());
                         Area area = entitiesCommandsService.getAreaByNameOrCreate(h.getAreaId());
                         haEntity.getAreas().add(area);
-                        entitiesCommandsService.updateHAEntity(haEntity);
                     }
                 }
             }
@@ -163,7 +176,7 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
     }
 
     public void sendResultRequest() throws JsonProcessingException {
-        entityRegistryRequestId = entityArray.length+offset;
+        entityRegistryRequestId = entityList.size()+offset;
         HomeAssistantWSGenericRequest message = new HomeAssistantWSGenericRequest(HomeAssistantWSRequestList.entityRegistry, entityRegistryRequestId);
         send(getJackson(true).writeValueAsString(message));
     }

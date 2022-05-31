@@ -30,13 +30,19 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
 
 
     @Override
-    public void syncHomeAssistantEntities() {
+    public void syncHomeAssistantEntities() throws InterruptedException {
         List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities(null);
         List<HAEntity> haEntityList = entitiesMapper.convertFromDto(homeAssistantEntityDtoList);
         if(haEntityList.size() > 0){
+            entitiesCommandsService.truncateHomsaiEntities();
             entitiesCommandsService.truncateHAEntities();
         }
         List<HAEntity> haEntitySavedList = entitiesCommandsService.saveAllHAEntities(haEntityList);
-        homeAssistantWSAPIGateway.syncEntityAreas(haEntitySavedList.toArray(new HAEntity[0]));
+        Object lock = new Object();
+        homeAssistantWSAPIGateway.syncEntityAreas(haEntitySavedList, lock);
+        synchronized (lock) {
+            lock.wait(30000);
+        }
+        entitiesCommandsService.syncHomsaiEntities();
     }
 }

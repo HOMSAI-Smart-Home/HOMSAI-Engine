@@ -26,7 +26,6 @@ sourceCompatibility = JavaVersion.VERSION_11
 repositories {
 	mavenCentral()
 	jcenter()
-	maven { url 'https://jitpack.io' }
 }
 
 springBoot {

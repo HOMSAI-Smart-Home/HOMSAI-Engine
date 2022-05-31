@@ -3,7 +3,9 @@ package app.homsai.engine.entities.application.http.converters;
 
 
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
+import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ public class EntitiesMapperImpl implements EntitiesMapper {
         return homeAssistantEntityDtoList.stream()
                 .map(h -> {
                     if(h.getAttributes() != null && h.getAttributes().getUnitOfMeasurement() != null)
-                        return new HAEntity(h.getAttributes().getFriendlyName(), h.getEntityId(), h.getEntityId().split("\\.")[0], h.getAttributes().getUnitOfMeasurement());
+                        return new HAEntity(h.getAttributes().getFriendlyName(), h.getEntityId(), h.getEntityId().split("\\.")[0], h.getAttributes().getUnitOfMeasurement(),  h.getAttributes().getDeviceClass());
                     else
                         return new HAEntity(h.getAttributes().getFriendlyName(), h.getEntityId(), h.getEntityId().split("\\.")[0]);
                 })
@@ -39,6 +41,13 @@ public class EntitiesMapperImpl implements EntitiesMapper {
     public List<HAEntityDto> convertToDto(Page<HAEntity> haEntities) {
         return haEntities.stream()
                 .map(h -> modelMapper.map(h, HAEntityDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HomsaiEntityDto> convertToHomsaiDto(Page<HomsaiEntity> homsaiEntities) {
+        return homsaiEntities.stream()
+                .map(h -> modelMapper.map(h, HomsaiEntityDto.class))
                 .collect(Collectors.toList());
     }
 }

@@ -16,4 +16,8 @@ public interface EntitiesCommandsService {
     void truncateAreas();
 
     void truncateHAEntities();
+
+    void truncateHomsaiEntities();
+
+    void syncHomsaiEntities();
 }

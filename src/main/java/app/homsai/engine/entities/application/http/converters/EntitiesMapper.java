@@ -2,7 +2,9 @@ package app.homsai.engine.entities.application.http.converters;
 
 
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
+import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.springframework.data.domain.Page;
 
@@ -18,4 +20,6 @@ public interface EntitiesMapper {
     List<HAEntity> convertFromDto(List<HomeAssistantEntityDto> homeAssistantEntityDtoList);
 
     List<HAEntityDto> convertToDto(Page<HAEntity> haEntities);
+
+    List<HomsaiEntityDto> convertToHomsaiDto(Page<HomsaiEntity> homsaiEntities);
 }
