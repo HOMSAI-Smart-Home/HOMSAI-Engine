@@ -37,8 +37,6 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
 
 
     @Override
-    //@Scheduled(cron = "0 0 0 * * ?")
-    //@EventListener(ApplicationStartedEvent.class)
     public void syncHomeAssistantEntities() throws InterruptedException {
         logger.info("synchronizing home assistant entities...");
         List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities(null);
@@ -58,7 +56,6 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     }
 
     @Override
-    //@Scheduled(fixedRate = 5*60*1000)
     public List<HomsaiEntitiesHistoricalStateDto> syncHomsaiEntitiesValues() throws AreaNotFoundException {
         logger.info("synchronizing homsai entities...");
         List<HomsaiEntity> homsaiEntityList = entitiesQueriesService.findAllHomsaiEntities(Pageable.unpaged(), null).getContent();
