@@ -4,6 +4,8 @@ import app.homsai.engine.common.domain.models.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collection;
 
 /**
@@ -11,12 +13,15 @@ import java.util.Collection;
  */
 
 @Entity
-@Table(name = "homsai_entities")
-public class HomsaiEntity extends BaseEntity {
+@Table(name = "homsai_entities_historical_states")
+public class HomsaiEntitiesHistoricalState extends BaseEntity {
 
-    @NotNull
-    @Column(length = 255, name = "name")
-    private String name;
+    @Column
+    private Instant timestamp;
+
+    @Column(name = "value")
+    private Double value;
+
 
     @Column(name = "unit_of_measurement")
     private String unitOfMeasurement;
@@ -29,24 +34,20 @@ public class HomsaiEntity extends BaseEntity {
     @JoinColumn(name = "type_uuid")
     private HomsaiEntityType type;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "ha_entities_homsai_entities",
-            joinColumns = @JoinColumn(name = "homsai_entiity_uuid", referencedColumnName = "uuid"),
-            inverseJoinColumns = @JoinColumn(name = "ha_entity_uuid",
-                    referencedColumnName = "uuid"))
-    private Collection<HAEntity> haEntities;
-
-
-
-    public HomsaiEntity() {
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
-    public String getName() {
-        return name;
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
     }
 
     public String getUnitOfMeasurement() {
@@ -71,14 +72,6 @@ public class HomsaiEntity extends BaseEntity {
 
     public void setType(HomsaiEntityType type) {
         this.type = type;
-    }
-
-    public Collection<HAEntity> getHaEntities() {
-        return haEntities;
-    }
-
-    public void setHaEntities(Collection<HAEntity> haEntities) {
-        this.haEntities = haEntities;
     }
 }
 

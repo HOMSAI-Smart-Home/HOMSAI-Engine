@@ -1,16 +1,21 @@
 package app.homsai.engine.entities.domain.services;
 
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntityType;
+import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
+import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static app.homsai.engine.common.domain.utils.HomsaiEntityTypesOperators.AVG;
+import static app.homsai.engine.common.domain.utils.HomsaiEntityTypesOperators.HOME_AREA_UUID;
 
 @Service
 public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
@@ -20,6 +25,10 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
 
     @Autowired
     private EntitiesCommandsRepository entitiesCommandsRepository;
+
+
+    @Autowired
+    HomeAssistantQueriesApplicationService homeAssistantQueriesApplicationService;
 
     @Override
     public Area getAreaByNameOrCreate(String name){
@@ -58,7 +67,8 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     }
 
     @Override
-    public void syncHomsaiEntities() {
+    public Integer syncHomsaiEntities() {
+        Integer count = 0;
         List<Area> areaList = entitiesQueriesRepository.findAllAreaList();
         List<HomsaiEntityType> homsaiEntityTypes = entitiesQueriesRepository.findAllHomsaiEntityTypes();
         for(HomsaiEntityType homsaiEntityType : homsaiEntityTypes) {
@@ -72,9 +82,105 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
                         .stream()
                         .filter(h -> homsaiEntityType.getDeviceClass().equals(h.getDeviceClass()))
                         .collect(Collectors.toList()));
-                if(homsaiEntity.getHaEntities().size() > 0)
+                if(homsaiEntity.getHaEntities().size() > 0) {
                     entitiesCommandsRepository.saveHomsaiEntity(homsaiEntity);
+                    count ++;
+                }
             }
+        }
+        return count;
+    }
+
+    @Override
+    public HomsaiEntitiesHistoricalState saveHomsaiEntityHistoricalState(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState) {
+        return entitiesCommandsRepository.saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState);
+    }
+
+    @Override
+    public List<HomsaiEntitiesHistoricalState> calculateHomsaiEntitiesValues(List<HomsaiEntity> homsaiEntityList) {
+        List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = new ArrayList<>();
+        for(HomsaiEntity homsaiEntity: homsaiEntityList){
+            double sum = 0D;
+            int count = 0;
+            for(HAEntity haEntity : homsaiEntity.getHaEntities()){
+                HomeAssistantEntityDto homeAssistantEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(haEntity.getEntityId());
+                try {
+                    sum += Double.parseDouble(homeAssistantEntityDto.getState());
+                    count += 1;
+                } catch(NumberFormatException pe){
+                    sum += 0D;
+                }
+            }
+            double homsaiSensorState;
+            switch (homsaiEntity.getType().getOperator()) {
+                case AVG:
+                default:
+                    homsaiSensorState = sum / (double) count;
+            }
+            HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState = new HomsaiEntitiesHistoricalState();
+            homsaiEntitiesHistoricalState.setArea(homsaiEntity.getArea());
+            homsaiEntitiesHistoricalState.setTimestamp(Instant.now());
+            homsaiEntitiesHistoricalState.setType(homsaiEntity.getType());
+            homsaiEntitiesHistoricalState.setUnitOfMeasurement(homsaiEntity.getUnitOfMeasurement());
+            homsaiEntitiesHistoricalState.setValue(homsaiSensorState);
+            homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
+        }
+        return homsaiEntitiesHistoricalStates;
+    }
+
+    @Override
+    public List<HomsaiEntitiesHistoricalState> calculateHomsaiHomeValues(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList) throws AreaNotFoundException {
+        List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = new ArrayList<>();
+        HashMap<HomsaiEntityType, AverageObject> homsaiHomeEntitiesMap = new HashMap<>();
+        Area homeArea = entitiesQueriesRepository.findOneArea(HOME_AREA_UUID);
+        for(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState : homsaiEntitiesHistoricalStateList){
+            homsaiHomeEntitiesMap.computeIfAbsent(homsaiEntitiesHistoricalState.getType(), v-> new AverageObject()).increment(homsaiEntitiesHistoricalState.getValue());
+        }
+        for(HomsaiEntityType homsaiEntityType : homsaiHomeEntitiesMap.keySet()){
+
+            HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState = new HomsaiEntitiesHistoricalState();
+            homsaiEntitiesHistoricalState.setArea(homeArea);
+            homsaiEntitiesHistoricalState.setTimestamp(Instant.now());
+            homsaiEntitiesHistoricalState.setType(homsaiEntityType);
+            homsaiEntitiesHistoricalState.setUnitOfMeasurement(homsaiEntityType.getUnitOfMeasurement());
+            homsaiEntitiesHistoricalState.setValue(homsaiHomeEntitiesMap.get(homsaiEntityType).getAverage());
+            homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
+        }
+        return homsaiEntitiesHistoricalStates;
+    }
+
+    private class AverageObject{
+        private Double sum;
+        private Integer count;
+
+        public AverageObject() {
+            sum = 0D;
+            count = 0;
+        }
+
+        public Double getSum() {
+            return sum;
+        }
+
+        public void setSum(Double sum) {
+            this.sum = sum;
+        }
+
+        public Integer getCount() {
+            return count;
+        }
+
+        public void setCount(Integer count) {
+            this.count = count;
+        }
+
+        public Double getAverage(){
+            return this.sum / this.count.doubleValue();
+        }
+
+        public void increment(Double value){
+            this.sum += value;
+            this.count ++;
         }
     }
 

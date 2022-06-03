@@ -2,10 +2,7 @@ package app.homsai.engine.entities.domain.repositories;
 
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntityType;
+import app.homsai.engine.entities.domain.models.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -33,4 +30,6 @@ public interface EntitiesQueriesRepository {
     List<HomsaiEntityType> findAllHomsaiEntityTypes();
 
     Page<HomsaiEntity> findAllHomsaiEntities(Pageable pageRequest, String search);
+
+    Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search);
 }

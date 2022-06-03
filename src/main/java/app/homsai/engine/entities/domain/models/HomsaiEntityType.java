@@ -28,6 +28,9 @@ public class HomsaiEntityType extends BaseEntity {
     @Column(name = "device_class")
     private String deviceClass;
 
+    @Column(name = "operator")
+    private String operator;
+
     public String getName() {
         return name;
     }
@@ -58,6 +61,14 @@ public class HomsaiEntityType extends BaseEntity {
 
     public void setDeviceClass(String deviceClass) {
         this.deviceClass = deviceClass;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 }
 

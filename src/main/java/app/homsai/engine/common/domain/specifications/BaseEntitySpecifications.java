@@ -2,13 +2,15 @@ package app.homsai.engine.common.domain.specifications;
 
 import app.homsai.engine.common.domain.models.BaseEntity;
 import app.homsai.engine.common.domain.models.Gender;
+import app.homsai.engine.entities.domain.models.Area;
+import app.homsai.engine.entities.domain.models.HomsaiEntityType;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * Created by Giacomo Agostini on 20/01/2017.
@@ -26,16 +28,16 @@ public class BaseEntitySpecifications<T extends BaseEntity> implements Specifica
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
         try {
             if (criteria.getOperation().equalsIgnoreCase(">")) {
-                if (root.get(criteria.getKey()).getJavaType() == Timestamp.class) {
+                if (root.get(criteria.getKey()).getJavaType() == Instant.class) {
                     return builder.greaterThanOrEqualTo(root.get(criteria.getKey()),
-                            Timestamp.valueOf(criteria.getValue().toString() + " 00:00:00"));
+                            Instant.parse(criteria.getValue().toString() + " 00:00:00"));
                 }
                 return builder.greaterThanOrEqualTo(root.<String>get(criteria.getKey()),
                         criteria.getValue().toString());
             } else if (criteria.getOperation().equalsIgnoreCase("<")) {
-                if (root.get(criteria.getKey()).getJavaType() == Timestamp.class) {
+                if (root.get(criteria.getKey()).getJavaType() == Instant.class) {
                     return builder.lessThanOrEqualTo(root.get(criteria.getKey()),
-                            Timestamp.valueOf(criteria.getValue().toString() + " 23:59:59"));
+                            Instant.parse(criteria.getValue().toString() + " 23:59:59"));
                 }
                 return builder.lessThanOrEqualTo(root.<String>get(criteria.getKey()),
                         criteria.getValue().toString());
@@ -56,13 +58,21 @@ public class BaseEntitySpecifications<T extends BaseEntity> implements Specifica
                     return builder.equal(root.get(criteria.getKey()),
                             Gender.valueOf(criteria.getValue().toString()));
                 }
-                if (root.get(criteria.getKey()).getJavaType() == Timestamp.class) {
+                if (root.get(criteria.getKey()).getJavaType() == HomsaiEntityType.class) {
+                    return builder.equal(root.get(criteria.getKey()).get("name"),
+                            criteria.getValue().toString());
+                }
+                if (root.get(criteria.getKey()).getJavaType() == Area.class) {
+                    return builder.equal(root.get(criteria.getKey()).get("name"),
+                            criteria.getValue().toString());
+                }
+                if (root.get(criteria.getKey()).getJavaType() == Instant.class) {
                     if (criteria.getValue().equals("null")) {
                         return builder.isNull(root.get(criteria.getKey()));
                     }
                     return builder.between(root.get(criteria.getKey()),
-                            Timestamp.valueOf(criteria.getValue().toString() + " 00:00:00"),
-                            Timestamp.valueOf(criteria.getValue().toString() + " 23:59:59"));
+                            Instant.parse(criteria.getValue().toString() + " 00:00:00"),
+                            Instant.parse(criteria.getValue().toString() + " 23:59:59"));
                 } else {
                     if (criteria.getValue().equals("null")) {
                         return builder.isNull(root.get(criteria.getKey()));

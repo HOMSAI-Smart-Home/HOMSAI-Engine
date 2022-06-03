@@ -2,10 +2,7 @@ package app.homsai.engine.entities.infrastructure.repositories;
 
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntityType;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +32,9 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
 
     @Autowired
     HomsaiEntityQueriesJpaRepository homsaiEntityQueriesJpaRepository;
+
+    @Autowired
+    HomsaiEntityHistoricalStateQueriesJpaRepository homsaiEntityHistoricalStateQueriesJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -92,6 +92,11 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     @Override
     public Page<HomsaiEntity> findAllHomsaiEntities(Pageable pageRequest, String search) {
         return homsaiEntityQueriesJpaRepository.findAllActive(pageRequest, search);
+    }
+
+    @Override
+    public Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search) {
+        return homsaiEntityHistoricalStateQueriesJpaRepository.findAllActive(pageRequest, search);
     }
 
 }

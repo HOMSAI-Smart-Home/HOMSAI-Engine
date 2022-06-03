@@ -7,4 +7,6 @@ import java.util.List;
 public interface HomeAssistantRestAPIGateway {
 
     List<HomeAssistantEntityDto> getAllHomeAssistantEntities();
+
+    HomeAssistantEntityDto syncHomeAssistantEntityValue(String entityId);
 }

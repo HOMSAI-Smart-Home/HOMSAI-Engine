@@ -39,4 +39,11 @@ public class EntitiesQueriesController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 entitiesQueriesApplicationService.getAllHomsaiEntities(pageRequest, search));
     }
+
+    @RequestMapping(value = "/entities/history/homsai", method = RequestMethod.GET)
+    public ResponseEntity getAllHomsaiHistoricalStates(@PageableDefault(sort = {"uuid"}) Pageable pageRequest,
+                                               @RequestParam(value = "search", required = false) String search) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                entitiesQueriesApplicationService.getAllHomsaiHistoricalStates(pageRequest, search));
+    }
 }

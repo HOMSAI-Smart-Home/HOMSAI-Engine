@@ -1,6 +1,7 @@
 package app.homsai.engine.entities.domain.services;
 
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
 import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,5 +23,10 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
     @Override
     public Page<HomsaiEntity> findAllHomsaiEntities(Pageable pageRequest, String search) {
         return entitiesQueriesRepository.findAllHomsaiEntities(pageRequest, search);
+    }
+
+    @Override
+    public Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search) {
+        return entitiesQueriesRepository.findAllHomsaiHistoricalStates(pageRequest, search);
     }
 }

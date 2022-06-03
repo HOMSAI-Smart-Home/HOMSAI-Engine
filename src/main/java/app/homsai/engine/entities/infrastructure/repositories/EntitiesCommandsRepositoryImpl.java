@@ -2,6 +2,7 @@ package app.homsai.engine.entities.infrastructure.repositories;
 
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
 import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
 
     @Autowired
     HomsaiEntityCommandsJpaRepository homsaiEntityCommandsJpaRepository;
+
+    @Autowired
+    HomsaiEntityHistoricalStateCommandsJpaRepository homsaiEntityHistoricalStateCommandsJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -67,6 +71,11 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
     @Override
     public HomsaiEntity saveHomsaiEntity(HomsaiEntity homsaiEntity) {
         return homsaiEntityCommandsJpaRepository.save(homsaiEntity);
+    }
+
+    @Override
+    public HomsaiEntitiesHistoricalState saveHomsaiEntityHistoricalState(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState) {
+        return homsaiEntityHistoricalStateCommandsJpaRepository.save(homsaiEntitiesHistoricalState);
     }
 
 }

@@ -1,5 +1,6 @@
 package app.homsai.engine.homeassistant.domain.services;
 
+import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGatewayImpl;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
@@ -18,7 +19,6 @@ public class HomeAssistantQueriesServiceImpl implements HomeAssistantQueriesServ
     @Autowired
     HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
 
-
     @Autowired
     HomeAssistantWSAPIGatewayImpl homeAssistantWSAPIGateway;
 
@@ -34,5 +34,15 @@ public class HomeAssistantQueriesServiceImpl implements HomeAssistantQueriesServ
     public List<HomeAssistantEntityDto> getHomeAssistantClimateEntitiesHavingMode(String mode) {
         List<HomeAssistantEntityDto> entities = getHomeAssistantEntities(CLIMATE);
         return entities.stream().filter(e -> e.getAttributes().getHvacModes().contains(mode)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void syncEntityAreas(List<HAEntity> entityList, Object lock) {
+        homeAssistantWSAPIGateway.syncEntityAreas(entityList, lock);
+    }
+
+    @Override
+    public HomeAssistantEntityDto syncHomeAssistantEntityValue(String entityId) {
+        return homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(entityId);
     }
 }

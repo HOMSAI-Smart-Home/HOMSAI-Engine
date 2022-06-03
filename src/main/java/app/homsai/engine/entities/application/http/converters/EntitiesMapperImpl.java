@@ -3,8 +3,10 @@ package app.homsai.engine.entities.application.http.converters;
 
 
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
+import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
 import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.modelmapper.ModelMapper;
@@ -48,6 +50,18 @@ public class EntitiesMapperImpl implements EntitiesMapper {
     public List<HomsaiEntityDto> convertToHomsaiDto(Page<HomsaiEntity> homsaiEntities) {
         return homsaiEntities.stream()
                 .map(h -> modelMapper.map(h, HomsaiEntityDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public HomsaiEntitiesHistoricalStateDto convertToDto(HomsaiEntitiesHistoricalState homsaiEntityHistoricalState) {
+        return modelMapper.map(homsaiEntityHistoricalState, HomsaiEntitiesHistoricalStateDto.class);
+    }
+
+    @Override
+    public List<HomsaiEntitiesHistoricalStateDto> convertHistoricalListToDto(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList) {
+        return homsaiEntitiesHistoricalStateList.stream()
+                .map(h -> modelMapper.map(h, HomsaiEntitiesHistoricalStateDto.class))
                 .collect(Collectors.toList());
     }
 }

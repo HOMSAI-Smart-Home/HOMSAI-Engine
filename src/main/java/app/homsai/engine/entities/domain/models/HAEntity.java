@@ -15,7 +15,6 @@ import java.util.Set;
 @Table(name = "ha_entities")
 public class HAEntity extends BaseEntity {
 
-    @NotNull
     @Column(length = 255, name = "name")
     private String name;
 
@@ -23,7 +22,6 @@ public class HAEntity extends BaseEntity {
     @Column(name = "entity_id")
     private String entityId;
 
-    @NotNull
     @Column(name = "domain")
     private String domain;
 

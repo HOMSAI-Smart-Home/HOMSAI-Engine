@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static app.homsai.engine.homeassistant.gateways.HomeAssistantAPIEndpoints.GET_ENTITIES_LIST;
+import static app.homsai.engine.homeassistant.gateways.HomeAssistantAPIEndpoints.GET_ENTITY_STATE;
 
 @Service
 public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGateway {
@@ -37,6 +38,20 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
                 restTemplate
                         .exchange(url, HttpMethod.GET, new HttpEntity<Object>(headers), HomeAssistantEntityDto[].class);
         return Arrays.asList(homeAssistantResponse.getBody());
+    }
+
+    @Override
+    public HomeAssistantEntityDto syncHomeAssistantEntityValue(String entityId) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+GET_ENTITY_STATE.replace("{entity_id}", entityId))
+                .encode()
+                .toUriString();
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("Authorization", "Bearer "+token);
+        ResponseEntity<HomeAssistantEntityDto> homeAssistantResponse =
+                restTemplate
+                        .exchange(url, HttpMethod.GET, new HttpEntity<Object>(headers), HomeAssistantEntityDto.class);
+        return homeAssistantResponse.getBody();
     }
 
 
