@@ -2,10 +2,7 @@ package app.homsai.engine.entities.domain.repositories;
 
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 
 import java.util.List;
 
@@ -30,4 +27,6 @@ public interface EntitiesCommandsRepository {
     HomsaiEntity saveHomsaiEntity(HomsaiEntity homsaiEntity);
 
     HomsaiEntitiesHistoricalState saveHomsaiEntityHistoricalState(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState);
+
+    ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity);
 }

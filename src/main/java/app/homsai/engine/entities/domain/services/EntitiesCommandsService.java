@@ -1,10 +1,7 @@
 package app.homsai.engine.entities.domain.services;
 
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 
 import java.util.List;
 
@@ -29,4 +26,6 @@ public interface EntitiesCommandsService {
     List<HomsaiEntitiesHistoricalState> calculateHomsaiEntitiesValues(List<HomsaiEntity> homsaiEntityList);
 
     List<HomsaiEntitiesHistoricalState> calculateHomsaiHomeValues(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList) throws AreaNotFoundException;
+
+    ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity);
 }

@@ -71,6 +71,10 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
         Integer count = 0;
         List<Area> areaList = entitiesQueriesRepository.findAllAreaList();
         List<HomsaiEntityType> homsaiEntityTypes = entitiesQueriesRepository.findAllHomsaiEntityTypes();
+        List<String> excludedHAEntityIDs = entitiesQueriesRepository.findAllExcludedHAEntities()
+                .stream()
+                .map(ExcludedHAEntity::getEntityId)
+                .collect(Collectors.toList());
         for(HomsaiEntityType homsaiEntityType : homsaiEntityTypes) {
             for (Area area : areaList) {
                 HomsaiEntity homsaiEntity = new HomsaiEntity();
@@ -80,7 +84,7 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
                 homsaiEntity.setName(homsaiEntityType.getRootName()+area.getName());
                 homsaiEntity.setHaEntities(area.getEntities()
                         .stream()
-                        .filter(h -> homsaiEntityType.getDeviceClass().equals(h.getDeviceClass()))
+                        .filter(h -> (homsaiEntityType.getDeviceClass().equals(h.getDeviceClass()) && !excludedHAEntityIDs.contains(h.getEntityId())))
                         .collect(Collectors.toList()));
                 if(homsaiEntity.getHaEntities().size() > 0) {
                     entitiesCommandsRepository.saveHomsaiEntity(homsaiEntity);
@@ -131,13 +135,18 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     @Override
     public List<HomsaiEntitiesHistoricalState> calculateHomsaiHomeValues(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList) throws AreaNotFoundException {
         List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = new ArrayList<>();
+        List<String> excludedHAEntityIDs = entitiesQueriesRepository.findAllExcludedHAEntities()
+                .stream()
+                .map(ExcludedHAEntity::getEntityId)
+                .collect(Collectors.toList());
         HashMap<HomsaiEntityType, AverageObject> homsaiHomeEntitiesMap = new HashMap<>();
         Area homeArea = entitiesQueriesRepository.findOneArea(HOME_AREA_UUID);
         for(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState : homsaiEntitiesHistoricalStateList){
-            homsaiHomeEntitiesMap.computeIfAbsent(homsaiEntitiesHistoricalState.getType(), v-> new AverageObject()).increment(homsaiEntitiesHistoricalState.getValue());
+            if(!excludedHAEntityIDs.contains(homsaiEntitiesHistoricalState.getArea().getName())) {
+                homsaiHomeEntitiesMap.computeIfAbsent(homsaiEntitiesHistoricalState.getType(), v -> new AverageObject()).increment(homsaiEntitiesHistoricalState.getValue());
+            }
         }
         for(HomsaiEntityType homsaiEntityType : homsaiHomeEntitiesMap.keySet()){
-
             HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState = new HomsaiEntitiesHistoricalState();
             homsaiEntitiesHistoricalState.setArea(homeArea);
             homsaiEntitiesHistoricalState.setTimestamp(Instant.now());
@@ -147,6 +156,11 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
             homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
         }
         return homsaiEntitiesHistoricalStates;
+    }
+
+    @Override
+    public ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity) {
+        return entitiesCommandsRepository.saveExcludedHAEntity(excludedHAEntity);
     }
 
     private class AverageObject{

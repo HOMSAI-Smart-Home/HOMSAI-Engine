@@ -32,4 +32,6 @@ public interface EntitiesQueriesRepository {
     Page<HomsaiEntity> findAllHomsaiEntities(Pageable pageRequest, String search);
 
     Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search);
+
+    List<ExcludedHAEntity> findAllExcludedHAEntities();
 }

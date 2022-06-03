@@ -1,9 +1,6 @@
 package app.homsai.engine.entities.infrastructure.repositories;
 
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +28,10 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
 
     @Autowired
     HomsaiEntityHistoricalStateCommandsJpaRepository homsaiEntityHistoricalStateCommandsJpaRepository;
+
+    @Autowired
+    ExcludedHAEntityCommandsJpaRepository excludedHAEntityCommandsJpaRepository;
+
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -76,6 +77,11 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
     @Override
     public HomsaiEntitiesHistoricalState saveHomsaiEntityHistoricalState(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState) {
         return homsaiEntityHistoricalStateCommandsJpaRepository.save(homsaiEntitiesHistoricalState);
+    }
+
+    @Override
+    public ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity) {
+        return excludedHAEntityCommandsJpaRepository.save(excludedHAEntity);
     }
 
 }

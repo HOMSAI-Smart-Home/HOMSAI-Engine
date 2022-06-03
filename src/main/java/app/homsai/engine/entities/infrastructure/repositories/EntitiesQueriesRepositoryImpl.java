@@ -36,6 +36,9 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     @Autowired
     HomsaiEntityHistoricalStateQueriesJpaRepository homsaiEntityHistoricalStateQueriesJpaRepository;
 
+    @Autowired
+    ExcludedHAEntityQueriesJpaRepository excludedHAEntityQueriesJpaRepository;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     @Override
@@ -97,6 +100,13 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     @Override
     public Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search) {
         return homsaiEntityHistoricalStateQueriesJpaRepository.findAllActive(pageRequest, search);
+    }
+
+    @Override
+    public List<ExcludedHAEntity> findAllExcludedHAEntities() {
+        List<ExcludedHAEntity> excludedHAEntityList = new ArrayList<>();
+        excludedHAEntityQueriesJpaRepository.findAllActive().forEach(excludedHAEntityList::add);
+        return excludedHAEntityList;
     }
 
 }

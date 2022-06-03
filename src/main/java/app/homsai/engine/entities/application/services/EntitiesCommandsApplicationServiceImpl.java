@@ -3,6 +3,7 @@ package app.homsai.engine.entities.application.services;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.models.ExcludedHAEntity;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
 import app.homsai.engine.entities.domain.models.HomsaiEntity;
@@ -63,6 +64,15 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
         List<HomsaiEntitiesHistoricalState> homsaiHomeHistoricalStateList = entitiesCommandsService.calculateHomsaiHomeValues(homsaiEntitiesHistoricalStateList);
         logger.info("synchronized "+(homsaiEntitiesHistoricalStateList.size()+ homsaiHomeHistoricalStateList.size())+" Homsai entities values");
         return entitiesMapper.convertHistoricalListToDto(homsaiEntitiesHistoricalStateList);
+    }
+
+    @Override
+    public void addExcludedHAEntities(List<String> excludedIds) throws InterruptedException {
+        for(String excludeEntityId : excludedIds){
+            ExcludedHAEntity excludedHAEntity = new ExcludedHAEntity(excludeEntityId);
+            entitiesCommandsService.saveExcludedHAEntity(excludedHAEntity);
+        }
+        syncHomeAssistantEntities();
     }
 
 }

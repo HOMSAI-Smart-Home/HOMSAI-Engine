@@ -10,6 +10,5 @@ public interface EntitiesScheduledApplicationService {
 
     void getAllHomeAssistantEntities();
 
-    @Scheduled(fixedRate = 5*60*1000)
     void getAllHomsaiEntityValues();
 }

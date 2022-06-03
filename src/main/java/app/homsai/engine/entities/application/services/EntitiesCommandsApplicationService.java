@@ -10,4 +10,6 @@ public interface EntitiesCommandsApplicationService {
     void syncHomeAssistantEntities() throws InterruptedException;
 
     List<HomsaiEntitiesHistoricalStateDto> syncHomsaiEntitiesValues() throws AreaNotFoundException;
+
+    void addExcludedHAEntities(List<String> excludedIds) throws InterruptedException;
 }
