@@ -1,4 +1,4 @@
-useSwagger=true
+useSwagger=false
 
 mail.domain=
 mail.port=

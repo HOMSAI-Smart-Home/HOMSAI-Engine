@@ -26,11 +26,11 @@ public class HomsaiEntitiesHistoricalState extends BaseEntity {
     @Column(name = "unit_of_measurement")
     private String unitOfMeasurement;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_uuid")
     private Area area;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_uuid")
     private HomsaiEntityType type;
 

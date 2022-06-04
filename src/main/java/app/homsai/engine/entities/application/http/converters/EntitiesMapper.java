@@ -3,6 +3,7 @@ package app.homsai.engine.entities.application.http.converters;
 
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
+import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateLightDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
@@ -28,4 +29,6 @@ public interface EntitiesMapper {
     HomsaiEntitiesHistoricalStateDto convertToDto(HomsaiEntitiesHistoricalState saveHomsaiEntityHistoricalState);
 
     List<HomsaiEntitiesHistoricalStateDto> convertHistoricalListToDto(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList);
+
+    List<HomsaiEntitiesHistoricalStateLightDto> convertHistoricalListToLightDto(List<HomsaiEntitiesHistoricalState> content);
 }

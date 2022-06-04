@@ -38,3 +38,7 @@ out/
 .env
 application.properties
 application.yml
+application.properties.build
+application.yml.build
+application.properties.run
+application.yml.run

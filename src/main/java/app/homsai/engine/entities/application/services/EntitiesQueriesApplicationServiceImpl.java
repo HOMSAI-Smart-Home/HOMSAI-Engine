@@ -3,6 +3,7 @@ package app.homsai.engine.entities.application.services;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
+import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateLightDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
@@ -46,9 +47,9 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
     }
 
     @Override
-    public Page<HomsaiEntitiesHistoricalStateDto> getAllHomsaiHistoricalStates(Pageable pageRequest, String search) {
+    public Page<HomsaiEntitiesHistoricalStateLightDto> getAllHomsaiHistoricalStates(Pageable pageRequest, String search) {
         Page<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = entitiesQueriesService.findAllHomsaiHistoricalStates(pageRequest, search);
-        List<HomsaiEntitiesHistoricalStateDto> homsaiEntitiesHistoricalStateDtos = entitiesMapper.convertHistoricalListToDto(homsaiEntitiesHistoricalStates.getContent());
+        List<HomsaiEntitiesHistoricalStateLightDto> homsaiEntitiesHistoricalStateDtos = entitiesMapper.convertHistoricalListToLightDto(homsaiEntitiesHistoricalStates.getContent());
         return new PageImpl<>(homsaiEntitiesHistoricalStateDtos, pageRequest, homsaiEntitiesHistoricalStates.getTotalElements());
     }
 }
