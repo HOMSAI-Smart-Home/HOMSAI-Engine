@@ -2,7 +2,6 @@ package app.homsai.engine.media.domain.services;
 
 import app.homsai.engine.media.domain.exceptions.MediaNotSupportedException;
 import app.homsai.engine.media.domain.repositories.MediaCommandsRepository;
-import com.google.zxing.WriterException;
 import app.homsai.engine.common.domain.utils.MimeTypeHelper;
 import app.homsai.engine.media.domain.exceptions.MediaNotFoundException;
 import app.homsai.engine.media.domain.models.Media;
@@ -117,22 +116,4 @@ public class MediaCommandsServiceImpl implements MediaCommandsService {
         mediaCommandsRepository.update(media);
     }
 
-    @Override
-    public Media createQRCode(Media media) throws WriterException {
-        String newFileName = String.valueOf(UUID.randomUUID());
-        String extension = "png";
-
-        BufferedImage bufferedImage =
-                imageService.generateQRCode(newFileName, 1280, 1280, newFileName);
-        imageService.generateScaledImages(bufferedImage, newFileName, extension);
-
-        media.setMimetype("image/png");
-        media.setFilename(newFileName);
-        media.setOriginalFileName(newFileName);
-        media.setTag("image");
-        media.setSize(1000L);
-        media.setOriginalExtension(extension);
-
-        return mediaCommandsRepository.create(media);
-    }
 }

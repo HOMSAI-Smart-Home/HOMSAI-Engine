@@ -127,7 +127,8 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
             homsaiEntitiesHistoricalState.setType(homsaiEntity.getType());
             homsaiEntitiesHistoricalState.setUnitOfMeasurement(homsaiEntity.getUnitOfMeasurement());
             homsaiEntitiesHistoricalState.setValue(homsaiSensorState);
-            homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
+            if(!Double.isNaN(homsaiSensorState))
+                homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
         }
         return homsaiEntitiesHistoricalStates;
     }
@@ -153,7 +154,8 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
             homsaiEntitiesHistoricalState.setType(homsaiEntityType);
             homsaiEntitiesHistoricalState.setUnitOfMeasurement(homsaiEntityType.getUnitOfMeasurement());
             homsaiEntitiesHistoricalState.setValue(homsaiHomeEntitiesMap.get(homsaiEntityType).getAverage());
-            homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
+            if(!Double.isNaN(homsaiEntitiesHistoricalState.getValue()))
+                homsaiEntitiesHistoricalStates.add(saveHomsaiEntityHistoricalState(homsaiEntitiesHistoricalState));
         }
         return homsaiEntitiesHistoricalStates;
     }

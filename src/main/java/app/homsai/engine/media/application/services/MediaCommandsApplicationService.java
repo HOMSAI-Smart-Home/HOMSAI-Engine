@@ -17,5 +17,4 @@ public interface MediaCommandsApplicationService {
 
     void disassociateMediaEntity(String mediaUuid, String entityUuid) throws MediaNotFoundException;
 
-    MediaQueriesDto createQRCode(String uuid, String tag) throws Exception;
 }

@@ -1,6 +1,7 @@
 package app.homsai.engine.entities.application.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpMethod;
@@ -17,7 +18,11 @@ public class EntitiesScheduledApplicationServiceImpl implements EntitiesSchedule
     @Autowired
     private ServletContext context;
 
-    private String rootUrl = "http://localhost:8080";
+    @Value("${server.port:}")
+    private String port;
+
+
+    private String rootUrl = "http://localhost:";
 
     @Override
     @EventListener(ApplicationStartedEvent.class)
@@ -26,7 +31,7 @@ public class EntitiesScheduledApplicationServiceImpl implements EntitiesSchedule
         String endPoint = "/entities/hass";
         String contextPath = context.getContextPath();
         RestTemplate restTemplate = new RestTemplate();
-        String url = UriComponentsBuilder.fromHttpUrl(rootUrl+contextPath+endPoint)
+        String url = UriComponentsBuilder.fromHttpUrl(rootUrl+port+contextPath+endPoint)
                 .encode()
                 .toUriString();
         restTemplate.postForEntity(url, HttpMethod.POST, String.class);
@@ -38,7 +43,7 @@ public class EntitiesScheduledApplicationServiceImpl implements EntitiesSchedule
         String endPoint = "/entities/homsai";
         String contextPath = context.getContextPath();
         RestTemplate restTemplate = new RestTemplate();
-        String url = UriComponentsBuilder.fromHttpUrl(rootUrl+contextPath+endPoint)
+        String url = UriComponentsBuilder.fromHttpUrl(rootUrl+port+contextPath+endPoint)
                 .encode()
                 .toUriString();
         restTemplate.postForEntity(url, HttpMethod.POST, String.class);

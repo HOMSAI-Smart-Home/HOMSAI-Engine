@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,7 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     }
 
     @Override
+    @Transactional
     public Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search) {
         return homsaiEntityHistoricalStateQueriesJpaRepository.findAllActive(pageRequest, search);
     }

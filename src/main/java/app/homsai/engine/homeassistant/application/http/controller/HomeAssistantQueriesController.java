@@ -2,7 +2,6 @@ package app.homsai.engine.homeassistant.application.http.controller;
 
 import app.homsai.engine.common.domain.models.DocsConsts;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
-import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static app.homsai.engine.homeassistant.gateways.HomeAssistantDomains.CLIMATE;
 
-@Api(tags = DocsConsts.DOCS_TAGS_COMMON)
 @RestController
 public class HomeAssistantQueriesController {
 

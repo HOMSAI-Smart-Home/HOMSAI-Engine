@@ -1,7 +1,6 @@
 package app.homsai.engine.media.domain.services;
 
 import app.homsai.engine.media.domain.exceptions.MediaNotSupportedException;
-import com.google.zxing.WriterException;
 import app.homsai.engine.media.domain.exceptions.MediaNotFoundException;
 import app.homsai.engine.media.domain.models.Media;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,5 +17,4 @@ public interface MediaCommandsService {
 
     void associateMediaEntity(String mediaUuid, String entityUuid) throws MediaNotFoundException;
 
-    Media createQRCode(Media media) throws WriterException;
 }

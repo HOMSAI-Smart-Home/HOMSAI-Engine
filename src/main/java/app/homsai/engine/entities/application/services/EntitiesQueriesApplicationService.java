@@ -1,11 +1,10 @@
 package app.homsai.engine.entities.application.services;
 
-import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateLightDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
+import app.homsai.engine.entities.application.http.dtos.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface EntitiesQueriesApplicationService {
 
@@ -14,4 +13,6 @@ public interface EntitiesQueriesApplicationService {
     Page<HomsaiEntityDto> getAllHomsaiEntities(Pageable pageRequest, String search);
 
     Page<HomsaiEntitiesHistoricalStateLightDto> getAllHomsaiHistoricalStates(Pageable pageRequest, String search);
+
+    List<HomsaiEntityShowDto> getAllLastHomsaiEntityToShow();
 }

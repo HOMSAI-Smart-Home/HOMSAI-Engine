@@ -1,25 +1,23 @@
 package app.homsai.engine.entities.application.services;
 
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
-import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateLightDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
+import app.homsai.engine.entities.application.http.dtos.*;
+import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
 import app.homsai.engine.entities.domain.models.HomsaiEntity;
-import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
-import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
-import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
-import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -51,5 +49,32 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
         Page<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = entitiesQueriesService.findAllHomsaiHistoricalStates(pageRequest, search);
         List<HomsaiEntitiesHistoricalStateLightDto> homsaiEntitiesHistoricalStateDtos = entitiesMapper.convertHistoricalListToLightDto(homsaiEntitiesHistoricalStates.getContent());
         return new PageImpl<>(homsaiEntitiesHistoricalStateDtos, pageRequest, homsaiEntitiesHistoricalStates.getTotalElements());
+    }
+
+    @Override
+    @Transactional
+    public List<HomsaiEntityShowDto> getAllLastHomsaiEntityToShow(){
+        List<HomsaiEntityShowDto> homsaiEntityShowDtos = new ArrayList<>();
+        List<Area> areaDtoList = entitiesQueriesService.findAllAreas();
+        for(Area area : areaDtoList){
+            String search = "area:"+area.getName();
+            List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = entitiesQueriesService.findAllHomsaiHistoricalStates(PageRequest.of(0, 2, Sort.by("timestamp").descending()), search).getContent();
+            if(homsaiEntitiesHistoricalStates.size() > 0){
+                HomsaiEntityShowDto homsaiEntityShowDto = new HomsaiEntityShowDto();
+                homsaiEntityShowDto.setArea(area.getName());
+                for(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState : Lists.reverse(homsaiEntitiesHistoricalStates)){
+                    if("temperature".equals(homsaiEntitiesHistoricalState.getType().getDeviceClass())){
+                        homsaiEntityShowDto.setTemperature(String.format("%.2f",homsaiEntitiesHistoricalState.getValue())+homsaiEntitiesHistoricalState.getUnitOfMeasurement());
+                        homsaiEntityShowDto.setTime(ChronoUnit.MINUTES.between(homsaiEntitiesHistoricalState.getTimestamp(), Instant.now())+" minutes ago");
+                    }
+                    if("humidity".equals(homsaiEntitiesHistoricalState.getType().getDeviceClass())){
+                        homsaiEntityShowDto.setHumidity(String.format("%.2f",homsaiEntitiesHistoricalState.getValue())+homsaiEntitiesHistoricalState.getUnitOfMeasurement());
+                        homsaiEntityShowDto.setTime(ChronoUnit.MINUTES.between(homsaiEntitiesHistoricalState.getTimestamp(), Instant.now())+" minutes ago");
+                    }
+                }
+                homsaiEntityShowDtos.add(homsaiEntityShowDto);
+            }
+        }
+        return homsaiEntityShowDtos;
     }
 }

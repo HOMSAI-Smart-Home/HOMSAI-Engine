@@ -1,6 +1,5 @@
 package app.homsai.engine.media.domain.services;
 
-import com.google.zxing.WriterException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.image.BufferedImage;
@@ -13,7 +12,4 @@ public interface ImageService {
 
     BufferedImage scaleImage(BufferedImage bufferedImage, int size);
 
-
-    BufferedImage generateQRCode(String fileName, int width, int height, String content)
-            throws WriterException;
 }

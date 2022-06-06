@@ -4,7 +4,6 @@ buildscript {
 		maven {
 			url 'https://plugins.gradle.org/m2/'
 		}
-		jcenter()
 	}
 	dependencies {
 		classpath 'com.diffplug.spotless:spotless-plugin-gradle:3.28.1'
@@ -13,10 +12,12 @@ buildscript {
 
 plugins {
 	id 'org.springframework.boot' version '2.4.2'
-	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'war'
 	id 'jacoco'
+	id 'com.vaadin' version '0.14.8.1'
+
 }
 
 group = 'app.homsai'
@@ -25,7 +26,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
 	mavenCentral()
-	jcenter()
+	maven { url "https://maven.vaadin.com/vaadin-addons" }
 }
 
 springBoot {
@@ -36,11 +37,21 @@ bootJar {
 	launchScript()
 }
 
+vaadin {
+	productionMode = true
+}
+
+dependencyManagement {
+	imports {
+		mavenBom 'com.vaadin:vaadin-bom:14.8.0'
+	}
+}
+
 dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	//implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -51,12 +62,7 @@ dependencies {
 	testCompile 'com.h2database:h2'
 	compile 'com.h2database:h2'
 
-	compile("org.postgresql:postgresql:42.2.5")
-	compile 'io.jsonwebtoken:jjwt-api:0.10.7'
-	runtime 'io.jsonwebtoken:jjwt-impl:0.10.7'
-	runtime 'io.jsonwebtoken:jjwt-jackson:0.10.7'
 	compile("org.apache.commons:commons-lang3:3.6")
-	compile("joda-time:joda-time:2.10.3")
 	compile("org.modelmapper:modelmapper:2.3.0")
 	compile("org.springframework.boot:spring-boot-starter-hateoas")
 
@@ -67,26 +73,12 @@ dependencies {
 
 	compile("org.springframework.boot:spring-boot-starter-websocket")
 
-	compile 'com.google.zxing:javase:3.3.3'
-
 	compile 'net.sargue:mailgun:1.9.0'
-	compile 'org.glassfish.jersey.inject:jersey-hk2:2.28'
-
-	implementation 'de.siegmar:logback-gelf:3.0.0'
 
 	implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.11'
 	compile group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.5.3'
 
-	//springfox-swagger dependencies
-	implementation('io.springfox:springfox-swagger2:2.9.2') {
-		exclude group: 'io.swagger', module: 'swagger-annotations'
-		exclude group: 'io.swagger', module: 'swagger-models'
-	}
-	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
-	implementation 'io.swagger:swagger-annotations:1.5.21'
-	implementation 'io.swagger:swagger-models:1.5.21'
-	implementation 'io.springfox:springfox-bean-validators:2.9.2'
-
+	implementation 'com.vaadin:vaadin-spring-boot-starter'
 	implementation "com.google.guava:guava:23.0"
 }
 

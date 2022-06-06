@@ -12,10 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import springfox.documentation.spring.web.plugins.DocumentationPluginsManager;
-import springfox.documentation.spring.web.scanners.ApiDescriptionReader;
-import springfox.documentation.spring.web.scanners.ApiListingScanner;
-import springfox.documentation.spring.web.scanners.ApiModelReader;
 
 @SpringBootApplication
 @EnableScheduling
@@ -37,10 +33,4 @@ public class HomsaiEngineApplication extends SpringBootServletInitializer {
         return new ModelMapper();
     }
 
-    @Primary
-    @Bean
-    public ApiListingScanner addExtraOperations(ApiDescriptionReader apiDescriptionReader,
-            ApiModelReader apiModelReader, DocumentationPluginsManager pluginsManager) {
-        return new FormLoginOperations(apiDescriptionReader, apiModelReader, pluginsManager);
-    }
 }

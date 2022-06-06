@@ -1,10 +1,6 @@
 package app.homsai.engine.media.domain.services;
 
 import app.homsai.engine.media.domain.exceptions.StorageException;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,24 +98,4 @@ public class ImageServiceImpl implements ImageService {
         return (scaledBI);
     }
 
-
-    @Override
-    public BufferedImage generateQRCode(String fileName, int width, int height, String content)
-            throws WriterException {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // create
-                                                                                            // an
-                                                                                            // empty
-                                                                                            // image
-        int white = 255 << 16 | 255 << 8 | 255;
-        int black = 0;
-        BitMatrix matrix =
-                new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                image.setRGB(i, j, matrix.get(i, j) ? black : white); // set pixel one by one
-            }
-        }
-        storageService.store(image, fileName, "png");
-        return image;
-    }
 }

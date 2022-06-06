@@ -42,3 +42,11 @@ application.properties.build
 application.yml.build
 application.properties.run
 application.yml.run
+
+node_modules/
+package-lock.json
+package.json
+target/
+webpack.config.js
+webpack.generated.js
+
