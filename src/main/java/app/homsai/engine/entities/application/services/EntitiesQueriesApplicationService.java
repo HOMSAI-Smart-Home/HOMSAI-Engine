@@ -15,4 +15,6 @@ public interface EntitiesQueriesApplicationService {
     Page<HomsaiEntitiesHistoricalStateLightDto> getAllHomsaiHistoricalStates(Pageable pageRequest, String search);
 
     List<HomsaiEntityShowDto> getAllLastHomsaiEntityToShow();
+
+    void cacheAllLastHomsaiEntitiesToShow();
 }

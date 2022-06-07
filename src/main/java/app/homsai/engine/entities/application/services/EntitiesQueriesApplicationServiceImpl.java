@@ -1,5 +1,6 @@
 package app.homsai.engine.entities.application.services;
 
+import app.homsai.engine.entities.application.http.cache.HomsaiEntityShowCacheRepository;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.*;
 import app.homsai.engine.entities.domain.models.Area;
@@ -16,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -25,6 +24,9 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
 
     @Autowired
     EntitiesQueriesService entitiesQueriesService;
+
+    @Autowired
+    HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository;
 
     @Autowired
     EntitiesMapper entitiesMapper;
@@ -76,5 +78,10 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
             }
         }
         return homsaiEntityShowDtos;
+    }
+
+    @Override
+    public void cacheAllLastHomsaiEntitiesToShow(){
+        homsaiEntityShowCacheRepository.setHomsaiEntityShowDtoList(getAllLastHomsaiEntityToShow());
     }
 }

@@ -11,12 +11,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletContext;
+import java.util.List;
 
 @Service
 public class EntitiesScheduledApplicationServiceImpl implements EntitiesScheduledApplicationService {
 
     @Autowired
     private ServletContext context;
+
 
     @Value("${server.port:}")
     private String port;
@@ -48,4 +50,5 @@ public class EntitiesScheduledApplicationServiceImpl implements EntitiesSchedule
                 .toUriString();
         restTemplate.postForEntity(url, HttpMethod.POST, String.class);
     }
+
 }

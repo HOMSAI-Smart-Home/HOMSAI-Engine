@@ -26,6 +26,9 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     HomeAssistantQueriesApplicationService homeAssistantQueriesApplicationService;
 
     @Autowired
+    EntitiesQueriesApplicationService entitiesQueriesApplicationService;
+
+    @Autowired
     EntitiesCommandsService entitiesCommandsService;
 
     @Autowired
@@ -63,6 +66,7 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
         List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList = entitiesCommandsService.calculateHomsaiEntitiesValues(homsaiEntityList);
         List<HomsaiEntitiesHistoricalState> homsaiHomeHistoricalStateList = entitiesCommandsService.calculateHomsaiHomeValues(homsaiEntitiesHistoricalStateList);
         logger.info("synchronized "+(homsaiEntitiesHistoricalStateList.size()+ homsaiHomeHistoricalStateList.size())+" Homsai entities values");
+        entitiesQueriesApplicationService.cacheAllLastHomsaiEntitiesToShow();
         return entitiesMapper.convertHistoricalListToDto(homsaiEntitiesHistoricalStateList);
     }
 
