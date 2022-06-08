@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static app.homsai.engine.common.domain.utils.Consts.HOME_INFO_UUID;
+
 /**
  * Created by Giacomo Agostini on 17/01/17.
  */
@@ -39,6 +41,12 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
 
     @Autowired
     ExcludedHAEntityQueriesJpaRepository excludedHAEntityQueriesJpaRepository;
+
+    @Autowired
+    HVACDeviceQueriesJpaRepository hvacDeviceQueriesJpaRepository;
+
+    @Autowired
+    HomeInfoQueriesJpaRepository homeInfoQueriesJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -109,6 +117,11 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
         List<ExcludedHAEntity> excludedHAEntityList = new ArrayList<>();
         excludedHAEntityQueriesJpaRepository.findAllActive().forEach(excludedHAEntityList::add);
         return excludedHAEntityList;
+    }
+
+    @Override
+    public HomeInfo getHomeInfo() {
+        return homeInfoQueriesJpaRepository.findOneActive(HOME_INFO_UUID);
     }
 
 }

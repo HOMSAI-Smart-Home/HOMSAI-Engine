@@ -1,6 +1,7 @@
 package app.homsai.engine.entities.domain.repositories;
 
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.*;
 
@@ -29,4 +30,6 @@ public interface EntitiesCommandsRepository {
     HomsaiEntitiesHistoricalState saveHomsaiEntityHistoricalState(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState);
 
     ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity);
+
+    HomeInfo updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException;
 }

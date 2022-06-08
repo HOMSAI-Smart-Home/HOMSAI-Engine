@@ -1,5 +1,6 @@
 package app.homsai.engine.entities.infrastructure.repositories;
 
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
 import org.slf4j.Logger;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static app.homsai.engine.common.domain.utils.Consts.HOME_INFO_UUID;
 
 /**
  * Created by Giacomo Agostini on 17/01/17.
@@ -31,6 +34,12 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
 
     @Autowired
     ExcludedHAEntityCommandsJpaRepository excludedHAEntityCommandsJpaRepository;
+
+    @Autowired
+    HVACDeviceCommandsJpaRepository hvacDeviceCommandsJpaRepository;
+
+    @Autowired
+    HomeInfoCommandsJpaRepository homeInfoCommandsJpaRepository;
 
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
@@ -82,6 +91,13 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
     @Override
     public ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity) {
         return excludedHAEntityCommandsJpaRepository.save(excludedHAEntity);
+    }
+
+    @Override
+    public HomeInfo updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException {
+        if(!HOME_INFO_UUID.equals(homeInfo.getUuid()))
+            throw new BadHomeInfoException();
+        return homeInfoCommandsJpaRepository.save(homeInfo);
     }
 
 }

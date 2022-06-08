@@ -1,12 +1,10 @@
 package app.homsai.engine.entities.application.services;
 
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
+import app.homsai.engine.entities.application.http.dtos.HVACDeviceDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
-import app.homsai.engine.entities.domain.models.ExcludedHAEntity;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
@@ -16,7 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import static app.homsai.engine.common.domain.utils.Consts.*;
 
 
 @Service
@@ -77,6 +79,43 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
             entitiesCommandsService.saveExcludedHAEntity(excludedHAEntity);
         }
         syncHomeAssistantEntities();
+    }
+
+    @Override
+    public List<HVACDeviceDto> initHVACDevices(Integer type) throws InterruptedException {
+        List<HVACDevice> hvacDeviceList = new ArrayList<>();
+        String hvacFunction;
+        switch (type){
+            case HVAC_DEVICE_HEATING:
+                hvacFunction = HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION;
+                break;
+            case HVAC_DEVICE_CONDITIONING:
+            default:
+                hvacFunction = HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION;
+        }
+        List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities("climate");
+        List<HAEntity> haEntities = entitiesQueriesService.findAllEntities(Pageable.unpaged(), "domain:climate").getContent();
+        for(HomeAssistantEntityDto homeAssistantEntityDto : homeAssistantEntityDtoList){
+            if(homeAssistantEntityDto.getAttributes().getHvacModes() == null || !homeAssistantEntityDto.getAttributes().getHvacModes().contains(hvacFunction))
+                continue;
+            HAEntity haEntity = haEntities.stream()
+                    .filter(h -> h.getEntityId().equals(homeAssistantEntityDto.getEntityId()))
+                    .findFirst()
+                    .orElse(null);
+            if(haEntity == null || haEntity.getAreas() == null || haEntity.getAreas().size() < 1)
+                continue;
+            Area area = haEntity.getAreas().iterator().next();
+            HVACDevice hvacDevice = new HVACDevice();
+            hvacDevice.setArea(area);
+            hvacDevice.setEntityUuid(homeAssistantEntityDto.getEntityId());
+            hvacDevice.setType(type);
+            hvacDevice.setMaxTemp(homeAssistantEntityDto.getAttributes().getMaxTemp());
+            hvacDevice.setMinTemp(homeAssistantEntityDto.getAttributes().getMinTemp());
+            hvacDevice.setHvacModes(homeAssistantEntityDto.getAttributes().getHvacModes());
+            hvacDeviceList.add(hvacDevice);
+        }
+        entitiesCommandsService.initHomsaiHvacDevices(hvacDeviceList);
+        return entitiesMapper.convertToDto(hvacDeviceList);
     }
 
 }

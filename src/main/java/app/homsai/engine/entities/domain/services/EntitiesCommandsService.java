@@ -28,4 +28,6 @@ public interface EntitiesCommandsService {
     List<HomsaiEntitiesHistoricalState> calculateHomsaiHomeValues(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList) throws AreaNotFoundException;
 
     ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity);
+
+    void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList) throws InterruptedException;
 }

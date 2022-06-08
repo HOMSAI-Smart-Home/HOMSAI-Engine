@@ -34,4 +34,6 @@ public interface EntitiesQueriesRepository {
     Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search);
 
     List<ExcludedHAEntity> findAllExcludedHAEntities();
+
+    HomeInfo getHomeInfo();
 }

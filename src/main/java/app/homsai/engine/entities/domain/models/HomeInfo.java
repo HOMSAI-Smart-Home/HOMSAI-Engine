@@ -111,5 +111,7 @@ public class HomeInfo extends BaseEntity {
     public void setPvStorageSensorId(String pvStorageSensorId) {
         this.pvStorageSensorId = pvStorageSensorId;
     }
+
+
 }
 

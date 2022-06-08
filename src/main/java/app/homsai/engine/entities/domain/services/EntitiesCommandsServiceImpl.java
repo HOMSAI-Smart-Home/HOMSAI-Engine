@@ -8,14 +8,15 @@ import app.homsai.engine.homeassistant.application.services.HomeAssistantQueries
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static app.homsai.engine.common.domain.utils.Consts.HOME_AREA_UUID;
 import static app.homsai.engine.common.domain.utils.HomsaiEntityTypesOperators.AVG;
-import static app.homsai.engine.common.domain.utils.HomsaiEntityTypesOperators.HOME_AREA_UUID;
 
 @Service
 public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
@@ -163,6 +164,14 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     @Override
     public ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity) {
         return entitiesCommandsRepository.saveExcludedHAEntity(excludedHAEntity);
+    }
+
+    @Override
+    @Async("threadPoolTaskExecutor")
+    public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList) throws InterruptedException {
+        Thread.sleep(4000);
+        System.out.println("finish");
+
     }
 
     private class AverageObject{

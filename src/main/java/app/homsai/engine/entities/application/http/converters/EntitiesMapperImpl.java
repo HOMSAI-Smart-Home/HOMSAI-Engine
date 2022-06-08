@@ -2,11 +2,9 @@ package app.homsai.engine.entities.application.http.converters;
 
 
 
-import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateLightDto;
-import app.homsai.engine.entities.application.http.dtos.HomsaiEntityDto;
+import app.homsai.engine.entities.application.http.dtos.*;
 import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.models.HVACDevice;
 import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
 import app.homsai.engine.entities.domain.models.HomsaiEntity;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
@@ -72,6 +70,13 @@ public class EntitiesMapperImpl implements EntitiesMapper {
     public List<HomsaiEntitiesHistoricalStateLightDto> convertHistoricalListToLightDto(List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList) {
         return homsaiEntitiesHistoricalStateList.stream()
                 .map(h -> modelMapper.map(h, HomsaiEntitiesHistoricalStateLightDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HVACDeviceDto> convertToDto(List<HVACDevice> hvacDeviceList) {
+        return hvacDeviceList.stream()
+                .map(h -> modelMapper.map(h, HVACDeviceDto.class))
                 .collect(Collectors.toList());
     }
 }

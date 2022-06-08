@@ -19,6 +19,12 @@ public class Area extends BaseEntity {
     @Column(length = 255, name = "name")
     private String name;
 
+    @Column(name = "desired_summer_temperature")
+    private Double desiredSummerTemperature;
+
+    @Column(name = "desired_winter_temperature")
+    private Double desiredWinterTemperature;
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "entities_areas",
@@ -43,6 +49,20 @@ public class Area extends BaseEntity {
         this.entities = entities;
     }
 
+    public Double getDesiredSummerTemperature() {
+        return desiredSummerTemperature;
+    }
 
+    public void setDesiredSummerTemperature(Double desiredSummerTemperature) {
+        this.desiredSummerTemperature = desiredSummerTemperature;
+    }
+
+    public Double getDesiredWinterTemperature() {
+        return desiredWinterTemperature;
+    }
+
+    public void setDesiredWinterTemperature(Double desiredWinterTemperature) {
+        this.desiredWinterTemperature = desiredWinterTemperature;
+    }
 }
 
