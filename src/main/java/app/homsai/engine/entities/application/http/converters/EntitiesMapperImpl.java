@@ -79,4 +79,9 @@ public class EntitiesMapperImpl implements EntitiesMapper {
                 .map(h -> modelMapper.map(h, HVACDeviceDto.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public HVACDeviceDto convertToDto(HVACDevice syncedDevice) {
+        return modelMapper.map(syncedDevice, HVACDeviceDto.class);
+    }
 }

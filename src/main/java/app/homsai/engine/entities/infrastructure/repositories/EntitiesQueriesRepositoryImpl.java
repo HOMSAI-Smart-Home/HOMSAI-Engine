@@ -51,6 +51,7 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     @Override
+    @Transactional
     public Page<HAEntity> findAllHAEntities(Pageable pageRequest, String search){
         return haEntityQueriesJpaRepository.findAllActive(pageRequest, search);
     }
@@ -122,6 +123,12 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     @Override
     public HomeInfo getHomeInfo() {
         return homeInfoQueriesJpaRepository.findOneActive(HOME_INFO_UUID);
+    }
+
+    @Override
+    @Transactional
+    public Page<HVACDevice> findAllHvacDevices(Pageable pageable, String search) {
+        return hvacDeviceQueriesJpaRepository.findAllActive(pageable, search);
     }
 
 }

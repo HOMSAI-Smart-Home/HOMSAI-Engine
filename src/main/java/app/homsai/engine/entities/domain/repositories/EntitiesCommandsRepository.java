@@ -32,4 +32,8 @@ public interface EntitiesCommandsRepository {
     ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity);
 
     HomeInfo updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException;
+
+    HVACDevice saveHvacDevice(HVACDevice hvacDevice);
+
+    void deleteFromHvacDevicesByType(Integer type);
 }

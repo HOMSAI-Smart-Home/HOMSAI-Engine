@@ -13,8 +13,8 @@ import java.util.List;
 
 public class HVACDeviceDto {
 
-    @JsonProperty("entity_uuid")
-    private String entityUuid;
+    @JsonProperty("entity_id")
+    private String entityId;
 
     @JsonProperty("power_consumption")
     private Double powerConsumption;
@@ -34,12 +34,12 @@ public class HVACDeviceDto {
     @JsonProperty("max_temp")
     private Double maxTemp;
 
-    public String getEntityUuid() {
-        return entityUuid;
+    public String getEntityId() {
+        return entityId;
     }
 
-    public void setEntityUuid(String entityUuid) {
-        this.entityUuid = entityUuid;
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
     public Double getPowerConsumption() {

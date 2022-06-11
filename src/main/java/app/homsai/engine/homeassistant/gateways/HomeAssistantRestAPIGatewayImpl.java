@@ -1,5 +1,6 @@
 package app.homsai.engine.homeassistant.gateways;
 
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantClimateHVACModeDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,8 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 import java.util.List;
 
-import static app.homsai.engine.homeassistant.gateways.HomeAssistantAPIEndpoints.GET_ENTITIES_LIST;
-import static app.homsai.engine.homeassistant.gateways.HomeAssistantAPIEndpoints.GET_ENTITY_STATE;
+import static app.homsai.engine.homeassistant.gateways.HomeAssistantAPIEndpoints.*;
 
 @Service
 public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGateway {
@@ -52,6 +52,25 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
                 restTemplate
                         .exchange(url, HttpMethod.GET, new HttpEntity<Object>(headers), HomeAssistantEntityDto.class);
         return homeAssistantResponse.getBody();
+    }
+
+
+    @Override
+    public HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String entityId, String hvacMode) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+SET_ENTITY_STATE.replace("{context}", "climate").replace("{command}", "set_hvac_mode"))
+                .encode()
+                .toUriString();
+        HomeAssistantClimateHVACModeDto homeAssistantClimateHVACModeDto = new HomeAssistantClimateHVACModeDto();
+        homeAssistantClimateHVACModeDto.setEntityId(entityId);
+        homeAssistantClimateHVACModeDto.setHvacMode(hvacMode);
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("Authorization", "Bearer "+token);
+        ResponseEntity<String> homeAssistantResponse =
+                restTemplate
+                        .exchange(url, HttpMethod.POST,  new HttpEntity<>(homeAssistantClimateHVACModeDto, headers), String.class);
+        return null;
+
     }
 
 

@@ -1,9 +1,12 @@
 package app.homsai.engine.entities.application.services;
 
+import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HVACDeviceDto;
+import app.homsai.engine.entities.application.http.dtos.HVACDeviceInitDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +86,8 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     }
 
     @Override
-    public List<HVACDeviceDto> initHVACDevices(Integer type) throws InterruptedException {
+    @Transactional
+    public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
         List<HVACDevice> hvacDeviceList = new ArrayList<>();
         String hvacFunction;
         switch (type){
@@ -95,6 +100,8 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
         }
         List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities("climate");
         List<HAEntity> haEntities = entitiesQueriesService.findAllEntities(Pageable.unpaged(), "domain:climate").getContent();
+        if(homeAssistantEntityDtoList.size()>0)
+            entitiesCommandsService.deleteFromHvacDevicesByType(type);
         for(HomeAssistantEntityDto homeAssistantEntityDto : homeAssistantEntityDtoList){
             if(homeAssistantEntityDto.getAttributes().getHvacModes() == null || !homeAssistantEntityDto.getAttributes().getHvacModes().contains(hvacFunction))
                 continue;
@@ -107,15 +114,18 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
             Area area = haEntity.getAreas().iterator().next();
             HVACDevice hvacDevice = new HVACDevice();
             hvacDevice.setArea(area);
-            hvacDevice.setEntityUuid(homeAssistantEntityDto.getEntityId());
+            hvacDevice.setEntityId(homeAssistantEntityDto.getEntityId());
             hvacDevice.setType(type);
             hvacDevice.setMaxTemp(homeAssistantEntityDto.getAttributes().getMaxTemp());
             hvacDevice.setMinTemp(homeAssistantEntityDto.getAttributes().getMinTemp());
             hvacDevice.setHvacModes(homeAssistantEntityDto.getAttributes().getHvacModes());
             hvacDeviceList.add(hvacDevice);
         }
-        entitiesCommandsService.initHomsaiHvacDevices(hvacDeviceList);
-        return entitiesMapper.convertToDto(hvacDeviceList);
+        entitiesCommandsService.initHomsaiHvacDevices(hvacDeviceList, hvacFunction);
+        HVACDeviceInitDto hvacDeviceInitDto = new HVACDeviceInitDto();
+        hvacDeviceInitDto.setHvacDeviceDtoList(entitiesMapper.convertToDto(hvacDeviceList));
+        hvacDeviceInitDto.setInitTimeSecs(entitiesCommandsService.calculateInitTime(hvacDeviceList.size()).intValue());
+        return hvacDeviceInitDto;
     }
 
 }

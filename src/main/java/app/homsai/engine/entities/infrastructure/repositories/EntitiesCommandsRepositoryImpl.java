@@ -6,6 +6,7 @@ import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
 
     @Autowired
     HVACDeviceCommandsJpaRepository hvacDeviceCommandsJpaRepository;
+
 
     @Autowired
     HomeInfoCommandsJpaRepository homeInfoCommandsJpaRepository;
@@ -98,6 +100,17 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
         if(!HOME_INFO_UUID.equals(homeInfo.getUuid()))
             throw new BadHomeInfoException();
         return homeInfoCommandsJpaRepository.save(homeInfo);
+    }
+
+    @Override
+    public HVACDevice saveHvacDevice(HVACDevice hvacDevice) {
+        return hvacDeviceCommandsJpaRepository.saveAndFlushNow(hvacDevice);
+    }
+
+    @Override
+    public void deleteFromHvacDevicesByType(Integer type) {
+        List<HVACDevice> hvacDeviceList = hvacDeviceCommandsJpaRepository.findAllActiveList(Pageable.unpaged(), "type:"+type, null);
+        hvacDeviceCommandsJpaRepository.deleteAll(hvacDeviceList);
     }
 
 }

@@ -31,4 +31,6 @@ public interface EntitiesMapper {
     List<HomsaiEntitiesHistoricalStateLightDto> convertHistoricalListToLightDto(List<HomsaiEntitiesHistoricalState> content);
 
     List<HVACDeviceDto> convertToDto(List<HVACDevice> hvacDeviceList);
+
+    HVACDeviceDto convertToDto(HVACDevice syncedDevice);
 }

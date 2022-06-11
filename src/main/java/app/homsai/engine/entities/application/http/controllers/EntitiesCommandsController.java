@@ -3,6 +3,7 @@ package app.homsai.engine.entities.application.http.controllers;
 import app.homsai.engine.common.domain.models.DocsConsts;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class EntitiesCommandsController {
 
     @RequestMapping(value = "/entities/homsai/hvac/init", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException {
+    public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
         return ResponseEntity.status(HttpStatus.OK).body(entitiesCommandsApplicationService.initHVACDevices(type));
     }
 

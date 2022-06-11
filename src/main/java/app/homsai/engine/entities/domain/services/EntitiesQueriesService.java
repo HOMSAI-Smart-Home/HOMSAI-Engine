@@ -1,10 +1,7 @@
 package app.homsai.engine.entities.domain.services;
 
 import app.homsai.engine.entities.application.http.dtos.AreaDto;
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,4 +16,6 @@ public interface EntitiesQueriesService {
     Page<HomsaiEntitiesHistoricalState> findAllHomsaiHistoricalStates(Pageable pageRequest, String search);
 
     List<Area> findAllAreas();
+
+    Page<HVACDevice> findAllHomsaiHvacDevices(Pageable unpaged, String s);
 }

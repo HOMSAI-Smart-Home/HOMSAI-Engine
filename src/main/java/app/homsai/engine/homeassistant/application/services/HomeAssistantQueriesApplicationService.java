@@ -12,4 +12,5 @@ public interface HomeAssistantQueriesApplicationService {
     void syncEntityAreas(List<HAEntity> entityList, Object lock);
 
     HomeAssistantEntityDto syncHomeAssistantEntityValue(String entityId);
+
 }

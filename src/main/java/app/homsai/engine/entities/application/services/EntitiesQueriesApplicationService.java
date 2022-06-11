@@ -17,4 +17,6 @@ public interface EntitiesQueriesApplicationService {
     List<HomsaiEntityShowDto> getAllLastHomsaiEntityToShow();
 
     void cacheAllLastHomsaiEntitiesToShow();
+
+    List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning);
 }

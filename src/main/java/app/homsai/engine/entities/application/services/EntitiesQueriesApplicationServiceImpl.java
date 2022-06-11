@@ -84,4 +84,10 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
     public void cacheAllLastHomsaiEntitiesToShow(){
         homsaiEntityShowCacheRepository.setHomsaiEntityShowDtoList(getAllLastHomsaiEntityToShow());
     }
+
+    @Override
+    @Transactional
+    public List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning) {
+        return entitiesMapper.convertToDto(entitiesQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), hvacDeviceConditioning == null ? null : "type:"+hvacDeviceConditioning).getContent());
+    }
 }

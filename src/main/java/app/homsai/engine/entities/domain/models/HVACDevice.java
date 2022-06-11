@@ -13,8 +13,8 @@ import java.util.List;
 @Table(name = "hvac_devices")
 public class HVACDevice extends BaseEntity {
 
-    @Column(name = "entity_uuid")
-    private String entityUuid;
+    @Column(name = "entity_id")
+    private String entityId;
 
     @Column(name = "power_consumption")
     private Double powerConsumption;
@@ -37,12 +37,12 @@ public class HVACDevice extends BaseEntity {
     @Column(name = "max_temp")
     private Double maxTemp;
 
-    public String getEntityUuid() {
-        return entityUuid;
+    public String getEntityId() {
+        return entityId;
     }
 
-    public void setEntityUuid(String entityUuid) {
-        this.entityUuid = entityUuid;
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
     public Double getPowerConsumption() {

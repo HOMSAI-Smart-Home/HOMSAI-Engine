@@ -19,6 +19,7 @@ public class ErrorCodes {
     public static final int AREA_NOT_FOUND = 31;
     public static final int HAENTITY_NOT_FOUND = 32;
     public static final int BAD_HOME_INFO = 33;
+    public static final int HVAC_POWER_METER_NOT_SET = 34;
 
     /*
      * JWT / Validation

@@ -1,6 +1,7 @@
 package app.homsai.engine.homeassistant.domain.services;
 
 
+import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,19 @@ public class HomeAssistantCommandsServiceImpl implements HomeAssistantCommandsSe
     private HomeAssistantWSAPIGateway homeAssistantWSAPIGateway;
 
 
+    @Autowired
+    private HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
+
+
     @Override
     public void syncHomeAssistantEntities() {
         List<HomeAssistantEntityDto> entities = homeAssistantQueriesService.getHomeAssistantEntities(null);
 
 
+    }
+
+    @Override
+    public HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String climateEntityId, String homeAssistantHvacDeviceOffFunction) {
+        return homeAssistantRestAPIGateway.sendHomeAssistantClimateHVACMode(climateEntityId, homeAssistantHvacDeviceOffFunction);
     }
 }

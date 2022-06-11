@@ -1,9 +1,6 @@
 package app.homsai.engine.entities.domain.services;
 
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +17,7 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
     EntitiesQueriesRepository entitiesQueriesRepository;
 
     @Override
+    @Transactional
     public Page<HAEntity> findAllEntities(Pageable pageRequest, String search) {
         return entitiesQueriesRepository.findAllHAEntities(pageRequest, search);
     }
@@ -38,5 +36,11 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
     @Override
     public List<Area> findAllAreas() {
         return entitiesQueriesRepository.findAllAreaList();
+    }
+
+    @Override
+    @Transactional
+    public Page<HVACDevice> findAllHomsaiHvacDevices(Pageable pageable, String search) {
+        return entitiesQueriesRepository.findAllHvacDevices(pageable, search);
     }
 }

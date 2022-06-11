@@ -1,11 +1,11 @@
-package app.homsai.engine.homeassistant.domain.services;
+package app.homsai.engine.homeassistant.application.services;
 
-
+import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 
-public interface HomeAssistantCommandsService {
+import java.util.List;
 
-    void syncHomeAssistantEntities();
+public interface HomeAssistantCommandsApplicationService {
 
     HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String climateEntityId, String homeAssistantHvacDeviceOffFunction);
 }
