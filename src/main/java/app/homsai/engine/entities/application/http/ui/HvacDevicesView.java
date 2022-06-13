@@ -37,8 +37,10 @@ public class HvacDevicesView extends VerticalLayout {
     private void configureGrid() {
         grid.addClassNames("hvac-devices-grid");
         grid.setSizeFull();
-        grid.setColumns("entityId", "powerConsumption", "type");
+        grid.setColumns("entityId");
         grid.addColumn(device -> device.getArea().getName()).setHeader("Area");
+        grid.addColumn(device -> String.format("%.2f", device.getPowerConsumption())+Consts.HOME_ASSISTANT_WATT).setHeader("AVG Consumption");
+        grid.addColumn(device -> device.getType().equals(Consts.HVAC_DEVICE_CONDITIONING)?Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION:Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION).setHeader("Type");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
     }
 

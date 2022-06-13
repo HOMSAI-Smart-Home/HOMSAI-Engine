@@ -186,7 +186,7 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList,  String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
 
         homsaiHVACDeviceCacheRepository.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue());
-        //TODO levare sta riga e mettere set mintemp -> restore
+        //TODO levare sta riga e mettere set mintemp -> restore e dialog
         Collections.reverse(hvacDeviceList);
 
         Double baseConsumption = readBaseConsumption(hvacDeviceList);
