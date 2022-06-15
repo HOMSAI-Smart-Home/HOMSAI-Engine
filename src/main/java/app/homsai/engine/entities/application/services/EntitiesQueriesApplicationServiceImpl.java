@@ -3,10 +3,7 @@ package app.homsai.engine.entities.application.services;
 import app.homsai.engine.entities.application.http.cache.HomsaiEntityShowCacheRepository;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.*;
-import app.homsai.engine.entities.domain.models.Area;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +64,7 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
                 for(HomsaiEntitiesHistoricalState homsaiEntitiesHistoricalState : Lists.reverse(homsaiEntitiesHistoricalStates)){
                     if("temperature".equals(homsaiEntitiesHistoricalState.getType().getDeviceClass())){
                         homsaiEntityShowDto.setTemperature(String.format("%.2f",homsaiEntitiesHistoricalState.getValue())+homsaiEntitiesHistoricalState.getUnitOfMeasurement());
+                        homsaiEntityShowDto.setTemperatureD(homsaiEntitiesHistoricalState.getValue());
                         homsaiEntityShowDto.setTime(ChronoUnit.MINUTES.between(homsaiEntitiesHistoricalState.getTimestamp(), Instant.now())+" minutes ago");
                     }
                     if("humidity".equals(homsaiEntitiesHistoricalState.getType().getDeviceClass())){
@@ -89,5 +87,15 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
     @Transactional
     public List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning) {
         return entitiesMapper.convertToDto(entitiesQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), hvacDeviceConditioning == null ? null : "type:"+hvacDeviceConditioning).getContent());
+    }
+
+    @Override
+    public List<AreaDto> getAllAreas() {
+        return entitiesMapper.convertToDtoArea(entitiesQueriesService.findAllAreas());
+    }
+
+    @Override
+    public HomeInfo getHomeInfo() {
+        return entitiesQueriesService.findHomeInfo();
     }
 }

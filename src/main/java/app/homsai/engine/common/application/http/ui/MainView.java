@@ -27,6 +27,7 @@ public class MainView extends VerticalLayout {
         UI.getCurrent().setPollInterval(5000);
         UI.getCurrent().addPollListener(pollEvent -> listHomsaiEntities());
         grid.setSizeFull();
+        grid.setColumns("area", "temperature", "humidity");
         add(grid);
         listHomsaiEntities();
 

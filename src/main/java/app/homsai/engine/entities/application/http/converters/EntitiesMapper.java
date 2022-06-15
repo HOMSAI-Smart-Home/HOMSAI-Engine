@@ -2,10 +2,7 @@ package app.homsai.engine.entities.application.http.converters;
 
 
 import app.homsai.engine.entities.application.http.dtos.*;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HVACDevice;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.springframework.data.domain.Page;
 
@@ -33,4 +30,6 @@ public interface EntitiesMapper {
     List<HVACDeviceDto> convertToDto(List<HVACDevice> hvacDeviceList);
 
     HVACDeviceDto convertToDto(HVACDevice syncedDevice);
+
+    List<AreaDto> convertToDtoArea(List<Area> allAreas);
 }

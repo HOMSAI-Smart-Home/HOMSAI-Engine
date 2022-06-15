@@ -18,4 +18,6 @@ public interface EntitiesQueriesService {
     List<Area> findAllAreas();
 
     Page<HVACDevice> findAllHomsaiHvacDevices(Pageable unpaged, String s);
+
+    HomeInfo findHomeInfo();
 }

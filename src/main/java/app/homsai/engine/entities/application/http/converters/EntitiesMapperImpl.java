@@ -3,10 +3,7 @@ package app.homsai.engine.entities.application.http.converters;
 
 
 import app.homsai.engine.entities.application.http.dtos.*;
-import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.entities.domain.models.HVACDevice;
-import app.homsai.engine.entities.domain.models.HomsaiEntitiesHistoricalState;
-import app.homsai.engine.entities.domain.models.HomsaiEntity;
+import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,5 +80,12 @@ public class EntitiesMapperImpl implements EntitiesMapper {
     @Override
     public HVACDeviceDto convertToDto(HVACDevice syncedDevice) {
         return modelMapper.map(syncedDevice, HVACDeviceDto.class);
+    }
+
+    @Override
+    public List<AreaDto> convertToDtoArea(List<Area> allAreas) {
+        return allAreas.stream()
+                .map(h -> modelMapper.map(h, AreaDto.class))
+                .collect(Collectors.toList());
     }
 }

@@ -10,6 +10,8 @@ public class HomsaiEntityShowDto {
 
     private String time;
 
+    private Double temperatureD;
+
     public String getArea() {
         return area;
     }
@@ -40,5 +42,13 @@ public class HomsaiEntityShowDto {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public Double getTemperatureD() {
+        return temperatureD;
+    }
+
+    public void setTemperatureD(Double temperatureD) {
+        this.temperatureD = temperatureD;
     }
 }

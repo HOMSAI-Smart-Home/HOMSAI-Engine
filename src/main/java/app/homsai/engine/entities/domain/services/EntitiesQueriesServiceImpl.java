@@ -43,4 +43,9 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
     public Page<HVACDevice> findAllHomsaiHvacDevices(Pageable pageable, String search) {
         return entitiesQueriesRepository.findAllHvacDevices(pageable, search);
     }
+
+    @Override
+    public HomeInfo findHomeInfo() {
+        return entitiesQueriesRepository.getHomeInfo();
+    }
 }

@@ -1,6 +1,8 @@
 package app.homsai.engine.entities.application.services;
 
 import app.homsai.engine.entities.application.http.dtos.*;
+import app.homsai.engine.entities.domain.models.Area;
+import app.homsai.engine.entities.domain.models.HomeInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,4 +21,8 @@ public interface EntitiesQueriesApplicationService {
     void cacheAllLastHomsaiEntitiesToShow();
 
     List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning);
+
+    List<AreaDto> getAllAreas();
+
+    HomeInfo getHomeInfo();
 }
