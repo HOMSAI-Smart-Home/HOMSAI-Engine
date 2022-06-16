@@ -8,6 +8,7 @@ import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.optimizations.application.http.dtos.HvacDeviceDto;
 import app.homsai.engine.optimizations.domain.models.HvacDevice;
+import app.homsai.engine.optimizations.domain.models.HvacInterval;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,13 @@ public class OptimizationsMapperImpl implements OptimizationsMapper {
     public List<HvacDeviceDto> convertToDto(HashMap<String, HvacDevice> hvacDeviceHashMap) {
         return hvacDeviceHashMap.values().stream()
                 .map(h -> modelMapper.map(h, HvacDeviceDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HvacInterval> convertToDtoIntervals(List<HvacDeviceInterval> intervals) {
+        return intervals.stream()
+                .map(h -> modelMapper.map(h, HvacInterval.class))
                 .collect(Collectors.toList());
     }
 }

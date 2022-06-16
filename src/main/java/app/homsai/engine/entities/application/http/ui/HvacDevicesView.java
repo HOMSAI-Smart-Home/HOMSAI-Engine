@@ -50,6 +50,7 @@ public class HvacDevicesView extends VerticalLayout {
         grid.addColumn(HvacDevice::getDeltaTemperature).setHeader("Delta Temperature");
         grid.addColumn(HvacDevice::getStartTime).setHeader("Start");
         grid.addColumn(HvacDevice::getEndTime).setHeader("End");
+        grid.addColumn(HvacDevice::isEnabled).setHeader("Enabled");
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
     }
 

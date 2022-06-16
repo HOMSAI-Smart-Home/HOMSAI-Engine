@@ -2,6 +2,7 @@ package app.homsai.engine.entities.application.http.dtos;
 
 import app.homsai.engine.common.domain.models.BaseEntity;
 import app.homsai.engine.entities.domain.models.Area;
+import app.homsai.engine.entities.domain.models.HvacDeviceInterval;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -28,11 +29,17 @@ public class HVACDeviceDto {
     @JsonProperty("hvac_modes")
     public List<String> hvacModes;
 
+    @JsonProperty("intervals")
+    public List<HvacDeviceInterval> intervals;
+
     @JsonProperty("min_temp")
     private Double minTemp;
 
     @JsonProperty("max_temp")
     private Double maxTemp;
+
+    @JsonProperty("enabled")
+    private Boolean enabled;
 
     public String getEntityId() {
         return entityId;
@@ -88,6 +95,22 @@ public class HVACDeviceDto {
 
     public void setMaxTemp(Double maxTemp) {
         this.maxTemp = maxTemp;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public List<HvacDeviceInterval> getIntervals() {
+        return intervals;
+    }
+
+    public void setIntervals(List<HvacDeviceInterval> intervals) {
+        this.intervals = intervals;
     }
 }
 

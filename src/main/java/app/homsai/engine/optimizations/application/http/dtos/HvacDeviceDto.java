@@ -40,6 +40,10 @@ public class HvacDeviceDto {
     @JsonProperty("end_time")
     private Instant endTime;
 
+    @JsonProperty("enabled")
+    private Boolean enabled;
+
+
     public String getEntityId() {
         return entityId;
     }
@@ -126,5 +130,13 @@ public class HvacDeviceDto {
 
     public void setEndTime(Instant endTime) {
         this.endTime = endTime;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

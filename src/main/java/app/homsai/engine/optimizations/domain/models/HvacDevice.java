@@ -30,6 +30,8 @@ public class HvacDevice {
 
     private Instant endTime;
 
+    private boolean enabled;
+
     public String getEntityId() {
         return entityId;
     }
@@ -126,5 +128,13 @@ public class HvacDevice {
 
     public void setEndTime(Instant endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

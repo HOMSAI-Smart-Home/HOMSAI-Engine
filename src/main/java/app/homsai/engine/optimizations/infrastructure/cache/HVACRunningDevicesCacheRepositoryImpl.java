@@ -9,7 +9,9 @@ import app.homsai.engine.entities.application.services.EntitiesQueriesApplicatio
 import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
+import app.homsai.engine.optimizations.application.http.converters.OptimizationsMapper;
 import app.homsai.engine.optimizations.domain.models.HvacDevice;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,9 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
 
     @Autowired
     private HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository;
+
+    @Autowired
+    OptimizationsMapper optimizationsMapper;
 
     private static HashMap<String, HvacDevice> hvacDevicesCache = null;
 
@@ -75,6 +80,10 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
             hvacDevice.setStartTime(null);
             hvacDevice.setEndTime(Instant.EPOCH);
             hvacDevice.setPowerConsumption(hvacDeviceDto.getPowerConsumption());
+            hvacDevice.setIntervals(optimizationsMapper.convertToDtoIntervals(hvacDeviceDto.getIntervals()));
+            if(hvacDeviceDto.getEnabled() == null)
+                hvacDevice.setEnabled(false);
+            hvacDevice.setEnabled(hvacDeviceDto.getEnabled());
             hvacDevicesCache.put(hvacDevice.getEntityId(), hvacDevice);
         }
     }
@@ -94,6 +103,8 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
         int active = 0;
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             HvacDevice hvacDevice = getHvacDevicesCache().get(hvacDeviceDto.getEntityId());
+            hvacDevice.setEnabled(hvacDeviceDto.getEnabled());
+            hvacDevice.setIntervals(optimizationsMapper.convertToDtoIntervals(hvacDeviceDto.getIntervals()));
             Double currentTemperature = homsaiEntityShowCacheRepository.getHomsaiEntityShowDtoList().stream()
                     .filter(hD -> hD.getArea().equals(hvacDeviceDto.getArea().getName()))
                     .map(HomsaiEntityShowDto::getTemperatureD)

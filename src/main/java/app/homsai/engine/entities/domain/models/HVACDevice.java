@@ -31,11 +31,18 @@ public class HVACDevice extends BaseEntity {
     @Column(name="hvac_modes")
     public List<String> hvacModes;
 
+    @ElementCollection
+    @CollectionTable(name="hvac_device_intervals", joinColumns=@JoinColumn(name="hvac_device_uuid"))
+    public List<HvacDeviceInterval> intervals;
+
     @Column(name = "min_temp")
     private Double minTemp;
 
     @Column(name = "max_temp")
     private Double maxTemp;
+
+    @Column(name="enabled")
+    private Boolean enabled;
 
     public String getEntityId() {
         return entityId;
@@ -91,6 +98,22 @@ public class HVACDevice extends BaseEntity {
 
     public void setMaxTemp(Double maxTemp) {
         this.maxTemp = maxTemp;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public List<HvacDeviceInterval> getIntervals() {
+        return intervals;
+    }
+
+    public void setIntervals(List<HvacDeviceInterval> intervals) {
+        this.intervals = intervals;
     }
 }
 
