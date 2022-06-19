@@ -1,5 +1,7 @@
 package app.homsai.engine.entities.domain.services;
 
+import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +49,20 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
     @Override
     public HomeInfo findHomeInfo() {
         return entitiesQueriesRepository.getHomeInfo();
+    }
+
+    @Override
+    @Transactional
+    public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
+        return entitiesQueriesRepository.findOneHvacDeviceByEntityId(entityId);
+    }
+
+    @Override
+    public Area getHomeArea() {
+        try {
+            return entitiesQueriesRepository.findOneArea(Consts.HOME_AREA_UUID);
+        } catch (AreaNotFoundException e) {
+            return null;
+        }
     }
 }

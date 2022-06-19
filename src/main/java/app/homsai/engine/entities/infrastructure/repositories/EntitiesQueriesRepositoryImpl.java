@@ -131,4 +131,10 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
         return hvacDeviceQueriesJpaRepository.findAllActive(pageable, search);
     }
 
+    @Override
+    @Transactional
+    public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
+        return hvacDeviceQueriesJpaRepository.findOneByEntityId(entityId);
+    }
+
 }

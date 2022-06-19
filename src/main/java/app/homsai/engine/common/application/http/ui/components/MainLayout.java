@@ -1,6 +1,7 @@
-package app.homsai.engine.common.application.http.ui;
+package app.homsai.engine.common.application.http.ui.components;
 
 
+import app.homsai.engine.common.application.http.ui.MainView;
 import app.homsai.engine.entities.application.http.ui.HvacDevicesView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;

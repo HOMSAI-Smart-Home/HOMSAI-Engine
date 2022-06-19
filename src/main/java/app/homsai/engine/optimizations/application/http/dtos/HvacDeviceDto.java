@@ -43,6 +43,9 @@ public class HvacDeviceDto {
     @JsonProperty("enabled")
     private Boolean enabled;
 
+    @JsonProperty("manual")
+    private boolean manual;
+
 
     public String getEntityId() {
         return entityId;
@@ -138,5 +141,13 @@ public class HvacDeviceDto {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isManual() {
+        return manual;
+    }
+
+    public void setManual(boolean manual) {
+        this.manual = manual;
     }
 }

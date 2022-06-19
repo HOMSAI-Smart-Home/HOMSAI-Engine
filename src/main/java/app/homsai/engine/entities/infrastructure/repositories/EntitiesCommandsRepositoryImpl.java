@@ -113,4 +113,9 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
         hvacDeviceCommandsJpaRepository.deleteAll(hvacDeviceList);
     }
 
+    @Override
+    public HVACDevice updateHvacDevice(HVACDevice hvacDevice) {
+        return hvacDeviceCommandsJpaRepository.saveAndFlushNow(hvacDevice);
+    }
+
 }

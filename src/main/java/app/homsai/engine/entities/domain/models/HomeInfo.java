@@ -40,6 +40,9 @@ public class HomeInfo extends BaseEntity {
     @Column(name = "longitude")
     private Double longitude;
 
+    @Column(name = "photovoltaic_optimizations_enabled")
+    private Boolean pvOptimizationsEnabled;
+
     public Boolean getHasPV() {
         return hasPV;
     }
@@ -112,8 +115,12 @@ public class HomeInfo extends BaseEntity {
         this.pvStorageSensorId = pvStorageSensorId;
     }
 
+    public Boolean getPvOptimizationsEnabled() {
+        return pvOptimizationsEnabled;
+    }
 
-
-
+    public void setPvOptimizationsEnabled(Boolean pvOptimizationsEnabled) {
+        this.pvOptimizationsEnabled = pvOptimizationsEnabled;
+    }
 }
 

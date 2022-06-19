@@ -1,31 +1,27 @@
 package app.homsai.engine.entities.application.http.ui;
 
-import app.homsai.engine.common.application.http.ui.CustomConfirmDialog;
-import app.homsai.engine.common.application.http.ui.MainLayout;
+import app.homsai.engine.common.application.http.ui.components.CustomConfirmDialog;
+import app.homsai.engine.common.application.http.ui.components.MainLayout;
 import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.common.domain.utils.EnText;
 import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
-import app.homsai.engine.entities.application.http.dtos.HVACDeviceDto;
 import app.homsai.engine.entities.application.http.dtos.HvacDeviceCacheDto;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
-import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinRequest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@PageTitle("HVAC Devices Initialization")
 @Route(value = "hvacdevicesinit", layout= MainLayout.class)
 public class HvacDevicesInitView extends VerticalLayout {
 
@@ -34,23 +30,19 @@ public class HvacDevicesInitView extends VerticalLayout {
 
     final Grid<HvacDeviceCacheDto> grid;
     final Span logLabel;
-    final Button startInitButton;
 
     public HvacDevicesInitView(HomsaiHVACDeviceCacheRepository homsaiHVACDeviceCacheRepository, EntitiesCommandsApplicationService entitiesCommandsApplicationService) {
         this.homsaiHVACDeviceCacheRepository = homsaiHVACDeviceCacheRepository;
         this.entitiesCommandsApplicationService = entitiesCommandsApplicationService;
         this.grid = new Grid<>(HvacDeviceCacheDto.class);
         this.logLabel = new Span();
-        this.startInitButton = new Button("Start initialization");
-        if(homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
-            this.startInitButton.setText("Initialization in progress...");
         UI.getCurrent().setPollInterval(5000);
         UI.getCurrent().addPollListener(pollEvent -> listInitStatus());
         addClassName("hvac-devices-init-view");
+        H2 pageTitle = new H2("HVAC Devices Initialization");
         configureGrid();
         listInitStatus();
-        addButtonListener();
-        add(startInitButton, grid, logLabel);
+        add(pageTitle, createButtonLayout(), grid, logLabel);
     }
 
     private void configureGrid() {
@@ -67,7 +59,28 @@ public class HvacDevicesInitView extends VerticalLayout {
         logLabel.getElement().setProperty("innerHTML", (homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getLog()));
     }
 
-    private void addButtonListener(){
+    private HorizontalLayout createButtonLayout(){
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(createBackButton(), createStartInitButton());
+        return horizontalLayout;
+    }
+
+    private Button createBackButton(){
+        Button button = new Button("Back");
+        button.addClickListener( e -> UI.getCurrent().navigate(HvacDevicesView.class));
+        return button;
+    }
+
+    private Button createStartInitButton(){
+        Button startInitButton = new Button("Start initialization");
+        if(homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
+            startInitButton.setText("Initialization in progress...");
+        addButtonListener(startInitButton);
+        return startInitButton;
+    }
+
+
+    private void addButtonListener(Button startInitButton){
         if(!homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
             startInitButton.addClickListener( e -> {
                 Integer timeRequiredMinutes = entitiesCommandsApplicationService.getHvacDeviceInitTimeSeconds()/60;

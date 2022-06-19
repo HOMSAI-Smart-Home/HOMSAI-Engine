@@ -13,9 +13,11 @@ import app.homsai.engine.optimizations.application.http.converters.Optimizations
 import app.homsai.engine.optimizations.domain.models.HvacDevice;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -41,11 +43,19 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
 
     private static HashMap<String, HvacDevice> hvacDevicesCache = null;
 
+
     @Override
     public HashMap<String, HvacDevice> getHvacDevicesCache() {
         if(hvacDevicesCache == null)
             initHvacDevicesCache();
         return hvacDevicesCache;
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void resetManualDevices() {
+        for(HvacDevice hvacDevice : getHvacDevicesCache().values()){
+            hvacDevice.setManual(false);
+        }
     }
 
     //ToDo move business logic to service
@@ -70,7 +80,7 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
             hvacDevice.setCurrentTemperature(currentTemperature);
             Double setTemperature = areaList.stream()
                     .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
-                    .map(AreaDto::getDesiredWinterTemperature)
+                    .map(AreaDto::getDesiredSummerTemperature)
                     .map(Optional::ofNullable)
                     .findFirst().flatMap(Function.identity())
                     .orElse(null);
@@ -113,7 +123,7 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
             hvacDevice.setCurrentTemperature(currentTemperature);
             Double setTemperature = areaList.stream()
                     .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
-                    .map(AreaDto::getDesiredWinterTemperature)
+                    .map(AreaDto::getDesiredSummerTemperature)
                     .map(Optional::ofNullable)
                     .findFirst().flatMap(Function.identity())
                     .orElse(null);
@@ -123,9 +133,11 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
             if(!hvacDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
                 hvacDevice.setActive(true);
                 hvacDevice.setStartTime(Instant.now());
+                hvacDevice.setManual(true);
             } else if(hvacDevice.getActive() && Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
                 hvacDevice.setActive(false);
                 hvacDevice.setEndTime(Instant.now());
+                hvacDevice.setManual(true);
             }
             if(hvacDevice.getActive())
                 active++;

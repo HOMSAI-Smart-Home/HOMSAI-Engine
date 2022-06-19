@@ -32,6 +32,8 @@ public class HvacDevice {
 
     private boolean enabled;
 
+    private boolean manual;
+
     public String getEntityId() {
         return entityId;
     }
@@ -136,5 +138,17 @@ public class HvacDevice {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public void setDeltaTemperature(Double deltaTemperature) {
+        this.deltaTemperature = deltaTemperature;
+    }
+
+    public boolean isManual() {
+        return manual;
+    }
+
+    public void setManual(boolean manual) {
+        this.manual = manual;
     }
 }

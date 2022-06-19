@@ -3,6 +3,7 @@ package app.homsai.engine.entities.domain.services;
 import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesCommandsRepository;
@@ -286,6 +287,21 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     @Override
     public void deleteFromHvacDevicesByType(Integer type) {
         entitiesCommandsRepository.deleteFromHvacDevicesByType(type);
+    }
+
+    @Override
+    public void updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException {
+        entitiesCommandsRepository.updateHomeInfo(homeInfo);
+    }
+
+    @Override
+    public HVACDevice updateHvacDevice(HVACDevice hvacDevice) {
+        return entitiesCommandsRepository.updateHvacDevice(hvacDevice);
+    }
+
+    @Override
+    public Area updateArea(Area area) {
+        return entitiesCommandsRepository.saveArea(area);
     }
 
 

@@ -36,4 +36,6 @@ public interface EntitiesCommandsRepository {
     HVACDevice saveHvacDevice(HVACDevice hvacDevice);
 
     void deleteFromHvacDevicesByType(Integer type);
+
+    HVACDevice updateHvacDevice(HVACDevice hvacDevice);
 }

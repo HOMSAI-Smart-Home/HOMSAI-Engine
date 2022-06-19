@@ -20,4 +20,8 @@ public interface EntitiesQueriesService {
     Page<HVACDevice> findAllHomsaiHvacDevices(Pageable unpaged, String s);
 
     HomeInfo findHomeInfo();
+
+    HVACDevice findOneHvacDeviceByEntityId(String entityId);
+
+    Area getHomeArea();
 }

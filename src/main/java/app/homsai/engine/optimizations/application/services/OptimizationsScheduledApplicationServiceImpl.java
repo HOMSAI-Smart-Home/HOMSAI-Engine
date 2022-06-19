@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletContext;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,8 +66,13 @@ public class OptimizationsScheduledApplicationServiceImpl implements Optimizatio
     @Scheduled(fixedRate = Consts.HVAC_PV_OPTIMIZATION_REQUEST_TIMEDELTA_MINUTES*60*1000)
     public void updateHvacDeviceOptimizationStatus(){
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        if(!homeInfo.getPvOptimizationsEnabled())
+            return;
         HashMap<String, HvacDevice> hvacDeviceHashMap = hvacRunningDevicesCacheRepository.getHvacDevicesCache();
-        List<HvacDeviceDto> hvacDevices = optimizationsMapper.convertToDto(hvacDeviceHashMap).stream().filter(HvacDeviceDto::getEnabled).collect(Collectors.toList());
+        List<HvacDeviceDto> hvacDevices = optimizationsMapper.convertToDto(hvacDeviceHashMap).stream()
+                .filter(HvacDeviceDto::getEnabled)
+                .filter(h -> !h.isManual())
+                .collect(Collectors.toList());
         HomeAssistantEntityDto globalConsumptionPowerEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(homeInfo.getGeneralPowerMeterId());
         HomeAssistantEntityDto solarProductionPowerEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(homeInfo.getPvProductionSensorId());
         double solarProductionPower = HOME_ASSISTANT_WATT.equals(solarProductionPowerEntity.getAttributes().getUnitOfMeasurement())? Double.parseDouble(solarProductionPowerEntity.getState()) : Double.parseDouble(solarProductionPowerEntity.getState()) * 1000;
@@ -89,6 +95,8 @@ public class OptimizationsScheduledApplicationServiceImpl implements Optimizatio
             logger.info("HVAC devices to turn on: "+hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn().size());
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn()){
                 homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(true);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setStartTime(Instant.now());
                 logger.info("HVAC device turned on: "+hvacDeviceEntityId);
             }
         } else
@@ -97,6 +105,8 @@ public class OptimizationsScheduledApplicationServiceImpl implements Optimizatio
             logger.info("HVAC devices to turn off: "+hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff().size());
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff()){
                 homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(false);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setEndTime(Instant.now());
                 logger.info("HVAC device turned off: "+hvacDeviceEntityId);
             }
         } else

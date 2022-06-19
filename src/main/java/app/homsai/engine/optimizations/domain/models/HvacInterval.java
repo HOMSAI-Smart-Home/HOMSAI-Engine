@@ -12,6 +12,7 @@ public class HvacInterval {
     @JsonProperty("end_time")
     private LocalTime endTime;
 
+
     public LocalTime getStartTime() {
         return startTime;
     }

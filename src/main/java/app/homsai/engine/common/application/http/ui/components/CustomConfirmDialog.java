@@ -1,4 +1,4 @@
-package app.homsai.engine.common.application.http.ui;
+package app.homsai.engine.common.application.http.ui.components;
 
 import app.homsai.engine.common.domain.utils.EnText;
 import com.vaadin.flow.component.ClickEvent;

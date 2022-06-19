@@ -38,4 +38,6 @@ public interface EntitiesQueriesRepository {
     HomeInfo getHomeInfo();
 
     Page<HVACDevice> findAllHvacDevices(Pageable pageable, String search);
+
+    HVACDevice findOneHvacDeviceByEntityId(String entityId);
 }

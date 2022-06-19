@@ -1,6 +1,7 @@
 package app.homsai.engine.entities.domain.services;
 
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.*;
 
@@ -35,4 +36,10 @@ public interface EntitiesCommandsService {
     Double calculateInitTime(Integer deviceSize);
 
     void deleteFromHvacDevicesByType(Integer type);
+
+    void updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException;
+
+    HVACDevice updateHvacDevice(HVACDevice hvacDevice);
+
+    Area updateArea(Area area);
 }
