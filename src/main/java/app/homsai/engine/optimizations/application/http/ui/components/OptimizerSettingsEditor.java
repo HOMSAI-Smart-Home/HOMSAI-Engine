@@ -1,12 +1,13 @@
 package app.homsai.engine.optimizations.application.http.ui.components;
 
+import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HVACDevice;
 import app.homsai.engine.entities.domain.models.HvacDeviceInterval;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import app.homsai.engine.optimizations.domain.models.HvacDevice;
-import app.homsai.engine.optimizations.domain.models.HvacInterval;
+import app.homsai.engine.optimizations.infrastructure.cache.HVACRunningDevicesCacheRepository;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
 import com.vaadin.flow.component.button.Button;
@@ -24,16 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 @SpringComponent
 @UIScope
 public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifier {
 
+    private HVACRunningDevicesCacheRepository hvacRunningDevicesCacheRepository;
     private EntitiesQueriesService entitiesQueriesService;
     private EntitiesCommandsService entitiesCommandsService;
 
@@ -41,19 +39,23 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
     private Area area;
 
     Checkbox enabled = new Checkbox("Enabled");
+    Checkbox auto = new Checkbox("Auto");
+
     TextField setTemp = new TextField("Desired Temperature");
     TimePicker startTime = new TimePicker("Restrict start hour - leave blank for no limit");
     TimePicker endTime = new TimePicker("Restrict end hour - leave blank for no limit");
     Label error = new Label();
     Button save = new Button("Save", VaadinIcon.CHECK.create());
-    Button cancel = new Button("Cancel");
+    Button cancel = new Button("Close");
     HorizontalLayout actions = new HorizontalLayout(save, cancel);
 
     @Autowired
-    public OptimizerSettingsEditor(EntitiesQueriesService entitiesQueriesService, EntitiesCommandsService entitiesCommandsService) {
+    public OptimizerSettingsEditor(EntitiesQueriesService entitiesQueriesService, EntitiesCommandsService entitiesCommandsService, HVACRunningDevicesCacheRepository hvacRunningDevicesCacheRepository) {
         this.entitiesQueriesService = entitiesQueriesService;
         this.entitiesCommandsService = entitiesCommandsService;
-        add(enabled, setTemp, startTime, endTime, error, actions);
+        this.hvacRunningDevicesCacheRepository = hvacRunningDevicesCacheRepository;
+        HorizontalLayout checkboxes = new HorizontalLayout(enabled, auto);
+        add(checkboxes, setTemp, startTime, endTime, error, actions);
 
         setSpacing(true);
 
@@ -70,10 +72,12 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
     void save() {
         try {
             Boolean enabledValue = enabled.getValue();
+            Boolean autoMode = auto.getValue();
             String desiredTemperature = setTemp.getValue();
             LocalTime startTimeValue = startTime.getValue();
             LocalTime endTimeValue = endTime.getValue();
             hvacDevice.setEnabled(enabledValue);
+            hvacRunningDevicesCacheRepository.getHvacDevicesCache().get(hvacDevice.getEntityId()).setManual(!autoMode);
             hvacDevice.getArea().setDesiredSummerTemperature(Double.parseDouble(desiredTemperature));
             if(startTimeValue != null && endTimeValue != null) {
                 LocalTime start = startTimeValue.minusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
@@ -110,7 +114,7 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
         hvacDevice = entitiesQueriesService.findOneHvacDeviceByEntityId(entityId);
         area = hvacDevice.getArea();
         cancel.setVisible(true);
-
+        auto.setValue(!hvacRunningDevicesCacheRepository.getHvacDevicesCache().get(entityId).isManual());
         enabled.setValue(hvacDevice.getEnabled());
         if(hvacDevice.getArea().getDesiredSummerTemperature() != null)
             setTemp.setValue(hvacDevice.getArea().getDesiredSummerTemperature().toString());
