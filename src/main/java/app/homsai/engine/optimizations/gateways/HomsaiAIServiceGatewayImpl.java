@@ -1,7 +1,10 @@
 package app.homsai.engine.optimizations.gateways;
 
+import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
+import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.optimizations.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
 import app.homsai.engine.optimizations.gateways.dtos.HvacOptimizationPVRequestDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -19,17 +22,19 @@ public class HomsaiAIServiceGatewayImpl implements HomsaiAIServiceGateway {
 
     @Value("${ai_service.api_url}")
     private String apiUrl;
-    @Value("${ai_service.token}")
-    private String token;
+
+    @Autowired
+    private EntitiesQueriesApplicationService entitiesQueriesApplicationService;
 
     @Override
     public HvacDevicesOptimizationPVResponseDto getHvacDevicesOptimizationPV(HvacOptimizationPVRequestDto hvacOptimizationPVRequestDto){
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         RestTemplate restTemplate = new RestTemplate();
         String url = UriComponentsBuilder.fromHttpUrl(apiUrl+POST_HVAC_DEVICES_TURN_ON_OFF)
                 .encode()
                 .toUriString();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add("Authorization", "Bearer "+token);
+        headers.add("Authorization", "Bearer "+homeInfo.getAiserviceToken());
         ResponseEntity<HvacDevicesOptimizationPVResponseDto> response =
                 restTemplate
                         .exchange(url, HttpMethod.POST,  new HttpEntity<>(hvacOptimizationPVRequestDto, headers), HvacDevicesOptimizationPVResponseDto.class);

@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import static app.homsai.engine.optimizations.gateways.AIServiceAPIEndpoints.LOGIN;
+import static app.homsai.engine.optimizations.gateways.AIServiceAPIEndpoints.REFRESH_TOKEN;
 
 @Service
 public class AIServiceAuthenticationGatewayImpl implements AIServiceAuthenticationGateway{
@@ -38,6 +39,27 @@ public class AIServiceAuthenticationGatewayImpl implements AIServiceAuthenticati
             ResponseEntity<LoginResponseDto> aiServiceResponse =
                     restTemplate
                             .exchange(url, HttpMethod.POST, new HttpEntity<>(loginRequestDto, headers), LoginResponseDto.class);
+
+            if(aiServiceResponse.getStatusCode() != HttpStatus.OK)
+                throw new BadCredentialsException("Authentication failed");
+            return aiServiceResponse.getBody();
+        }catch (Exception e){
+            throw new BadCredentialsException("Authentication failed");
+        }
+    }
+
+    @Override
+    public LoginResponseDto refreshToken(String refreshToken) throws AuthenticationException {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+REFRESH_TOKEN)
+                .encode()
+                .toUriString();
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("Authorization", "Bearer "+refreshToken);
+        try {
+            ResponseEntity<LoginResponseDto> aiServiceResponse =
+                    restTemplate
+                            .exchange(url, HttpMethod.GET, new HttpEntity<>(headers), LoginResponseDto.class);
 
             if(aiServiceResponse.getStatusCode() != HttpStatus.OK)
                 throw new BadCredentialsException("Authentication failed");

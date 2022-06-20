@@ -13,7 +13,7 @@ import com.vaadin.flow.router.Route;
 import java.util.List;
 
 @PageTitle("Homsai Engine")
-@Route(value="", layout = MainLayout.class)
+@Route(value="dashboard", layout = MainLayout.class)
 public class MainView extends VerticalLayout {
 
     private HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository;

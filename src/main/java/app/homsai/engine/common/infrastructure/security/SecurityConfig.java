@@ -43,23 +43,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Allow all Vaadin internal requests.
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
+            .antMatchers( "/").permitAll()
             .antMatchers("/entities/hass").permitAll()
             .antMatchers("/entities/homsai").permitAll()
             .antMatchers(HttpMethod.POST, "/entities/hass/excluded").permitAll()
             .antMatchers(HttpMethod.POST, "/entities/homsai/hvac/init").permitAll()
             .antMatchers(HttpMethod.GET, "/entities/history/homsai").permitAll()
+            .antMatchers(HttpMethod.GET, "/login").permitAll()
 
         // Allow all requests by logged-in users.
         .anyRequest().authenticated()
 
         // Configure the login page.
-        .and().formLogin()
+     /*   .and().formLogin()
         .loginPage(LOGIN_URL).permitAll()
         .loginProcessingUrl(LOGIN_PROCESSING_URL)
-        .failureUrl(LOGIN_FAILURE_URL)
+        .failureUrl(LOGIN_FAILURE_URL)*/
 
         // Configure logout
         .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+
+    http.headers().frameOptions().disable(); //TODO REMOVE
   }
 
   @Override

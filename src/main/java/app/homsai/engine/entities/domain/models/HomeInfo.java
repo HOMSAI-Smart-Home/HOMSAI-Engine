@@ -43,6 +43,16 @@ public class HomeInfo extends BaseEntity {
     @Column(name = "photovoltaic_optimizations_enabled")
     private Boolean pvOptimizationsEnabled;
 
+    @Column(name = "aiservice_email")
+    private String aiserviceEmail;
+
+    @Column(name = "aiservice_token")
+    private String aiserviceToken;
+
+    @Column(name = "aiservice_refresh_token")
+    private String aiserviceRefreshToken;
+
+
     public Boolean getHasPV() {
         return hasPV;
     }
@@ -121,6 +131,30 @@ public class HomeInfo extends BaseEntity {
 
     public void setPvOptimizationsEnabled(Boolean pvOptimizationsEnabled) {
         this.pvOptimizationsEnabled = pvOptimizationsEnabled;
+    }
+
+    public String getAiserviceToken() {
+        return aiserviceToken;
+    }
+
+    public void setAiserviceToken(String aiserviceToken) {
+        this.aiserviceToken = aiserviceToken;
+    }
+
+    public String getAiserviceRefreshToken() {
+        return aiserviceRefreshToken;
+    }
+
+    public void setAiserviceRefreshToken(String aiserviceRefreshToken) {
+        this.aiserviceRefreshToken = aiserviceRefreshToken;
+    }
+
+    public String getAiserviceEmail() {
+        return aiserviceEmail;
+    }
+
+    public void setAiserviceEmail(String aiserviceEmail) {
+        this.aiserviceEmail = aiserviceEmail;
     }
 }
 
