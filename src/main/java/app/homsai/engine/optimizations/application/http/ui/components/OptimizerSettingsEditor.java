@@ -1,5 +1,6 @@
 package app.homsai.engine.optimizations.application.http.ui.components;
 
+import app.homsai.engine.common.domain.utils.EnText;
 import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HVACDevice;
@@ -92,11 +93,11 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
             area = entitiesCommandsService.updateArea(area);
         }catch (Exception e){
             error.getStyle().set("color", "#FF0000");
-            error.setText("Error: please check input values");
+            error.setText(EnText.ERROR_DATA_SAVE);
             return;
         }
         error.getStyle().set("color", "#00FF00");
-        error.setText("Data saved correctly");
+        error.setText(EnText.DATA_SAVED);
 
     }
 

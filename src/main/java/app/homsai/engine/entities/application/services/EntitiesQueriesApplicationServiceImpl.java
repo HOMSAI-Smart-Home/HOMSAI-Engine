@@ -30,6 +30,7 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
 
 
     @Override
+    @Transactional
     public Page<HAEntityDto> getAllHomeAssistantEntities(Pageable pageRequest, String search) {
         Page<HAEntity> haEntities = entitiesQueriesService.findAllEntities(pageRequest, search);
         List<HAEntityDto> haEntityDtos = entitiesMapper.convertToDto(haEntities);

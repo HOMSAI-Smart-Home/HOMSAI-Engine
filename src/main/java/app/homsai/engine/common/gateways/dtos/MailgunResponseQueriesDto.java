@@ -1,4 +1,4 @@
-package app.homsai.engine.common.application.http.dtos;
+package app.homsai.engine.common.gateways.dtos;
 
 public class MailgunResponseQueriesDto {
 

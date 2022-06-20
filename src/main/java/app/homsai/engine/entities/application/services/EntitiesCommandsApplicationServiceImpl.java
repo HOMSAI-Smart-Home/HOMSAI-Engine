@@ -5,6 +5,7 @@ import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HVACDeviceInitDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
@@ -90,6 +91,9 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     @Override
     @Transactional
     public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        if(homeInfo.getHvacPowerMeterId() == null)
+            throw new HvacPowerMeterIdNotSet();
         List<HVACDevice> hvacDeviceList = new ArrayList<>();
         String hvacFunction;
         switch (type){
@@ -133,6 +137,15 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     @Override
     public Integer getHvacDeviceInitTimeSeconds(){
         return entitiesCommandsService.calculateInitTime((int) entitiesQueriesService.findAllEntities(Pageable.unpaged(), "domain:climate").getTotalElements()).intValue();
+    }
+
+    @Override
+    public void saveHomeInfo(HomeInfo homeInfo) {
+        try {
+            entitiesCommandsService.updateHomeInfo(homeInfo);
+        } catch (BadHomeInfoException e) {
+            e.printStackTrace();
+        }
     }
 
 }

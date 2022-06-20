@@ -1,7 +1,7 @@
 package app.homsai.engine.common.application.services;
 
-import app.homsai.engine.common.application.http.dtos.MailCreateCommandDto;
-import app.homsai.engine.common.application.http.dtos.MailQueriesDto;
+import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
+import app.homsai.engine.common.gateways.dtos.MailQueriesDto;
 import app.homsai.engine.common.gateways.MailgunGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

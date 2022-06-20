@@ -12,11 +12,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.List;
 
-public class CustomConfirmDialog extends Dialog {
+public class CustomErrorDialog extends Dialog {
 
-    OnClickConfirmDialog listener;
 
-    public CustomConfirmDialog(String title, String description, List<String> args) {
+    public CustomErrorDialog(String title, String description, List<String> args) {
         super();
         configureDialog(title, description, args);
     }
@@ -40,22 +39,15 @@ public class CustomConfirmDialog extends Dialog {
         Paragraph paragraph = new Paragraph();
         paragraph.getElement().setProperty("innerHTML", description);
 
-        Button closeButton = new Button(EnText.CANCEL);
+        Button closeButton = new Button(EnText.CLOSE);
         closeButton.addClickListener(e -> dialog.close());
 
-        Button continueButton = new Button(EnText.CONTINUE);
-        continueButton.addClickListener(e -> listener.onClick());
 
-        VerticalLayout dialogLayout = new VerticalLayout(headline, paragraph, continueButton, closeButton);
+        VerticalLayout dialogLayout = new VerticalLayout(headline, paragraph, closeButton);
         dialogLayout.setPadding(false);
         dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
         dialogLayout.getStyle().set("width", "300px").set("max-width", "100%");
-        //dialogLayout.setAlignSelf(FlexComponent.Alignment.END, closeButton);
-
         return dialogLayout;
     }
 
-    public void setOnConfirmListener(OnClickConfirmDialog listener){
-        this.listener = listener;
-    }
 }

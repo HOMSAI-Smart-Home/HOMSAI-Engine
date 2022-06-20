@@ -1,6 +1,7 @@
 package app.homsai.engine.entities.application.http.ui;
 
 import app.homsai.engine.common.application.http.ui.components.CustomConfirmDialog;
+import app.homsai.engine.common.application.http.ui.components.CustomErrorDialog;
 import app.homsai.engine.common.application.http.ui.components.MainLayout;
 import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.common.domain.utils.EnText;
@@ -81,21 +82,23 @@ public class HvacDevicesInitView extends VerticalLayout {
 
 
     private void addButtonListener(Button startInitButton){
-        if(!homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
-            startInitButton.addClickListener( e -> {
-                Integer timeRequiredMinutes = entitiesCommandsApplicationService.getHvacDeviceInitTimeSeconds()/60;
-                CustomConfirmDialog d1 = new CustomConfirmDialog(EnText.START_HVAC_DEVICE_INIT_TITLE, EnText.START_HVAC_DEVICE_INIT_DESCRIPTION, Collections.singletonList(timeRequiredMinutes.toString()));
-                d1.setOnConfirmListener(c -> {
-                    try {
-                        entitiesCommandsApplicationService.initHVACDevices(Consts.HVAC_DEVICE_CONDITIONING);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    } catch (HvacPowerMeterIdNotSet ex) {
-                        ex.printStackTrace();
-                    }
-                });
-                d1.open();
+        if(homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
+            return;
+        startInitButton.addClickListener( e -> {
+            Integer timeRequiredMinutes = entitiesCommandsApplicationService.getHvacDeviceInitTimeSeconds()/60;
+            CustomConfirmDialog d1 = new CustomConfirmDialog(EnText.START_HVAC_DEVICE_INIT_TITLE, EnText.START_HVAC_DEVICE_INIT_DESCRIPTION, Collections.singletonList(timeRequiredMinutes.toString()));
+            d1.setOnConfirmListener(() -> {
+                try {
+                    entitiesCommandsApplicationService.initHVACDevices(Consts.HVAC_DEVICE_CONDITIONING);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                } catch (HvacPowerMeterIdNotSet ex) {
+                    d1.close();
+                    new CustomErrorDialog(EnText.ERROR_TITLE, EnText.ERROR_HVAC_DEVICE_INIT_DESCRIPTION, null).open();
+                }
             });
+            d1.open();
+        });
         //TODO show error message
     }
 

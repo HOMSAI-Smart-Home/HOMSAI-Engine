@@ -1,10 +1,9 @@
-package app.homsai.engine.common.application.http.dtos;
+package app.homsai.engine.common.gateways.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
+public class MailQueriesDto {
 
-public class MailCreateCommandDto {
     @JsonProperty("mail_to")
     private String mailTo;
 
@@ -14,8 +13,11 @@ public class MailCreateCommandDto {
     @JsonProperty("mail_text")
     private String mailText;
 
-    @JsonProperty("arguments")
-    private List<String> args;
+    @JsonProperty("response_message")
+    private String responseMessage;
+
+    @JsonProperty("response_code")
+    private int responseCode;
 
     public String getMailTo() {
         return mailTo;
@@ -41,11 +43,19 @@ public class MailCreateCommandDto {
         this.mailText = mailText;
     }
 
-    public List<String> getArgs() {
-        return args;
+    public String getResponseMessage() {
+        return responseMessage;
     }
 
-    public void setArgs(List<String> args) {
-        this.args = args;
+    public void setResponseMessage(String responseMessage) {
+        this.responseMessage = responseMessage;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
     }
 }

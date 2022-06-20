@@ -103,6 +103,8 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
     public void updateHvacDevicesCache(){
         List<HVACDeviceDto> hvacDeviceDtoList = entitiesQueriesApplicationService.getAllHomsaiHvacDevices(Consts.HVAC_DEVICE_CONDITIONING);
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        if(homeInfo.getHvacPowerMeterId() == null)
+            return;
         List<AreaDto> areaList = entitiesQueriesApplicationService.getAllAreas();
         Double homeSetTemperature = areaList.stream()
                 .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))

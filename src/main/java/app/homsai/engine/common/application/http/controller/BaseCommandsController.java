@@ -1,13 +1,10 @@
 package app.homsai.engine.common.application.http.controller;
 
-import app.homsai.engine.common.application.http.dtos.MailCreateCommandDto;
-import app.homsai.engine.common.application.http.dtos.MailQueriesDto;
+import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
 import app.homsai.engine.common.application.services.BaseCommandsApplicationService;
-import app.homsai.engine.common.domain.models.DocsConsts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

@@ -1,6 +1,6 @@
 package app.homsai.engine.common.gateways;
 
-import app.homsai.engine.common.application.http.dtos.MailgunResponseQueriesDto;
+import app.homsai.engine.common.gateways.dtos.MailgunResponseQueriesDto;
 import net.sargue.mailgun.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

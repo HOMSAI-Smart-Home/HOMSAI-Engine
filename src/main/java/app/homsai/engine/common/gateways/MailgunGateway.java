@@ -1,6 +1,6 @@
 package app.homsai.engine.common.gateways;
 
-import app.homsai.engine.common.application.http.dtos.MailgunResponseQueriesDto;
+import app.homsai.engine.common.gateways.dtos.MailgunResponseQueriesDto;
 
 import java.io.File;
 import java.io.IOException;
