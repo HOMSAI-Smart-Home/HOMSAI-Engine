@@ -31,4 +31,5 @@ public class EnText {
     public static final String SAVE = "Save";
     public static final String LOGOUT_TITLE = "Logout";
     public static final String LOGOUT_TEXT = "Are you sure you want to log out?";
+    public static final String WAITING_FIRST_SYNC = "First sync in progress.. Please wait";
 }
