@@ -51,7 +51,7 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
 
     @Override
     public void syncHomeAssistantEntities() throws InterruptedException {
-        logger.info("synchronizing home assistant entities...");
+        logger.debug("synchronizing home assistant entities...");
         List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities(null);
         List<HAEntity> haEntityList = entitiesMapper.convertFromDto(homeAssistantEntityDtoList);
         if(haEntityList.size() > 0){
@@ -65,16 +65,16 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
             lock.wait(30000);
         }
         Integer homsaiEntitiesCount = entitiesCommandsService.syncHomsaiEntities();
-        logger.info("synchronized "+haEntitySavedList.size()+ " Home Assistant entities and "+homsaiEntitiesCount+ " Homsai entities");
+        logger.debug("synchronized "+haEntitySavedList.size()+ " Home Assistant entities and "+homsaiEntitiesCount+ " Homsai entities");
     }
 
     @Override
     public List<HomsaiEntitiesHistoricalStateDto> syncHomsaiEntitiesValues() throws AreaNotFoundException {
-        logger.info("synchronizing homsai entities...");
+        logger.debug("synchronizing homsai entities...");
         List<HomsaiEntity> homsaiEntityList = entitiesQueriesService.findAllHomsaiEntities(Pageable.unpaged(), null).getContent();
         List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStateList = entitiesCommandsService.calculateHomsaiEntitiesValues(homsaiEntityList);
         List<HomsaiEntitiesHistoricalState> homsaiHomeHistoricalStateList = entitiesCommandsService.calculateHomsaiHomeValues(homsaiEntitiesHistoricalStateList);
-        logger.info("synchronized "+(homsaiEntitiesHistoricalStateList.size()+ homsaiHomeHistoricalStateList.size())+" Homsai entities values");
+        logger.debug("synchronized "+(homsaiEntitiesHistoricalStateList.size()+ homsaiHomeHistoricalStateList.size())+" Homsai entities values");
         entitiesQueriesApplicationService.cacheAllLastHomsaiEntitiesToShow();
         return entitiesMapper.convertHistoricalListToDto(homsaiEntitiesHistoricalStateList);
     }

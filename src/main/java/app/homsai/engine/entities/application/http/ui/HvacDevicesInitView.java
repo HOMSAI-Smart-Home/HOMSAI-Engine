@@ -85,8 +85,8 @@ public class HvacDevicesInitView extends VerticalLayout {
         if(homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
             return;
         startInitButton.addClickListener( e -> {
-            Integer timeRequiredMinutes = entitiesCommandsApplicationService.getHvacDeviceInitTimeSeconds()/60;
-            CustomConfirmDialog d1 = new CustomConfirmDialog(EnText.START_HVAC_DEVICE_INIT_TITLE, EnText.START_HVAC_DEVICE_INIT_DESCRIPTION, Collections.singletonList(timeRequiredMinutes.toString()));
+            int timeRequiredMinutes = entitiesCommandsApplicationService.getHvacDeviceInitTimeSeconds()/60;
+            CustomConfirmDialog d1 = new CustomConfirmDialog(EnText.START_HVAC_DEVICE_INIT_TITLE, EnText.START_HVAC_DEVICE_INIT_DESCRIPTION, Collections.singletonList(Integer.toString(timeRequiredMinutes)));
             d1.setOnConfirmListener(() -> {
                 try {
                     entitiesCommandsApplicationService.initHVACDevices(Consts.HVAC_DEVICE_CONDITIONING);

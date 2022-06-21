@@ -1,10 +1,14 @@
 package app.homsai.engine.optimizations.application.http.ui;
 
+import app.homsai.engine.common.application.http.ui.components.CustomConfirmDialog;
+import app.homsai.engine.common.application.http.ui.components.CustomErrorDialog;
 import app.homsai.engine.common.application.http.ui.components.MainLayout;
 import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.EnText;
 import app.homsai.engine.entities.application.http.ui.HvacDevicesView;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
+import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
@@ -28,6 +32,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @PageTitle("Photovoltaic Optimizer")
@@ -111,6 +116,12 @@ public class HvacPVOptimizationView extends VerticalLayout {
 
     private void onChangeEnabled(boolean enabledValue){
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        if(enabledValue){
+            if(homeInfo.getGeneralPowerMeterId() == null || homeInfo.getHvacPowerMeterId() == null || homeInfo.getPvProductionSensorId() == null){
+                new CustomErrorDialog(EnText.ERROR_TITLE, EnText.ERROR_PV_OPT_START_DESCRIPTION, null).open();
+                return;
+            }
+        }
         homeInfo.setPvOptimizationsEnabled(enabledValue);
         try {
             entitiesCommandsService.updateHomeInfo(homeInfo);
