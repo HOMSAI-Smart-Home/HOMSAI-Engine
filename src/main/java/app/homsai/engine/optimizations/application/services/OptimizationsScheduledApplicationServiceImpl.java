@@ -106,25 +106,29 @@ public class OptimizationsScheduledApplicationServiceImpl implements Optimizatio
                 logger.info("[HVAC Optimizer] HVAC devices to turn on: " + hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn().size());
             }
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn()){
+                Integer setTemp = hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature().intValue() - HVAC_THRESHOLD_TEMPERATURE.intValue();
+                homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(hvacDeviceEntityId, setTemp.doubleValue());
+
                 homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(true);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setStartTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned on: "+hvacDeviceEntityId);
             }
         } else
-            logger.debug("[HVAC Optimizer] HVAC devices to turn on: 0");
+            logger.info("[HVAC Optimizer] HVAC devices to turn on: 0");
         if(hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff() != null) {
             if(hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff().size() > 0) {
                 logger.info("[HVAC Optimizer] Home consumption:" + globalConsumptionPower + ",PV Production:" + solarProductionPower + ", Storage power:" + storagePower);
                 logger.info("[HVAC Optimizer] HVAC devices to turn off: " + hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff().size());
             }
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff()){
+                Double oldConsumption = hvacDeviceHashMap.get(hvacDeviceEntityId).getActualPowerConsumption();
                 homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(false);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setEndTime(Instant.now());
-                logger.info("[HVAC Optimizer] HVAC device turned off: "+hvacDeviceEntityId);
+                logger.info("[HVAC Optimizer] HVAC device turned off: "+hvacDeviceEntityId+", current consumption: "+oldConsumption);
             }
         } else
-            logger.debug("[HVAC Optimizer] HVAC devices to turn off: 0");
+            logger.info("[HVAC Optimizer] HVAC devices to turn off: 0");
     }
 }

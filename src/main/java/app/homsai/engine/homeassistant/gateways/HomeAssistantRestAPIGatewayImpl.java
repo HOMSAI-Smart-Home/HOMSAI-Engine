@@ -1,6 +1,7 @@
 package app.homsai.engine.homeassistant.gateways;
 
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantClimateHVACModeDto;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantClimateSetTemperatureDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -69,6 +70,24 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
         ResponseEntity<String> homeAssistantResponse =
                 restTemplate
                         .exchange(url, HttpMethod.POST,  new HttpEntity<>(homeAssistantClimateHVACModeDto, headers), String.class);
+        return null;
+
+    }
+
+    @Override
+    public HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String entityId, Double temperature) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+SET_ENTITY_STATE.replace("{context}", "climate").replace("{command}", "set_temperature"))
+                .encode()
+                .toUriString();
+        HomeAssistantClimateSetTemperatureDto homeAssistantClimateSetTemperatureDto = new HomeAssistantClimateSetTemperatureDto();
+        homeAssistantClimateSetTemperatureDto.setEntityId(entityId);
+        homeAssistantClimateSetTemperatureDto.setTemperature(temperature);
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("Authorization", "Bearer "+token);
+        ResponseEntity<String> homeAssistantResponse =
+                restTemplate
+                        .exchange(url, HttpMethod.POST,  new HttpEntity<>(homeAssistantClimateSetTemperatureDto, headers), String.class);
         return null;
 
     }

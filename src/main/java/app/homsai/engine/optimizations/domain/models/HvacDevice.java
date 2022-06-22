@@ -34,6 +34,11 @@ public class HvacDevice {
 
     private boolean manual;
 
+    private DoubleCircularArray consumptionArray;
+
+    public HvacDevice() {
+    }
+
     public String getEntityId() {
         return entityId;
     }
@@ -106,14 +111,18 @@ public class HvacDevice {
 
     public void setPowerConsumption(Double powerConsumption) {
         this.powerConsumption = powerConsumption;
+        this.consumptionArray = new DoubleCircularArray(30, powerConsumption);
     }
 
     public Double getActualPowerConsumption() {
-        return actualPowerConsumption;
+        if(active)
+            return this.consumptionArray.getAverageValue();
+        else
+            return 0D;
     }
 
     public void setActualPowerConsumption(Double actualPowerConsumption) {
-        this.actualPowerConsumption = actualPowerConsumption;
+        this.consumptionArray.insert(actualPowerConsumption);
     }
 
     public Instant getStartTime() {

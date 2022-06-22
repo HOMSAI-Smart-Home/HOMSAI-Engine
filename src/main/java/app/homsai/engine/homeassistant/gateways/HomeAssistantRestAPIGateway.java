@@ -11,4 +11,6 @@ public interface HomeAssistantRestAPIGateway {
     HomeAssistantEntityDto syncHomeAssistantEntityValue(String entityId);
 
     HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String entityId, String hvacMode);
+
+    HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String entityId, Double temperature);
 }

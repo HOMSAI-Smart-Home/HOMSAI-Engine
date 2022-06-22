@@ -8,4 +8,6 @@ import java.util.List;
 public interface HomeAssistantCommandsApplicationService {
 
     HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String climateEntityId, String homeAssistantHvacDeviceOffFunction);
+
+    HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String climateEntityId, Double temperature);
 }

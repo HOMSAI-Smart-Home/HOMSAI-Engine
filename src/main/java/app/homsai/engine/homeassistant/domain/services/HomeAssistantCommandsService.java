@@ -8,4 +8,6 @@ public interface HomeAssistantCommandsService {
     void syncHomeAssistantEntities();
 
     HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String climateEntityId, String homeAssistantHvacDeviceOffFunction);
+
+    HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String climateEntityId, Double temperature);
 }

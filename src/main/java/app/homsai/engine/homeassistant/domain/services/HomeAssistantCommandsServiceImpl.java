@@ -35,4 +35,10 @@ public class HomeAssistantCommandsServiceImpl implements HomeAssistantCommandsSe
     public HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String climateEntityId, String homeAssistantHvacDeviceOffFunction) {
         return homeAssistantRestAPIGateway.sendHomeAssistantClimateHVACMode(climateEntityId, homeAssistantHvacDeviceOffFunction);
     }
+
+
+    @Override
+    public HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String climateEntityId, Double temperature) {
+        return homeAssistantRestAPIGateway.sendHomeAssistantClimateTemperature(climateEntityId, temperature);
+    }
 }

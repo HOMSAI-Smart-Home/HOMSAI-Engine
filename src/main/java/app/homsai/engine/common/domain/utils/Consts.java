@@ -25,4 +25,6 @@ public class Consts {
     public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5;
     public static final Integer HVAC_INITIALIZATION_WATT_THRESHOLD = 200;
     public static final String HVAC_MODE = "summer";
+
+    public static final Double HVAC_THRESHOLD_TEMPERATURE = 2D;
 }

@@ -148,9 +148,7 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             HvacDevice hvacDevice = getHvacDevicesCache().get(hvacDeviceDto.getEntityId());
             if(hvacDevice.getActive())
-                hvacDevice.setActualPowerConsumption(currentClimateConsumption);
-            else
-                hvacDevice.setActualPowerConsumption(0D);
+                hvacDevice.setActualPowerConsumption(currentClimateConsumption);;
         }
     }
 
