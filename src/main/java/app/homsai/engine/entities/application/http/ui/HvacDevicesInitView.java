@@ -74,8 +74,10 @@ public class HvacDevicesInitView extends VerticalLayout {
 
     private Button createStartInitButton(){
         Button startInitButton = new Button("Start initialization");
-        if(homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
+        if(homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress()) {
             startInitButton.setText("Initialization in progress...");
+            startInitButton.setEnabled(false);
+        }
         addButtonListener(startInitButton);
         return startInitButton;
     }
@@ -90,6 +92,8 @@ public class HvacDevicesInitView extends VerticalLayout {
             d1.setOnConfirmListener(() -> {
                 try {
                     entitiesCommandsApplicationService.initHVACDevices(Consts.HVAC_DEVICE_CONDITIONING);
+                    startInitButton.setEnabled(false);
+                    startInitButton.setText("Initialization in progress...");
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 } catch (HvacPowerMeterIdNotSet ex) {

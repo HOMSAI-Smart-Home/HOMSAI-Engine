@@ -44,7 +44,10 @@ public class CustomConfirmDialog extends Dialog {
         closeButton.addClickListener(e -> dialog.close());
 
         Button continueButton = new Button(EnText.CONTINUE);
-        continueButton.addClickListener(e -> listener.onClick());
+        continueButton.addClickListener(e -> {
+            listener.onClick();
+            dialog.close();
+        });
 
         VerticalLayout dialogLayout = new VerticalLayout(headline, paragraph, continueButton, closeButton);
         dialogLayout.setPadding(false);

@@ -93,7 +93,8 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
             hvacDevice.setIntervals(optimizationsMapper.convertToDtoIntervals(hvacDeviceDto.getIntervals()));
             if(hvacDeviceDto.getEnabled() == null)
                 hvacDevice.setEnabled(false);
-            hvacDevice.setEnabled(hvacDeviceDto.getEnabled());
+            else
+                hvacDevice.setEnabled(hvacDeviceDto.getEnabled());
             hvacDevicesCache.put(hvacDevice.getEntityId(), hvacDevice);
         }
     }
