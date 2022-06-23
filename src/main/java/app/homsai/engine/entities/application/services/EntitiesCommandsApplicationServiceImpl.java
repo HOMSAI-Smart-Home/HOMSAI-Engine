@@ -125,6 +125,7 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
             hvacDevice.setMaxTemp(homeAssistantEntityDto.getAttributes().getMaxTemp());
             hvacDevice.setMinTemp(homeAssistantEntityDto.getAttributes().getMinTemp());
             hvacDevice.setHvacModes(homeAssistantEntityDto.getAttributes().getHvacModes());
+            hvacDevice.setEnabled(true);
             hvacDeviceList.add(hvacDevice);
         }
         entitiesCommandsService.initHomsaiHvacDevices(hvacDeviceList, hvacFunction);

@@ -116,7 +116,10 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
         int active = 0;
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             HvacDevice hvacDevice = getHvacDevicesCache().get(hvacDeviceDto.getEntityId());
-            hvacDevice.setEnabled(hvacDeviceDto.getEnabled());
+            if(hvacDeviceDto.getEnabled() == null)
+                hvacDevice.setEnabled(false);
+            else
+                hvacDevice.setEnabled(hvacDeviceDto.getEnabled());
             hvacDevice.setIntervals(optimizationsMapper.convertToDtoIntervals(hvacDeviceDto.getIntervals()));
             Double currentTemperature = homsaiEntityShowCacheRepository.getHomsaiEntityShowDtoList().stream()
                     .filter(hD -> hD.getArea().equals(hvacDeviceDto.getArea().getName()))
