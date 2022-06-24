@@ -7,6 +7,8 @@ import app.homsai.engine.entities.application.http.dtos.AreaDto;
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
+import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
+import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.optimizations.application.http.ui.HvacPVOptimizationView;
@@ -36,20 +38,23 @@ public class SettingsView extends VerticalLayout {
 
     private EntitiesQueriesApplicationService entitiesQueriesApplicationService;
     private EntitiesCommandsApplicationService entitiesCommandsApplicationService;
+    private EntitiesScheduledApplicationService entitiesScheduledApplicationService;
+
     private Select<HAEntityDto> storageMeterSensorSelect;
     private Select<HAEntityDto> generalMeterSensorSelect;
     private Select<HAEntityDto> hvacMeterSensorSelect;
     private Select<HAEntityDto> pvMeterSensorSelect;
     private final Label error;
 
-    public SettingsView(EntitiesQueriesApplicationService entitiesQueriesApplicationService, EntitiesCommandsApplicationService entitiesCommandsApplicationService) {
+    public SettingsView(EntitiesQueriesApplicationService entitiesQueriesApplicationService, EntitiesCommandsApplicationService entitiesCommandsApplicationService, EntitiesScheduledApplicationService entitiesScheduledApplicationService) {
         this.entitiesQueriesApplicationService = entitiesQueriesApplicationService;
         this.entitiesCommandsApplicationService = entitiesCommandsApplicationService;
+        this.entitiesScheduledApplicationService = entitiesScheduledApplicationService;
         addClassName("settings-view");
         setSizeFull();
         H2 pageTitle = new H2("Settings");
         error = new Label();
-        add(pageTitle, createSettingsLayout(), error, createSaveButton());
+        add(pageTitle, createSettingsLayout(), error, createButtonLayout());
         populateSelects();
     }
 
@@ -114,11 +119,30 @@ public class SettingsView extends VerticalLayout {
                 .findFirst().orElse(null);
     }
 
+    private HorizontalLayout createButtonLayout(){
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(createSyncButton(), createSaveButton());
+        return horizontalLayout;
+    }
+
 
     private Button createSaveButton(){
         Button button = new Button(EnText.SAVE);
         button.addClickListener( e -> save());
         return button;
+    }
+
+    private Button createSyncButton(){
+        Button button = new Button(EnText.SYNC_DEVICES);
+        button.addClickListener( e -> syncHassDevices());
+        return button;
+    }
+
+    private void syncHassDevices() {
+        error.setText(EnText.SYNC_IN_PROGRESS);
+        entitiesScheduledApplicationService.getAllHomeAssistantEntities();
+        entitiesScheduledApplicationService.getAllHomsaiEntityValues();
+        error.setText(EnText.SYNC_DONE);
     }
 
     private void save() {

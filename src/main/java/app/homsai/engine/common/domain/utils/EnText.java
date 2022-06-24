@@ -29,7 +29,11 @@ public class EnText {
     public static final String DATA_SAVED = "Data saved correctly";
     public static final String ERROR_DATA_SAVE = "Error: please check input values";
     public static final String SAVE = "Save";
+    public static final String SYNC_DEVICES = "Sync Home Assistant Entities";
     public static final String LOGOUT_TITLE = "Logout";
     public static final String LOGOUT_TEXT = "Are you sure you want to log out?";
     public static final String WAITING_FIRST_SYNC = "First sync in progress.. Please wait";
+    public static final String SYNC_DONE = "Home Assistant devices sync done";
+    public static final String SYNC_IN_PROGRESS = "Home Assistant devices sync in progress.. Please wait";
+    public static final String ERROR_SYNC = "Error: unable to sync Home Assistant devices";
 }

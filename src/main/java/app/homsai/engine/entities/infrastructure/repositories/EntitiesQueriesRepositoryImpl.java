@@ -67,6 +67,7 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     }
 
     @Override
+    @Transactional
     public Area findOneAreaByName(String name) {
         return areaQueriesJpaRepository.findOneByNameAndDeletedAtIsNull(name);
     }
@@ -89,6 +90,7 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     }
 
     @Override
+    @Transactional
     public List<Area> findAllAreaList() {
         List<Area> areaList = new ArrayList<>();
         areaQueriesJpaRepository.findAllActive().forEach(areaList::add);
@@ -96,6 +98,7 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     }
 
     @Override
+    @Transactional
     public List<HomsaiEntityType> findAllHomsaiEntityTypes() {
         List<HomsaiEntityType> haEntityTypeList = new ArrayList<>();
         homsaiEntityTypeQueriesJpaRepository.findAllActive().forEach(haEntityTypeList::add);
@@ -114,6 +117,7 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     }
 
     @Override
+    @Transactional
     public List<ExcludedHAEntity> findAllExcludedHAEntities() {
         List<ExcludedHAEntity> excludedHAEntityList = new ArrayList<>();
         excludedHAEntityQueriesJpaRepository.findAllActive().forEach(excludedHAEntityList::add);
