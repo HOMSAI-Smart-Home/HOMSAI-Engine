@@ -21,6 +21,7 @@ public class Consts {
 
     public static final Integer HVAC_INITIALIZATION_SLEEP_TIME_MILLIS = 30*1000;
     public static final Integer HVAC_INITIALIZATION_INFRA_TIME_DURATION_MILLIS = 5*60*1000;
+
     public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 20;
     public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5;
     public static final Integer HVAC_INITIALIZATION_WATT_THRESHOLD = 200;

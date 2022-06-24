@@ -2,6 +2,7 @@ package app.homsai.engine.optimizations.infrastructure.cache;
 
 import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.entities.application.http.cache.HomsaiEntityShowCacheRepository;
+import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.application.http.dtos.AreaDto;
 import app.homsai.engine.entities.application.http.dtos.HVACDeviceDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntityShowDto;
@@ -39,6 +40,9 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
     private HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository;
 
     @Autowired
+    private HomsaiHVACDeviceCacheRepository HomsaiHVACDeviceCacheRepository;
+
+    @Autowired
     OptimizationsMapper optimizationsMapper;
 
     private static HashMap<String, HvacDevice> hvacDevicesCache = null;
@@ -46,7 +50,7 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
 
     @Override
     public HashMap<String, HvacDevice> getHvacDevicesCache() {
-        if(hvacDevicesCache == null)
+        if(hvacDevicesCache == null || hvacDevicesCache.size() == 0)
             initHvacDevicesCache();
         return hvacDevicesCache;
     }
@@ -105,6 +109,8 @@ public class HVACRunningDevicesCacheRepositoryImpl implements HVACRunningDevices
         List<HVACDeviceDto> hvacDeviceDtoList = entitiesQueriesApplicationService.getAllHomsaiHvacDevices(Consts.HVAC_DEVICE_CONDITIONING);
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         if(homeInfo.getHvacPowerMeterId() == null)
+            return;
+        if(HomsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto().getInProgress())
             return;
         List<AreaDto> areaList = entitiesQueriesApplicationService.getAllAreas();
         Double homeSetTemperature = areaList.stream()

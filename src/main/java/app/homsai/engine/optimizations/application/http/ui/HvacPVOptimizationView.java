@@ -119,6 +119,7 @@ public class HvacPVOptimizationView extends VerticalLayout {
         if(enabledValue){
             if(homeInfo.getGeneralPowerMeterId() == null || homeInfo.getHvacPowerMeterId() == null || homeInfo.getPvProductionSensorId() == null){
                 new CustomErrorDialog(EnText.ERROR_TITLE, EnText.ERROR_PV_OPT_START_DESCRIPTION, null).open();
+                enabled.setValue(false);
                 return;
             }
         }

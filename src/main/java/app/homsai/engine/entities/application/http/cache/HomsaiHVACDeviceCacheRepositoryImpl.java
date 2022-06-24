@@ -3,6 +3,7 @@ package app.homsai.engine.entities.application.http.cache;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HvacDeviceCacheDto;
 import app.homsai.engine.entities.domain.models.HVACDevice;
+import app.homsai.engine.optimizations.infrastructure.cache.HVACRunningDevicesCacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ public class HomsaiHVACDeviceCacheRepositoryImpl implements HomsaiHVACDeviceCach
 
     @Autowired
     EntitiesMapper entitiesMapper;
+
+    @Autowired
+    HVACRunningDevicesCacheRepository hvacRunningDevicesCacheRepository;
 
     private static final HvacDeviceCacheDto hvacDeviceCacheDto = new HvacDeviceCacheDto();
 
@@ -42,6 +46,7 @@ public class HomsaiHVACDeviceCacheRepositoryImpl implements HomsaiHVACDeviceCach
 
     @Override
     public void endHvacDeviceInit(){
+        hvacRunningDevicesCacheRepository.initHvacDevicesCache();
         hvacDeviceCacheDto.setInProgress(false);
         hvacDeviceCacheDto.setRemainingTimeSeconds(0);
         hvacDeviceCacheDto.setElapsedTimeSeconds(hvacDeviceCacheDto.getTotalTimeSeconds());
