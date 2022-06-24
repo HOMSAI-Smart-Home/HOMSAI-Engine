@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
@@ -49,7 +48,6 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
 
 
     @Override
-    @Transactional
     public Area getAreaByNameOrCreate(String name){
         Area area = entitiesQueriesRepository.findOneAreaByName(name);
         if(area == null){
@@ -86,7 +84,6 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     }
 
     @Override
-    @Transactional
     public Integer syncHomsaiEntities() {
         Integer count = 0;
         List<Area> areaList = entitiesQueriesRepository.findAllAreaList();
@@ -121,7 +118,6 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
     }
 
     @Override
-    @Transactional
     public List<HomsaiEntitiesHistoricalState> calculateHomsaiEntitiesValues(List<HomsaiEntity> homsaiEntityList) {
         List<HomsaiEntitiesHistoricalState> homsaiEntitiesHistoricalStates = new ArrayList<>();
         for(HomsaiEntity homsaiEntity: homsaiEntityList){
