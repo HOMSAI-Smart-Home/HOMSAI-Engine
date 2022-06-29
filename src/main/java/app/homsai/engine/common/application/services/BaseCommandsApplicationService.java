@@ -1,6 +1,7 @@
 package app.homsai.engine.common.application.services;
 
 import app.homsai.engine.common.application.http.dtos.LoggedDto;
+import app.homsai.engine.common.application.http.dtos.SettingsDto;
 import app.homsai.engine.common.application.http.dtos.TokenDto;
 import app.homsai.engine.common.domain.exceptions.TokenIsNullException;
 import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
@@ -17,4 +18,8 @@ public interface BaseCommandsApplicationService {
     void deleteToken();
 
     LoggedDto isLogged();
+
+    SettingsDto updateSettings(SettingsDto settingsDto);
+
+    SettingsDto readSettings();
 }

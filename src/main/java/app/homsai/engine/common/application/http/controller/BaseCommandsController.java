@@ -1,5 +1,6 @@
 package app.homsai.engine.common.application.http.controller;
 
+import app.homsai.engine.common.application.http.dtos.SettingsDto;
 import app.homsai.engine.common.application.http.dtos.TokenDto;
 import app.homsai.engine.common.domain.exceptions.TokenIsNullException;
 import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
@@ -79,5 +80,21 @@ public class BaseCommandsController {
     public ResponseEntity isLogged() {
         logger.debug("[BaseCommandsController] GET /auth/islogged");
         return ResponseEntity.status(HttpStatus.OK).body(baseCommandsApplicationService.isLogged());
+    }
+
+    @RequestMapping(value = "/settings", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateSettings(@RequestBody SettingsDto settingsDto) {
+        logger.debug("[BaseCommandsController] POST /settings");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(baseCommandsApplicationService.updateSettings(settingsDto));
+    }
+
+    @RequestMapping(value = "/settings", method = RequestMethod.GET)
+    public ResponseEntity readSettings() {
+        logger.debug("[BaseCommandsController] GET /settings");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(baseCommandsApplicationService.readSettings());
     }
 }

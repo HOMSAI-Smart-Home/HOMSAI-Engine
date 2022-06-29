@@ -50,9 +50,11 @@ public class TokenCRUDTest {
         // Injecting token
         String token = "tokenTemplate";
         String refreshToken = "refreshTokenTemplate";
+        String email = "emailTemplate";
         TokenDto tokenDto = new TokenDto();
         tokenDto.setToken(token);
         tokenDto.setRefreshToken(refreshToken);
+        tokenDto.setEmail(email);
 
         HttpEntity<TokenDto> request = new HttpEntity<>(tokenDto);
         ResponseEntity<String> loginResponse =

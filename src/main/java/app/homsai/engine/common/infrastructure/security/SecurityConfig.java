@@ -26,6 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final String injectTokenEndpoint = "/auth/token/inject";
   private final String removeTokenEndpoint = "/auth/token/remove";
   private final String isLoggedEndpoint = "/auth/islogged";
+  private final String settingsEndpoint = "/settings";
 
   @Autowired
   AIServiceAuthenticationProvider aiServiceAuthenticationProvider;
@@ -56,6 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, injectTokenEndpoint).permitAll()
             .antMatchers(HttpMethod.POST, removeTokenEndpoint).permitAll()
             .antMatchers(HttpMethod.GET, isLoggedEndpoint).permitAll()
+            .antMatchers(settingsEndpoint).permitAll()
 
         // Allow all requests by logged-in users.
         .anyRequest().authenticated()

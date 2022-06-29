@@ -1,6 +1,7 @@
 package app.homsai.engine.common.application.services;
 
 import app.homsai.engine.common.application.http.dtos.LoggedDto;
+import app.homsai.engine.common.application.http.dtos.SettingsDto;
 import app.homsai.engine.common.application.http.dtos.TokenDto;
 import app.homsai.engine.common.domain.exceptions.TokenIsNullException;
 import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
@@ -9,6 +10,7 @@ import app.homsai.engine.common.gateways.MailgunGateway;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.models.HomeInfo;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
@@ -27,6 +29,9 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
     //ToDO move HomeInfo to Common
     @Autowired
     EntitiesCommandsApplicationService entitiesCommandsApplicationService;
+
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
     public MailQueriesDto sendMail(MailCreateCommandDto mailCreateCommandDto) {
@@ -70,11 +75,12 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
 
     @Override
     public void injectToken(TokenDto tokenDto) throws TokenIsNullException {
-        if(tokenDto.getToken() == null || tokenDto.getRefreshToken() == null)
+        if(tokenDto.getToken() == null || tokenDto.getRefreshToken() == null || tokenDto.getEmail() == null)
             throw new TokenIsNullException();
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         homeInfo.setAiserviceToken(tokenDto.getToken());
         homeInfo.setAiserviceRefreshToken(tokenDto.getRefreshToken());
+        homeInfo.setAiserviceEmail(tokenDto.getEmail());
         entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
     }
 
@@ -83,6 +89,7 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         homeInfo.setAiserviceToken(null);
         homeInfo.setAiserviceRefreshToken(null);
+        homeInfo.setAiserviceEmail(null);
         entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
     }
 
@@ -92,6 +99,27 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
         LoggedDto loggedDto = new LoggedDto();
         loggedDto.setLogged(homeInfo.getAiserviceToken() != null && homeInfo.getAiserviceRefreshToken() != null);
         return loggedDto;
+    }
+
+    @Override
+    public SettingsDto updateSettings(SettingsDto settingsDto) {
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        homeInfo.setGeneralPowerMeterId(settingsDto.getGeneralPowerMeterId());
+        homeInfo.setHvacPowerMeterId(settingsDto.getHvacPowerMeterId());
+        homeInfo.setPvProductionSensorId(settingsDto.getPvProductionSensorId());
+        homeInfo.setPvStorageSensorId(settingsDto.getPvStorageSensorId());
+        homeInfo.setLatitude(settingsDto.getLatitude());
+        homeInfo.setLongitude(settingsDto.getLongitude());
+        homeInfo.setPvPeakPower(settingsDto.getPvPeakPower());
+        homeInfo.setPvInstallDate(settingsDto.getPvInstallDate());
+        entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
+        return settingsDto;
+    }
+
+    @Override
+    public SettingsDto readSettings() {
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        return modelMapper.map(homeInfo, SettingsDto.class);
     }
 
 
