@@ -30,6 +30,7 @@ public class ErrorCodes {
     public static final int JWT_EXPIRED_TOKEN_EXCEPTION = 103;
     public static final int ACCESS_DENIED_EXCEPTION = 104;
     public static final int VALIDATION_FAILED_EXCEPTION = 105;
+    public static final int TOKEN_IS_NULL = 106;
 
 
 }

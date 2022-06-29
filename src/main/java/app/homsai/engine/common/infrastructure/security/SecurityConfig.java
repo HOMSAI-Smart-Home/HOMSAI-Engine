@@ -23,6 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private static final String LOGIN_FAILURE_URL = "/login?error";
   private static final String LOGIN_URL = "/login";
   private static final String LOGOUT_SUCCESS_URL = "/login";
+  private final String injectTokenEndpoint = "/auth/token/inject";
+  private final String removeTokenEndpoint = "/auth/token/remove";
+  private final String isLoggedEndpoint = "/auth/islogged";
 
   @Autowired
   AIServiceAuthenticationProvider aiServiceAuthenticationProvider;
@@ -49,7 +52,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, "/entities/hass/excluded").permitAll()
             .antMatchers(HttpMethod.POST, "/entities/homsai/hvac/init").permitAll()
             .antMatchers(HttpMethod.GET, "/entities/history/homsai").permitAll()
-            .antMatchers(HttpMethod.GET, "/login").permitAll()
+            .antMatchers(HttpMethod.GET, LOGIN_URL).permitAll()
+            .antMatchers(HttpMethod.POST, injectTokenEndpoint).permitAll()
+            .antMatchers(HttpMethod.POST, removeTokenEndpoint).permitAll()
+            .antMatchers(HttpMethod.GET, isLoggedEndpoint).permitAll()
 
         // Allow all requests by logged-in users.
         .anyRequest().authenticated()

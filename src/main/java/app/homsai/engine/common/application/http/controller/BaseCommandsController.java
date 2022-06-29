@@ -1,5 +1,7 @@
 package app.homsai.engine.common.application.http.controller;
 
+import app.homsai.engine.common.application.http.dtos.TokenDto;
+import app.homsai.engine.common.domain.exceptions.TokenIsNullException;
 import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
 import app.homsai.engine.common.application.services.BaseCommandsApplicationService;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ public class BaseCommandsController {
 
     @RequestMapping(value = "/version", method = RequestMethod.GET)
     public ResponseEntity getVersion() {
-        logger.info("[BaseCommandsController] GET /version");
+        logger.debug("[BaseCommandsController] GET /version");
         return ResponseEntity.status(HttpStatus.OK).body(buildProperties.getVersion());
     }
 
@@ -37,7 +39,7 @@ public class BaseCommandsController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity sendMail(@RequestBody MailCreateCommandDto mailCreateCommandDto) {
-        logger.info("[BaseCommandsController] POST /sendmail");
+        logger.debug("[BaseCommandsController] POST /sendmail");
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(baseCommandsApplicationService.sendMail(mailCreateCommandDto));
@@ -48,9 +50,34 @@ public class BaseCommandsController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity sendMailHtml(@RequestBody MailCreateCommandDto mailCreateCommandDto) {
-        logger.info("[BaseCommandsController] POST /sendmailhtml");
+        logger.debug("[BaseCommandsController] POST /sendmailhtml");
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(baseCommandsApplicationService.sendMailHtml(mailCreateCommandDto));
+    }
+
+    @RequestMapping(value = "/auth/token/inject", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity injectToken(@RequestBody TokenDto tokenDto) throws TokenIsNullException {
+        logger.debug("[BaseCommandsController] POST /auth/token/inject");
+        baseCommandsApplicationService.injectToken(tokenDto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(null);
+    }
+
+    @RequestMapping(value = "/auth/token/remove", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity injectToken() {
+        logger.debug("[BaseCommandsController] POST /auth/token/remove");
+        baseCommandsApplicationService.deleteToken();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(null);
+    }
+
+    @RequestMapping(value = "/auth/islogged", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity isLogged() {
+        logger.debug("[BaseCommandsController] GET /auth/islogged");
+        return ResponseEntity.status(HttpStatus.OK).body(baseCommandsApplicationService.isLogged());
     }
 }

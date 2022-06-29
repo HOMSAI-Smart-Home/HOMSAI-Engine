@@ -1,8 +1,14 @@
 package app.homsai.engine.common.application.services;
 
+import app.homsai.engine.common.application.http.dtos.LoggedDto;
+import app.homsai.engine.common.application.http.dtos.TokenDto;
+import app.homsai.engine.common.domain.exceptions.TokenIsNullException;
 import app.homsai.engine.common.gateways.dtos.MailCreateCommandDto;
 import app.homsai.engine.common.gateways.dtos.MailQueriesDto;
 import app.homsai.engine.common.gateways.MailgunGateway;
+import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
+import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
+import app.homsai.engine.entities.domain.models.HomeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
@@ -13,6 +19,14 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
 
     @Autowired
     MailgunGateway mailgunGateway;
+
+    //ToDO move HomeInfo to Common
+    @Autowired
+    EntitiesQueriesApplicationService entitiesQueriesApplicationService;
+
+    //ToDO move HomeInfo to Common
+    @Autowired
+    EntitiesCommandsApplicationService entitiesCommandsApplicationService;
 
     @Override
     public MailQueriesDto sendMail(MailCreateCommandDto mailCreateCommandDto) {
@@ -53,4 +67,32 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
 
         return mailQueriesDto;
     }
+
+    @Override
+    public void injectToken(TokenDto tokenDto) throws TokenIsNullException {
+        if(tokenDto.getToken() == null || tokenDto.getRefreshToken() == null)
+            throw new TokenIsNullException();
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        homeInfo.setAiserviceToken(tokenDto.getToken());
+        homeInfo.setAiserviceRefreshToken(tokenDto.getRefreshToken());
+        entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
+    }
+
+    @Override
+    public void deleteToken() {
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        homeInfo.setAiserviceToken(null);
+        homeInfo.setAiserviceRefreshToken(null);
+        entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
+    }
+
+    @Override
+    public LoggedDto isLogged() {
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        LoggedDto loggedDto = new LoggedDto();
+        loggedDto.setLogged(homeInfo.getAiserviceToken() != null && homeInfo.getAiserviceRefreshToken() != null);
+        return loggedDto;
+    }
+
+
 }
