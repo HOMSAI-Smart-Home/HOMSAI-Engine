@@ -30,25 +30,33 @@ public class EntitiesScheduledApplicationServiceImpl implements EntitiesSchedule
     @EventListener(ApplicationStartedEvent.class)
     @Scheduled(cron = "0 0 0 * * ?")
     public void getAllHomeAssistantEntities(){
-        String endPoint = "/entities/hass";
-        String contextPath = context.getContextPath();
-        RestTemplate restTemplate = new RestTemplate();
-        String url = UriComponentsBuilder.fromHttpUrl(rootUrl+port+contextPath+endPoint)
-                .encode()
-                .toUriString();
-        restTemplate.postForEntity(url, HttpMethod.POST, String.class);
+        try {
+            String endPoint = "/entities/hass";
+            String contextPath = context.getContextPath();
+            RestTemplate restTemplate = new RestTemplate();
+            String url = UriComponentsBuilder.fromHttpUrl(rootUrl + port + contextPath + endPoint)
+                    .encode()
+                    .toUriString();
+            restTemplate.postForEntity(url, HttpMethod.POST, String.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     @Scheduled(fixedRate = 5*60*1000)
     public void getAllHomsaiEntityValues(){
-        String endPoint = "/entities/homsai";
-        String contextPath = context.getContextPath();
-        RestTemplate restTemplate = new RestTemplate();
-        String url = UriComponentsBuilder.fromHttpUrl(rootUrl+port+contextPath+endPoint)
-                .encode()
-                .toUriString();
-        restTemplate.postForEntity(url, HttpMethod.POST, String.class);
+        try {
+            String endPoint = "/entities/homsai";
+            String contextPath = context.getContextPath();
+            RestTemplate restTemplate = new RestTemplate();
+            String url = UriComponentsBuilder.fromHttpUrl(rootUrl+port+contextPath+endPoint)
+                    .encode()
+                    .toUriString();
+            restTemplate.postForEntity(url, HttpMethod.POST, String.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

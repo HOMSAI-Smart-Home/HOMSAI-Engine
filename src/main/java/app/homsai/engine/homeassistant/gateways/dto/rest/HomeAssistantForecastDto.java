@@ -27,17 +27,17 @@ public class HomeAssistantForecastDto {
     @JsonProperty("condition")
     private String condition;
     @JsonProperty("precipitation")
-    private Double precipitation;
+    private String precipitation;
     @JsonProperty("temperature")
-    private Double temperature;
+    private String temperature;
     @JsonProperty("templow")
-    private Double templow;
+    private String templow;
     @JsonProperty("datetime")
     private String datetime;
     @JsonProperty("wind_bearing")
-    private Double windBearing;
+    private String windBearing;
     @JsonProperty("wind_speed")
-    private Double windSpeed;
+    private String windSpeed;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -52,32 +52,32 @@ public class HomeAssistantForecastDto {
     }
 
     @JsonProperty("precipitation")
-    public Double getPrecipitation() {
+    public String getPrecipitation() {
         return precipitation;
     }
 
     @JsonProperty("precipitation")
-    public void setPrecipitation(Double precipitation) {
+    public void setPrecipitation(String precipitation) {
         this.precipitation = precipitation;
     }
 
     @JsonProperty("temperature")
-    public Double getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
     @JsonProperty("temperature")
-    public void setTemperature(Double temperature) {
+    public void setTemperature(String temperature) {
         this.temperature = temperature;
     }
 
     @JsonProperty("templow")
-    public Double getTemplow() {
+    public String getTemplow() {
         return templow;
     }
 
     @JsonProperty("templow")
-    public void setTemplow(Double templow) {
+    public void setTemplow(String templow) {
         this.templow = templow;
     }
 
@@ -92,22 +92,22 @@ public class HomeAssistantForecastDto {
     }
 
     @JsonProperty("wind_bearing")
-    public Double getWindBearing() {
+    public String getWindBearing() {
         return windBearing;
     }
 
     @JsonProperty("wind_bearing")
-    public void setWindBearing(Double windBearing) {
+    public void setWindBearing(String windBearing) {
         this.windBearing = windBearing;
     }
 
     @JsonProperty("wind_speed")
-    public Double getWindSpeed() {
+    public String getWindSpeed() {
         return windSpeed;
     }
 
     @JsonProperty("wind_speed")
-    public void setWindSpeed(Double windSpeed) {
+    public void setWindSpeed(String windSpeed) {
         this.windSpeed = windSpeed;
     }
 

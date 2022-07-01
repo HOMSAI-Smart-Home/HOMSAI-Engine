@@ -122,8 +122,13 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
             hvacDevice.setArea(area);
             hvacDevice.setEntityId(homeAssistantEntityDto.getEntityId());
             hvacDevice.setType(type);
-            hvacDevice.setMaxTemp(homeAssistantEntityDto.getAttributes().getMaxTemp());
-            hvacDevice.setMinTemp(homeAssistantEntityDto.getAttributes().getMinTemp());
+            try {
+                hvacDevice.setMaxTemp(Double.parseDouble(homeAssistantEntityDto.getAttributes().getMaxTemp()));
+                hvacDevice.setMinTemp(Double.parseDouble(homeAssistantEntityDto.getAttributes().getMinTemp()));
+            }catch (Exception e){
+                hvacDevice.setMaxTemp(30D);
+                hvacDevice.setMinTemp(16D);
+            }
             hvacDevice.setHvacModes(homeAssistantEntityDto.getAttributes().getHvacModes());
             hvacDevice.setEnabled(true);
             hvacDeviceList.add(hvacDevice);

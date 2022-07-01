@@ -94,15 +94,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class HomeAssistantAttributesDto {
 
     @JsonProperty("editable")
-    private Boolean editable;
+    private String editable;
     @JsonProperty("id")
     private String id;
     @JsonProperty("latitude")
-    private Double latitude;
+    private String latitude;
     @JsonProperty("longitude")
-    private Double longitude;
+    private String longitude;
     @JsonProperty("gps_accuracy")
-    private Integer gpsAccuracy;
+    private String gpsAccuracy;
     @JsonProperty("source")
     private String source;
     @JsonProperty("user_id")
@@ -110,11 +110,11 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("friendly_name")
     private String friendlyName;
     @JsonProperty("auto_update")
-    private Boolean autoUpdate;
+    private String autoUpdate;
     @JsonProperty("installed_version")
     private String installedVersion;
     @JsonProperty("in_progress")
-    private Boolean inProgress;
+    private String inProgress;
     @JsonProperty("latest_version")
     private String latestVersion;
     @JsonProperty("release_summary")
@@ -128,7 +128,7 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("entity_picture")
     private String entityPicture;
     @JsonProperty("supported_features")
-    private Integer supportedFeatures;
+    private String supportedFeatures;
     @JsonProperty("next_dawn")
     private String nextDawn;
     @JsonProperty("next_dusk")
@@ -142,15 +142,15 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("next_setting")
     private String nextSetting;
     @JsonProperty("elevation")
-    private Double elevation;
+    private String elevation;
     @JsonProperty("azimuth")
-    private Double azimuth;
+    private String azimuth;
     @JsonProperty("rising")
-    private Boolean rising;
+    private String rising;
     @JsonProperty("radius")
-    private Integer radius;
+    private String radius;
     @JsonProperty("passive")
-    private Boolean passive;
+    private String passive;
     @JsonProperty("icon")
     private String icon;
     @JsonProperty("supported_color_modes")
@@ -162,7 +162,7 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("mode")
     private String mode;
     @JsonProperty("current")
-    private Integer current;
+    private String current;
     @JsonProperty("attribution")
     private String attribution;
     @JsonProperty("state_class")
@@ -172,23 +172,23 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("source_type")
     private String sourceType;
     @JsonProperty("altitude")
-    private Integer altitude;
+    private String altitude;
     @JsonProperty("course")
-    private Integer course;
+    private String course;
     @JsonProperty("speed")
-    private Integer speed;
+    private String speed;
     @JsonProperty("vertical_accuracy")
-    private Integer verticalAccuracy;
+    private String verticalAccuracy;
     @JsonProperty("temperature")
-    private Double temperature;
+    private String temperature;
     @JsonProperty("humidity")
-    private Integer humidity;
+    private String humidity;
     @JsonProperty("pressure")
-    private Double pressure;
+    private String pressure;
     @JsonProperty("wind_bearing")
-    private Double windBearing;
+    private String windBearing;
     @JsonProperty("wind_speed")
-    private Double windSpeed;
+    private String windSpeed;
     @JsonProperty("forecast")
     private List<HomeAssistantForecastDto> homeAssistantForecastDto = null;
     @JsonProperty("repositories")
@@ -198,29 +198,29 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("time")
     private String time;
     @JsonProperty("setting")
-    private Integer setting;
+    private String setting;
     @JsonProperty("hvac_modes")
     private List<String> hvacModes = null;
     @JsonProperty("min_temp")
-    private Double minTemp;
+    private String minTemp;
     @JsonProperty("max_temp")
-    private Double maxTemp;
+    private String maxTemp;
     @JsonProperty("target_temp_step")
-    private Double targetTempStep;
+    private String targetTempStep;
     @JsonProperty("preset_modes")
     private List<String> presetModes = null;
     @JsonProperty("current_temperature")
-    private Double currentTemperature;
+    private String currentTemperature;
     @JsonProperty("current_humidity")
-    private Double currentHumidity;
+    private String currentHumidity;
     @JsonProperty("hvac_action")
     private String hvacAction;
     @JsonProperty("preset_mode")
     private String presetMode;
     @JsonProperty("offset_celsius")
-    private Double offsetCelsius;
+    private String offsetCelsius;
     @JsonProperty("offset_fahrenheit")
-    private Double offsetFahrenheit;
+    private String offsetFahrenheit;
     @JsonProperty("default_overlay_type")
     private String defaultOverlayType;
     @JsonProperty("default_overlay_seconds")
@@ -228,7 +228,7 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("name")
     private String name;
     @JsonProperty("peak_power")
-    private Double peakPower;
+    private String peakPower;
     @JsonProperty("last_update_time")
     private String lastUpdateTime;
     @JsonProperty("installation_date")
@@ -240,19 +240,19 @@ public class HomeAssistantAttributesDto {
     @JsonProperty("model_name")
     private String modelName;
     @JsonProperty("maximum_power")
-    private Double maximumPower;
+    private String maximumPower;
     @JsonProperty("temperature_coef")
-    private Double temperatureCoef;
+    private String temperatureCoef;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("editable")
-    public Boolean getEditable() {
+    public String getEditable() {
         return editable;
     }
 
     @JsonProperty("editable")
-    public void setEditable(Boolean editable) {
+    public void setEditable(String editable) {
         this.editable = editable;
     }
 
@@ -267,32 +267,32 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("latitude")
-    public Double getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
     @JsonProperty("latitude")
-    public void setLatitude(Double latitude) {
+    public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
 
     @JsonProperty("longitude")
-    public Double getLongitude() {
+    public String getLongitude() {
         return longitude;
     }
 
     @JsonProperty("longitude")
-    public void setLongitude(Double longitude) {
+    public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
 
     @JsonProperty("gps_accuracy")
-    public Integer getGpsAccuracy() {
+    public String getGpsAccuracy() {
         return gpsAccuracy;
     }
 
     @JsonProperty("gps_accuracy")
-    public void setGpsAccuracy(Integer gpsAccuracy) {
+    public void setGpsAccuracy(String gpsAccuracy) {
         this.gpsAccuracy = gpsAccuracy;
     }
 
@@ -327,12 +327,12 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("auto_update")
-    public Boolean getAutoUpdate() {
+    public String getAutoUpdate() {
         return autoUpdate;
     }
 
     @JsonProperty("auto_update")
-    public void setAutoUpdate(Boolean autoUpdate) {
+    public void setAutoUpdate(String autoUpdate) {
         this.autoUpdate = autoUpdate;
     }
 
@@ -347,12 +347,12 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("in_progress")
-    public Boolean getInProgress() {
+    public String getInProgress() {
         return inProgress;
     }
 
     @JsonProperty("in_progress")
-    public void setInProgress(Boolean inProgress) {
+    public void setInProgress(String inProgress) {
         this.inProgress = inProgress;
     }
 
@@ -417,12 +417,12 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("supported_features")
-    public Integer getSupportedFeatures() {
+    public String getSupportedFeatures() {
         return supportedFeatures;
     }
 
     @JsonProperty("supported_features")
-    public void setSupportedFeatures(Integer supportedFeatures) {
+    public void setSupportedFeatures(String supportedFeatures) {
         this.supportedFeatures = supportedFeatures;
     }
 
@@ -487,52 +487,52 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("elevation")
-    public Double getElevation() {
+    public String getElevation() {
         return elevation;
     }
 
     @JsonProperty("elevation")
-    public void setElevation(Double elevation) {
+    public void setElevation(String elevation) {
         this.elevation = elevation;
     }
 
     @JsonProperty("azimuth")
-    public Double getAzimuth() {
+    public String getAzimuth() {
         return azimuth;
     }
 
     @JsonProperty("azimuth")
-    public void setAzimuth(Double azimuth) {
+    public void setAzimuth(String azimuth) {
         this.azimuth = azimuth;
     }
 
     @JsonProperty("rising")
-    public Boolean getRising() {
+    public String getRising() {
         return rising;
     }
 
     @JsonProperty("rising")
-    public void setRising(Boolean rising) {
+    public void setRising(String rising) {
         this.rising = rising;
     }
 
     @JsonProperty("radius")
-    public Integer getRadius() {
+    public String getRadius() {
         return radius;
     }
 
     @JsonProperty("radius")
-    public void setRadius(Integer radius) {
+    public void setRadius(String radius) {
         this.radius = radius;
     }
 
     @JsonProperty("passive")
-    public Boolean getPassive() {
+    public String getPassive() {
         return passive;
     }
 
     @JsonProperty("passive")
-    public void setPassive(Boolean passive) {
+    public void setPassive(String passive) {
         this.passive = passive;
     }
 
@@ -587,12 +587,12 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("current")
-    public Integer getCurrent() {
+    public String getCurrent() {
         return current;
     }
 
     @JsonProperty("current")
-    public void setCurrent(Integer current) {
+    public void setCurrent(String current) {
         this.current = current;
     }
 
@@ -637,92 +637,92 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("altitude")
-    public Integer getAltitude() {
+    public String getAltitude() {
         return altitude;
     }
 
     @JsonProperty("altitude")
-    public void setAltitude(Integer altitude) {
+    public void setAltitude(String altitude) {
         this.altitude = altitude;
     }
 
     @JsonProperty("course")
-    public Integer getCourse() {
+    public String getCourse() {
         return course;
     }
 
     @JsonProperty("course")
-    public void setCourse(Integer course) {
+    public void setCourse(String course) {
         this.course = course;
     }
 
     @JsonProperty("speed")
-    public Integer getSpeed() {
+    public String getSpeed() {
         return speed;
     }
 
     @JsonProperty("speed")
-    public void setSpeed(Integer speed) {
+    public void setSpeed(String speed) {
         this.speed = speed;
     }
 
     @JsonProperty("vertical_accuracy")
-    public Integer getVerticalAccuracy() {
+    public String getVerticalAccuracy() {
         return verticalAccuracy;
     }
 
     @JsonProperty("vertical_accuracy")
-    public void setVerticalAccuracy(Integer verticalAccuracy) {
+    public void setVerticalAccuracy(String verticalAccuracy) {
         this.verticalAccuracy = verticalAccuracy;
     }
 
     @JsonProperty("temperature")
-    public Double getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
     @JsonProperty("temperature")
-    public void setTemperature(Double temperature) {
+    public void setTemperature(String temperature) {
         this.temperature = temperature;
     }
 
     @JsonProperty("humidity")
-    public Integer getHumidity() {
+    public String getHumidity() {
         return humidity;
     }
 
     @JsonProperty("humidity")
-    public void setHumidity(Integer humidity) {
+    public void setHumidity(String humidity) {
         this.humidity = humidity;
     }
 
     @JsonProperty("pressure")
-    public Double getPressure() {
+    public String getPressure() {
         return pressure;
     }
 
     @JsonProperty("pressure")
-    public void setPressure(Double pressure) {
+    public void setPressure(String pressure) {
         this.pressure = pressure;
     }
 
     @JsonProperty("wind_bearing")
-    public Double getWindBearing() {
+    public String getWindBearing() {
         return windBearing;
     }
 
     @JsonProperty("wind_bearing")
-    public void setWindBearing(Double windBearing) {
+    public void setWindBearing(String windBearing) {
         this.windBearing = windBearing;
     }
 
     @JsonProperty("wind_speed")
-    public Double getWindSpeed() {
+    public String getWindSpeed() {
         return windSpeed;
     }
 
     @JsonProperty("wind_speed")
-    public void setWindSpeed(Double windSpeed) {
+    public void setWindSpeed(String windSpeed) {
         this.windSpeed = windSpeed;
     }
 
@@ -767,12 +767,12 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("setting")
-    public Integer getSetting() {
+    public String getSetting() {
         return setting;
     }
 
     @JsonProperty("setting")
-    public void setSetting(Integer setting) {
+    public void setSetting(String setting) {
         this.setting = setting;
     }
 
@@ -787,32 +787,32 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("min_temp")
-    public Double getMinTemp() {
+    public String getMinTemp() {
         return minTemp;
     }
 
     @JsonProperty("min_temp")
-    public void setMinTemp(Double minTemp) {
+    public void setMinTemp(String minTemp) {
         this.minTemp = minTemp;
     }
 
     @JsonProperty("max_temp")
-    public Double getMaxTemp() {
+    public String getMaxTemp() {
         return maxTemp;
     }
 
     @JsonProperty("max_temp")
-    public void setMaxTemp(Double maxTemp) {
+    public void setMaxTemp(String maxTemp) {
         this.maxTemp = maxTemp;
     }
 
     @JsonProperty("target_temp_step")
-    public Double getTargetTempStep() {
+    public String getTargetTempStep() {
         return targetTempStep;
     }
 
     @JsonProperty("target_temp_step")
-    public void setTargetTempStep(Double targetTempStep) {
+    public void setTargetTempStep(String targetTempStep) {
         this.targetTempStep = targetTempStep;
     }
 
@@ -827,22 +827,22 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("current_temperature")
-    public Double getCurrentTemperature() {
+    public String getCurrentTemperature() {
         return currentTemperature;
     }
 
     @JsonProperty("current_temperature")
-    public void setCurrentTemperature(Double currentTemperature) {
+    public void setCurrentTemperature(String currentTemperature) {
         this.currentTemperature = currentTemperature;
     }
 
     @JsonProperty("current_humidity")
-    public Double getCurrentHumidity() {
+    public String getCurrentHumidity() {
         return currentHumidity;
     }
 
     @JsonProperty("current_humidity")
-    public void setCurrentHumidity(Double currentHumidity) {
+    public void setCurrentHumidity(String currentHumidity) {
         this.currentHumidity = currentHumidity;
     }
 
@@ -867,22 +867,22 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("offset_celsius")
-    public Double getOffsetCelsius() {
+    public String getOffsetCelsius() {
         return offsetCelsius;
     }
 
     @JsonProperty("offset_celsius")
-    public void setOffsetCelsius(Double offsetCelsius) {
+    public void setOffsetCelsius(String offsetCelsius) {
         this.offsetCelsius = offsetCelsius;
     }
 
     @JsonProperty("offset_fahrenheit")
-    public Double getOffsetFahrenheit() {
+    public String getOffsetFahrenheit() {
         return offsetFahrenheit;
     }
 
     @JsonProperty("offset_fahrenheit")
-    public void setOffsetFahrenheit(Double offsetFahrenheit) {
+    public void setOffsetFahrenheit(String offsetFahrenheit) {
         this.offsetFahrenheit = offsetFahrenheit;
     }
 
@@ -917,12 +917,12 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("peak_power")
-    public Double getPeakPower() {
+    public String getPeakPower() {
         return peakPower;
     }
 
     @JsonProperty("peak_power")
-    public void setPeakPower(Double peakPower) {
+    public void setPeakPower(String peakPower) {
         this.peakPower = peakPower;
     }
 
@@ -977,22 +977,22 @@ public class HomeAssistantAttributesDto {
     }
 
     @JsonProperty("maximum_power")
-    public Double getMaximumPower() {
+    public String getMaximumPower() {
         return maximumPower;
     }
 
     @JsonProperty("maximum_power")
-    public void setMaximumPower(Double maximumPower) {
+    public void setMaximumPower(String maximumPower) {
         this.maximumPower = maximumPower;
     }
 
     @JsonProperty("temperature_coef")
-    public Double getTemperatureCoef() {
+    public String getTemperatureCoef() {
         return temperatureCoef;
     }
 
     @JsonProperty("temperature_coef")
-    public void setTemperatureCoef(Double temperatureCoef) {
+    public void setTemperatureCoef(String temperatureCoef) {
         this.temperatureCoef = temperatureCoef;
     }
 
