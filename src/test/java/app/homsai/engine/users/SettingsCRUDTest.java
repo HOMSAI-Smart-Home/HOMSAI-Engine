@@ -4,6 +4,8 @@ import app.homsai.engine.common.application.http.dtos.LoggedDto;
 import app.homsai.engine.common.application.http.dtos.SettingsDto;
 import app.homsai.engine.common.application.http.dtos.TokenDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
+import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
+import app.homsai.engine.optimizations.application.services.OptimizationsScheduledApplicationService;
 import elemental.json.Json;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(EntitiesScheduledApplicationService.class)
+@MockBean(classes = {EntitiesScheduledApplicationService.class, OptimizationsScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
 public class SettingsCRUDTest {
 
     @Autowired
@@ -46,10 +48,10 @@ public class SettingsCRUDTest {
         // Check right init values
         ResponseEntity<SettingsDto> defaultSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, SettingsDto.class);
         assertThat(defaultSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getGeneralPowerMeterId()).isNull();
-        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getHvacPowerMeterId()).isNull();
-        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getPvProductionSensorId()).isNull();
-        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getPvStorageSensorId()).isNull();
+        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getGeneralPowerMeterId()).isEqualTo("sensor.general");
+        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getHvacPowerMeterId()).isEqualTo("sensor.hvac");
+        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getPvProductionSensorId()).isEqualTo("sensor.production");
+        assertThat(Objects.requireNonNull(defaultSettings.getBody()).getPvStorageSensorId()).isEqualTo("sensor.storage");
         assertThat(Objects.requireNonNull(defaultSettings.getBody()).getLatitude()).isNull();
         assertThat(Objects.requireNonNull(defaultSettings.getBody()).getLongitude()).isNull();
         assertThat(Objects.requireNonNull(defaultSettings.getBody()).getPvPeakPower()).isNull();

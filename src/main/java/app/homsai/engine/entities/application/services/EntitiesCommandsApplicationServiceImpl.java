@@ -1,17 +1,19 @@
 package app.homsai.engine.entities.application.services;
 
-import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HVACDeviceInitDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
+import app.homsai.engine.entities.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
+import app.homsai.engine.entities.domain.exceptions.BadIntervalsException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
+import app.homsai.engine.optimizations.infrastructure.cache.HVACRunningDevicesCacheRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static app.homsai.engine.common.domain.utils.Consts.*;
@@ -44,14 +49,14 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     EntitiesMapper entitiesMapper;
 
     @Autowired
-    HomsaiHVACDeviceCacheRepository homsaiHVACDeviceCacheRepository;
+    HVACRunningDevicesCacheRepository hvacRunningDevicesCacheRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
 
     @Override
     public void syncHomeAssistantEntities() throws InterruptedException {
-        logger.debug("synchronizing home assistant entities...");
+        logger.info("synchronizing home assistant entities...");
         List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities(null);
         List<HAEntity> haEntityList = entitiesMapper.convertFromDto(homeAssistantEntityDtoList);
         if(haEntityList.size() > 0){
@@ -65,7 +70,7 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
             lock.wait(30000);
         }
         Integer homsaiEntitiesCount = entitiesCommandsService.syncHomsaiEntities();
-        logger.debug("synchronized "+haEntitySavedList.size()+ " Home Assistant entities and "+homsaiEntitiesCount+ " Homsai entities");
+        logger.info("synchronized "+haEntitySavedList.size()+ " Home Assistant entities and "+homsaiEntitiesCount+ " Homsai entities");
     }
 
     @Override
@@ -152,6 +157,31 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
         } catch (BadHomeInfoException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException {
+        HVACDevice hvacDevice = entitiesQueriesService.findOneHvacDeviceByEntityId(hvacDeviceEntityId);
+        Boolean enabledValue = hvacDeviceSettingDto.getEnabled();
+        Boolean autoMode = hvacDeviceSettingDto.getManual();
+        Double desiredTemperature = hvacDeviceSettingDto.getSetTemperature();
+        LocalTime startTimeValue = hvacDeviceSettingDto.getStartTime();
+        LocalTime endTimeValue = hvacDeviceSettingDto.getEndTime();
+        hvacDevice.setEnabled(enabledValue);
+        hvacRunningDevicesCacheRepository.getHvacDevicesCache().get(hvacDevice.getEntityId()).setManual(autoMode);
+        hvacDevice.getArea().setDesiredSummerTemperature(desiredTemperature);
+        if(startTimeValue != null && endTimeValue != null) {
+            HvacDeviceInterval hvacInterval = new HvacDeviceInterval(startTimeValue, endTimeValue);
+            List<HvacDeviceInterval> hvacDeviceIntervalList = new ArrayList<>();
+            hvacDeviceIntervalList.add(hvacInterval);
+            hvacDevice.setIntervals(hvacDeviceIntervalList);
+        }
+        else if(startTimeValue == null && endTimeValue == null)
+            hvacDevice.setIntervals(null);
+        else throw new BadIntervalsException();
+        entitiesCommandsService.updateHvacDevice(hvacDevice);
+        hvacRunningDevicesCacheRepository.updateHvacDevicesCache();
+        return hvacDeviceSettingDto;
     }
 
 }

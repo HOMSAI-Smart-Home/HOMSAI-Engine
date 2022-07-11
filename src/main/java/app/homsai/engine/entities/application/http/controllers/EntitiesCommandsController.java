@@ -1,8 +1,10 @@
 package app.homsai.engine.entities.application.http.controllers;
 
 import app.homsai.engine.common.domain.models.DocsConsts;
+import app.homsai.engine.entities.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.BadIntervalsException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,14 @@ public class EntitiesCommandsController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
         return ResponseEntity.status(HttpStatus.OK).body(entitiesCommandsApplicationService.initHVACDevices(type));
+    }
+
+    @RequestMapping(value = "/entities/homsai/hvac/settings/{entityId}", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity editHvacDeviceSettings(@RequestBody HvacDeviceSettingDto hvacDeviceSettingDto,
+                                                 @PathVariable("entityId") String entityUuid) throws BadIntervalsException {
+        return ResponseEntity.status(HttpStatus.OK).body(entitiesCommandsApplicationService.updateHvacDeviceSetting(entityUuid, hvacDeviceSettingDto));
     }
 
 }

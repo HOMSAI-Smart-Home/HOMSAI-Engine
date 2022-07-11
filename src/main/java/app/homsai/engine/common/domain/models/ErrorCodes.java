@@ -20,6 +20,10 @@ public class ErrorCodes {
     public static final int HAENTITY_NOT_FOUND = 32;
     public static final int BAD_HOME_INFO = 33;
     public static final int HVAC_POWER_METER_NOT_SET = 34;
+    public static final int BAD_INTERVALS = 35;
+    public static final int HVAC_ENTITY_NOT_FOUND = 36;
+
+
 
     /*
      * JWT / Validation

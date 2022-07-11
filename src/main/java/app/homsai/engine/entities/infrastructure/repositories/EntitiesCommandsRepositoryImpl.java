@@ -115,7 +115,7 @@ public class EntitiesCommandsRepositoryImpl implements EntitiesCommandsRepositor
 
     @Override
     public HVACDevice updateHvacDevice(HVACDevice hvacDevice) {
-        return hvacDeviceCommandsJpaRepository.saveAndFlushNow(hvacDevice);
+        return hvacDeviceCommandsJpaRepository.save(hvacDevice);
     }
 
 }

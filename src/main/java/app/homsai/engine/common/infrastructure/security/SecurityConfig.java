@@ -23,10 +23,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private static final String LOGIN_FAILURE_URL = "/login?error";
   private static final String LOGIN_URL = "/login";
   private static final String LOGOUT_SUCCESS_URL = "/login";
+  private final String homeAssistantEntitiesEndpoint = "/entities/hass";
+  private final String homsaiEntitiesEndpoint = "/entities/homsai";
+  private final String excludedEntitiesEndpoint = "/entities/hass/excluded";
+  private final String homsaiEntitiesValuesEndpoint = "/entities/history/homsai";
   private final String injectTokenEndpoint = "/auth/token/inject";
   private final String removeTokenEndpoint = "/auth/token/remove";
   private final String isLoggedEndpoint = "/auth/islogged";
   private final String settingsEndpoint = "/settings";
+  private final String hvacInitEndpoint = "/entities/homsai/hvac/init";
+  private final String hvacInitStatusEndpoint = "/entities/homsai/hvac/init/status";
+  private final String hvacListEndpoint = "/entities/homsai/hvac";
+  private final String hvacDetailEndpoint = "/entities/homsai/hvac/*";
+  private final String hvacDeviceSetSettingsEndpoint = "/entities/homsai/hvac/settings/*";
 
   @Autowired
   AIServiceAuthenticationProvider aiServiceAuthenticationProvider;
@@ -36,42 +45,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
    */
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    // Vaadin handles CSRF internally
+
     http.csrf().disable()
 
-        // Register our CustomRequestCache, which saves unauthorized access attempts, so the user is redirected after login.
         .requestCache().requestCache(new CustomRequestCache())
 
-        // Restrict access to our application.
         .and().authorizeRequests()
 
-        // Allow all Vaadin internal requests.
         .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
             .antMatchers( "/").permitAll()
-            .antMatchers("/entities/hass").permitAll()
-            .antMatchers("/entities/homsai").permitAll()
-            .antMatchers(HttpMethod.POST, "/entities/hass/excluded").permitAll()
-            .antMatchers(HttpMethod.POST, "/entities/homsai/hvac/init").permitAll()
-            .antMatchers(HttpMethod.GET, "/entities/history/homsai").permitAll()
+            .antMatchers(homeAssistantEntitiesEndpoint).permitAll()
+            .antMatchers(homsaiEntitiesEndpoint).permitAll()
+            .antMatchers(HttpMethod.POST, excludedEntitiesEndpoint).permitAll()
+            .antMatchers(HttpMethod.GET, homsaiEntitiesValuesEndpoint).permitAll()
             .antMatchers(HttpMethod.GET, LOGIN_URL).permitAll()
             .antMatchers(HttpMethod.POST, injectTokenEndpoint).permitAll()
             .antMatchers(HttpMethod.POST, removeTokenEndpoint).permitAll()
             .antMatchers(HttpMethod.GET, isLoggedEndpoint).permitAll()
+            .antMatchers(HttpMethod.POST, hvacInitEndpoint).permitAll()
+            .antMatchers(HttpMethod.GET, hvacInitStatusEndpoint).permitAll()
+            .antMatchers(HttpMethod.GET, hvacListEndpoint).permitAll()
+            .antMatchers(HttpMethod.GET, hvacDetailEndpoint).permitAll()
+            .antMatchers(HttpMethod.POST, hvacDeviceSetSettingsEndpoint).permitAll()
             .antMatchers(settingsEndpoint).permitAll()
-
-        // Allow all requests by logged-in users.
         .anyRequest().authenticated()
-
-        // Configure the login page.
-     /*   .and().formLogin()
-        .loginPage(LOGIN_URL).permitAll()
-        .loginProcessingUrl(LOGIN_PROCESSING_URL)
-        .failureUrl(LOGIN_FAILURE_URL)*/
-
-        // Configure logout
         .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
 
-    http.headers().frameOptions().disable(); //TODO REMOVE
+    http.headers().frameOptions().disable();
   }
 
   @Override

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class HvacDeviceCacheDto {
 
-    @JsonProperty("in_progress")
+    @JsonProperty("progress")
     private Boolean inProgress;
 
     @JsonProperty("elapsed_time_seconds")
@@ -58,7 +58,7 @@ public class HvacDeviceCacheDto {
         this.remainingTimeSeconds = remainingTimeSeconds;
     }
 
-    @JsonProperty("elapsed_percent")
+    @JsonProperty("elapsed")
     public Double getElapsedPercent() {
         if(totalTimeSeconds==0)
             return 0D;
