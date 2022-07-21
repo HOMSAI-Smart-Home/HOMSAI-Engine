@@ -34,4 +34,6 @@ public interface EntitiesQueriesApplicationService {
     List<HvacDeviceDto> getHvacEntities();
 
     HvacDeviceDto getOneHvacEntity(String entityUuid) throws HvacEntityNotFoundException;
+
+    HomeHvacSettingsDto getHomsaiHvacSettings();
 }

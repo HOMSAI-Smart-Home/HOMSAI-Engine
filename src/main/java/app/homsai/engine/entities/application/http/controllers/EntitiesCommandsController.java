@@ -1,9 +1,12 @@
 package app.homsai.engine.entities.application.http.controllers;
 
+import app.homsai.engine.common.domain.exceptions.BadRequestException;
 import app.homsai.engine.common.domain.models.DocsConsts;
+import app.homsai.engine.entities.application.http.dtos.HomeHvacSettingsDto;
 import app.homsai.engine.entities.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.BadIntervalsException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import org.slf4j.Logger;
@@ -57,6 +60,14 @@ public class EntitiesCommandsController {
     public ResponseEntity editHvacDeviceSettings(@RequestBody HvacDeviceSettingDto hvacDeviceSettingDto,
                                                  @PathVariable("entityId") String entityUuid) throws BadIntervalsException {
         return ResponseEntity.status(HttpStatus.OK).body(entitiesCommandsApplicationService.updateHvacDeviceSetting(entityUuid, hvacDeviceSettingDto));
+    }
+
+
+    @RequestMapping(value = "/entities/homsai/home/settings", method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity editHomeHvacSettings(@RequestBody HomeHvacSettingsDto homeHvacSettingsDto) throws BadRequestException, BadHomeInfoException {
+        return ResponseEntity.status(HttpStatus.OK).body(entitiesCommandsApplicationService.updateHomeHvacSettings(homeHvacSettingsDto));
     }
 
 }

@@ -1,7 +1,11 @@
 package app.homsai.engine.entities.application.services;
 
+import app.homsai.engine.common.domain.exceptions.BadRequestException;
+import app.homsai.engine.common.domain.models.ErrorCodes;
+import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HVACDeviceInitDto;
+import app.homsai.engine.entities.application.http.dtos.HomeHvacSettingsDto;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
@@ -182,6 +186,23 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
         entitiesCommandsService.updateHvacDevice(hvacDevice);
         hvacRunningDevicesCacheRepository.updateHvacDevicesCache();
         return hvacDeviceSettingDto;
+    }
+
+    @Override
+    public HomeHvacSettingsDto updateHomeHvacSettings(HomeHvacSettingsDto homeHvacSettingsDto) throws BadRequestException, BadHomeInfoException {
+        if (homeHvacSettingsDto.getOptimizerEnabled() == null || homeHvacSettingsDto.getSetTemperature() == null)
+            throw new BadRequestException(ErrorCodes.BAD_HOME_INFO, "Home settings cannot be null");
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        Area area = entitiesQueriesService.getHomeArea();
+        if(Consts.HVAC_MODE.equals("summer")){
+            area.setDesiredSummerTemperature(homeHvacSettingsDto.getSetTemperature());
+        } else {
+            area.setDesiredWinterTemperature(homeHvacSettingsDto.getSetTemperature());
+        }
+        homeInfo.setPvOptimizationsEnabled(homeHvacSettingsDto.getOptimizerEnabled());
+        entitiesCommandsService.updateHomeInfo(homeInfo);
+        entitiesCommandsService.updateArea(area);
+        return homeHvacSettingsDto;
     }
 
 }

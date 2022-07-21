@@ -61,4 +61,10 @@ public class EntitiesQueriesController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(entitiesQueriesApplicationService.getOneHvacEntity(entityUuid));
     }
+
+    @RequestMapping(value = "/entities/homsai/home/settings", method = RequestMethod.GET)
+    public ResponseEntity getHomsaiHvacSettings() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(entitiesQueriesApplicationService.getHomsaiHvacSettings());
+    }
 }

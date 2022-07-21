@@ -1,5 +1,6 @@
 package app.homsai.engine.entities.application.services;
 
+import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.entities.application.http.cache.HomsaiEntityShowCacheRepository;
 import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
@@ -127,5 +128,15 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
         if(hvacDevice == null)
             throw new HvacEntityNotFoundException(entityUuid);
         return entitiesMapper.convertToDto(hvacDevice);
+    }
+
+    @Override
+    public HomeHvacSettingsDto getHomsaiHvacSettings() {
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        Area area = entitiesQueriesService.getHomeArea();
+        HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
+        homeHvacSettingsDto.setSetTemperature(Consts.HVAC_MODE.equals("summer")?area.getDesiredSummerTemperature():area.getDesiredWinterTemperature());
+        homeHvacSettingsDto.setOptimizerEnabled(homeInfo.getPvOptimizationsEnabled());
+        return homeHvacSettingsDto;
     }
 }

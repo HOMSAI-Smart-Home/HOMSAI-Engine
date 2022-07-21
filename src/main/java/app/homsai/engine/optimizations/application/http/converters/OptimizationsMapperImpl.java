@@ -40,6 +40,8 @@ public class OptimizationsMapperImpl implements OptimizationsMapper {
 
     @Override
     public List<HvacInterval> convertToDtoIntervals(List<HvacDeviceInterval> intervals) {
+        if(intervals == null)
+            return null;
         return intervals.stream()
                 .map(h -> modelMapper.map(h, HvacInterval.class))
                 .collect(Collectors.toList());

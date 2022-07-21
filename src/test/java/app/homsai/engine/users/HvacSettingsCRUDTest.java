@@ -1,6 +1,6 @@
 package app.homsai.engine.users;
 
-import app.homsai.engine.common.application.http.dtos.SettingsDto;
+import app.homsai.engine.entities.application.http.dtos.HomeHvacSettingsDto;
 import app.homsai.engine.entities.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
@@ -20,9 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.Instant;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +39,8 @@ public class HvacSettingsCRUDTest {
 
     private final String readSettingsEndpoint = "/entities/homsai/hvac/climate.area1";
     private final String updateSettingsEndpoint = "/entities/homsai/hvac/settings/climate.area1";
+    private final String readHomeSettingsEndpoint = "/entities/homsai/home/settings";
+    private final String updateHomeSettingsEndpoint = "/entities/homsai/home/settings";
 
     @Autowired
     HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
@@ -89,6 +89,73 @@ public class HvacSettingsCRUDTest {
         assertThat(Objects.requireNonNull(newSettings.getBody()).getSetTemperature()).isEqualTo(30.0);
         assertThat(Objects.requireNonNull(newSettings.getBody()).getIntervals().get(0).getStartTime()).isEqualToIgnoringSeconds(LocalTime.of(10, 0));
         assertThat(Objects.requireNonNull(newSettings.getBody()).getIntervals().get(0).getEndTime()).isEqualToIgnoringSeconds(LocalTime.of(15, 0));
+
+
+        hvacDeviceSettingDto = new HvacDeviceSettingDto();
+        hvacDeviceSettingDto.setEnabled(false);
+        hvacDeviceSettingDto.setManual(true);
+        hvacDeviceSettingDto.setSetTemperature(26.0);
+        hvacDeviceSettingDto.setStartTime(null);
+        hvacDeviceSettingDto.setEndTime(null);
+        request = new HttpEntity<>(hvacDeviceSettingDto);
+        updateSettingsResponse  =
+                restTemplate.postForEntity(env.getProperty("server.contextPath") + updateSettingsEndpoint,
+                        request, String.class);
+        assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        newSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, HvacDeviceDto.class);
+        assertThat(newSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getActualPowerConsumption()).isZero();
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getPowerConsumption()).isEqualTo(1090.63);
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getActive()).isFalse();
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getEnabled()).isFalse();
+        assertThat(Objects.requireNonNull(newSettings.getBody()).isManual()).isTrue();
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getAreaId()).isEqualTo("area1");
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getCurrentTemperature()).isNull();
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getSetTemperature()).isEqualTo(26.0);
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getIntervals()).isNull();
+
+    }
+
+    @Test
+    public void whenUpdateHomeSettings_thenReadRightValues() {
+
+        // Check right init values
+        ResponseEntity<HomeHvacSettingsDto> defaultHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
+        assertThat(defaultHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getSetTemperature()).isEqualTo(26.0);
+        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getOptimizerEnabled()).isEqualTo(false);
+
+        HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
+        homeHvacSettingsDto.setOptimizerEnabled(true);
+        homeHvacSettingsDto.setSetTemperature(30.0);
+        HttpEntity<HomeHvacSettingsDto> request = new HttpEntity<>(homeHvacSettingsDto);
+        ResponseEntity<HomeHvacSettingsDto> updateSettingsResponse  =
+                restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
+                        request, HomeHvacSettingsDto.class);
+        assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<HomeHvacSettingsDto> newHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
+        assertThat(newHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getSetTemperature()).isEqualTo(30);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerEnabled()).isEqualTo(true);
+
+        homeHvacSettingsDto.setOptimizerEnabled(null);
+        homeHvacSettingsDto.setSetTemperature(null);
+        request = new HttpEntity<>(homeHvacSettingsDto);
+        updateSettingsResponse  =
+                restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
+                        request, HomeHvacSettingsDto.class);
+        assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+
+        homeHvacSettingsDto.setOptimizerEnabled(false);
+        homeHvacSettingsDto.setSetTemperature(26.0);
+        request = new HttpEntity<>(homeHvacSettingsDto);
+        updateSettingsResponse  =
+                restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
+                        request, HomeHvacSettingsDto.class);
+        assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
     }
 
