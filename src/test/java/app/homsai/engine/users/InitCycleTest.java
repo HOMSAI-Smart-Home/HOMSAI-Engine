@@ -1,11 +1,9 @@
 package app.homsai.engine.users;
 
-import app.homsai.engine.common.application.http.dtos.SettingsDto;
-import app.homsai.engine.entities.application.http.dtos.HVACDeviceInitDto;
-import app.homsai.engine.entities.application.http.dtos.HvacDeviceCacheDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationCacheDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
-import app.homsai.engine.optimizations.application.services.OptimizationsScheduledApplicationService;
+import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +12,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -29,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, OptimizationsScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, PVOptimizerScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
 public class InitCycleTest {
 
 
@@ -55,7 +51,7 @@ public class InitCycleTest {
     public void whenStartHVACInit_thenReadRightStatus() {
 
         // Check right init values
-        ResponseEntity<HvacDeviceCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacDeviceCacheDto.class);
+        ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
         assertThat(preInitStatus.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(preInitStatus.getBody()).getInProgress()).isFalse();
         assertThat(Objects.requireNonNull(preInitStatus.getBody()).getLog()).isEqualTo("");
@@ -75,7 +71,7 @@ public class InitCycleTest {
         assertThat(startHvacInit.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // check read settings values
-        ResponseEntity<HvacDeviceCacheDto> postInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacDeviceCacheDto.class);
+        ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> postInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
         assertThat(postInitStatus.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getInProgress()).isTrue();
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getLog()).isNotEqualTo("");

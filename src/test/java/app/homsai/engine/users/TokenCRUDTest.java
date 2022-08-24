@@ -4,7 +4,7 @@ import app.homsai.engine.common.application.http.dtos.LoggedDto;
 import app.homsai.engine.common.application.http.dtos.TokenDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
-import app.homsai.engine.optimizations.application.services.OptimizationsScheduledApplicationService;
+import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, OptimizationsScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, PVOptimizerScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
 public class TokenCRUDTest {
 
     @Autowired

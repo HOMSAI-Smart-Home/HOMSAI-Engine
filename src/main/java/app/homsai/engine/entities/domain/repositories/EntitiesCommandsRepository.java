@@ -1,8 +1,6 @@
 package app.homsai.engine.entities.domain.repositories;
 
-import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
-import app.homsai.engine.entities.domain.exceptions.HAEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.*;
 
 import java.util.List;
@@ -33,9 +31,5 @@ public interface EntitiesCommandsRepository {
 
     HomeInfo updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException;
 
-    HVACDevice saveHvacDevice(HVACDevice hvacDevice);
 
-    void deleteFromHvacDevicesByType(Integer type);
-
-    HVACDevice updateHvacDevice(HVACDevice hvacDevice);
 }

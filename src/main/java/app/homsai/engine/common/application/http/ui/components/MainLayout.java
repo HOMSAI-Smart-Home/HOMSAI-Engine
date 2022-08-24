@@ -2,13 +2,11 @@ package app.homsai.engine.common.application.http.ui.components;
 
 
 import app.homsai.engine.common.application.http.ui.MainView;
-import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.common.domain.utils.EnText;
 import app.homsai.engine.common.infrastructure.security.SecurityService;
-import app.homsai.engine.entities.application.http.ui.HvacDevicesView;
+import app.homsai.engine.pvoptimizer.application.http.ui.HvacDevicesView;
 import app.homsai.engine.entities.application.http.ui.SettingsView;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
-import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -19,10 +17,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 
-import java.util.Collections;
 @Theme(themeFolder = "homsai")
 public class MainLayout extends AppLayout {
 

@@ -1,13 +1,13 @@
 package app.homsai.engine.users;
 
-import app.homsai.engine.entities.application.http.dtos.HomeHvacSettingsDto;
-import app.homsai.engine.entities.application.http.dtos.HvacDeviceSettingDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
-import app.homsai.engine.optimizations.application.http.dtos.HvacDeviceDto;
-import app.homsai.engine.optimizations.application.services.OptimizationsScheduledApplicationService;
+import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
+import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, OptimizationsScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, PVOptimizerScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
 public class HvacSettingsCRUDTest {
 
     @Autowired
@@ -51,7 +51,7 @@ public class HvacSettingsCRUDTest {
         configureMockServices();
 
         // Check right init values
-        ResponseEntity<HvacDeviceDto> defaultHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, HvacDeviceDto.class);
+        ResponseEntity<OptimizerHVACDeviceDto> defaultHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, OptimizerHVACDeviceDto.class);
         assertThat(defaultHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getActualPowerConsumption()).isZero();
         assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getPowerConsumption()).isEqualTo(1090.63);
@@ -77,7 +77,7 @@ public class HvacSettingsCRUDTest {
         assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // check read settings values
-        ResponseEntity<HvacDeviceDto> newSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, HvacDeviceDto.class);
+        ResponseEntity<OptimizerHVACDeviceDto> newSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, OptimizerHVACDeviceDto.class);
         assertThat(newSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(newSettings.getBody()).getActualPowerConsumption()).isZero();
         assertThat(Objects.requireNonNull(newSettings.getBody()).getPowerConsumption()).isEqualTo(1090.63);
@@ -103,7 +103,7 @@ public class HvacSettingsCRUDTest {
                         request, String.class);
         assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        newSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, HvacDeviceDto.class);
+        newSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, OptimizerHVACDeviceDto.class);
         assertThat(newSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(newSettings.getBody()).getActualPowerConsumption()).isZero();
         assertThat(Objects.requireNonNull(newSettings.getBody()).getPowerConsumption()).isEqualTo(1090.63);

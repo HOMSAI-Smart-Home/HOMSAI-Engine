@@ -1,8 +1,6 @@
 package app.homsai.engine.common.application.http.ui;
 
 import app.homsai.engine.common.gateways.AIServiceAuthenticationGateway;
-import app.homsai.engine.common.gateways.dtos.LoginResponseDto;
-import app.homsai.engine.entities.application.http.ui.HvacDevicesInitView;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.models.HomeInfo;
@@ -15,9 +13,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;

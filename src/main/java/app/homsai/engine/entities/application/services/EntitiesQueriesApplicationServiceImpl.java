@@ -1,16 +1,10 @@
 package app.homsai.engine.entities.application.services;
 
-import app.homsai.engine.common.domain.utils.Consts;
-import app.homsai.engine.entities.application.http.cache.HomsaiEntityShowCacheRepository;
-import app.homsai.engine.entities.application.http.cache.HomsaiHVACDeviceCacheRepository;
+import app.homsai.engine.entities.domain.services.cache.HomsaiEntityShowCacheService;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.*;
-import app.homsai.engine.entities.domain.exceptions.HvacEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
-import app.homsai.engine.optimizations.application.http.dtos.HvacDeviceDto;
-import app.homsai.engine.optimizations.domain.models.HvacDevice;
-import app.homsai.engine.optimizations.infrastructure.cache.HVACRunningDevicesCacheRepository;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -29,13 +23,7 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
     EntitiesQueriesService entitiesQueriesService;
 
     @Autowired
-    HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository;
-
-    @Autowired
-    HomsaiHVACDeviceCacheRepository homsaiHVACDeviceCacheRepository;
-
-    @Autowired
-    HVACRunningDevicesCacheRepository hvacRunningDevicesCacheRepository;
+    HomsaiEntityShowCacheService homsaiEntityShowCacheService;
 
     @Autowired
     EntitiesMapper entitiesMapper;
@@ -93,13 +81,7 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
 
     @Override
     public void cacheAllLastHomsaiEntitiesToShow(){
-        homsaiEntityShowCacheRepository.setHomsaiEntityShowDtoList(getAllLastHomsaiEntityToShow());
-    }
-
-    @Override
-    @Transactional
-    public List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning) {
-        return entitiesMapper.convertToDto(entitiesQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), hvacDeviceConditioning == null ? null : "type:"+hvacDeviceConditioning).getContent());
+        homsaiEntityShowCacheService.setHomsaiEntityShowDtoList(getAllLastHomsaiEntityToShow());
     }
 
     @Override
@@ -113,30 +95,8 @@ public class EntitiesQueriesApplicationServiceImpl implements EntitiesQueriesApp
     }
 
     @Override
-    public HvacDeviceCacheDto getHvacInitStatus() {
-        return homsaiHVACDeviceCacheRepository.getHvacDeviceCacheDto();
+    public Area getHomeArea() {
+        return entitiesQueriesService.getHomeArea();
     }
 
-    @Override
-    public List<HvacDeviceDto> getHvacEntities() {
-        return entitiesMapper.convertToDto(hvacRunningDevicesCacheRepository.getHvacDevicesCache().values());
-    }
-
-    @Override
-    public HvacDeviceDto getOneHvacEntity(String entityUuid) throws HvacEntityNotFoundException {
-        HvacDevice hvacDevice = hvacRunningDevicesCacheRepository.getHvacDevicesCache().get(entityUuid);
-        if(hvacDevice == null)
-            throw new HvacEntityNotFoundException(entityUuid);
-        return entitiesMapper.convertToDto(hvacDevice);
-    }
-
-    @Override
-    public HomeHvacSettingsDto getHomsaiHvacSettings() {
-        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
-        Area area = entitiesQueriesService.getHomeArea();
-        HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
-        homeHvacSettingsDto.setSetTemperature(Consts.HVAC_MODE.equals("summer")?area.getDesiredSummerTemperature():area.getDesiredWinterTemperature());
-        homeHvacSettingsDto.setOptimizerEnabled(homeInfo.getPvOptimizationsEnabled());
-        return homeHvacSettingsDto;
-    }
 }

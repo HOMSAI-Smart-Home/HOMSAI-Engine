@@ -42,8 +42,6 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     @Autowired
     ExcludedHAEntityQueriesJpaRepository excludedHAEntityQueriesJpaRepository;
 
-    @Autowired
-    HVACDeviceQueriesJpaRepository hvacDeviceQueriesJpaRepository;
 
     @Autowired
     HomeInfoQueriesJpaRepository homeInfoQueriesJpaRepository;
@@ -127,18 +125,6 @@ public class EntitiesQueriesRepositoryImpl implements EntitiesQueriesRepository 
     @Override
     public HomeInfo getHomeInfo() {
         return homeInfoQueriesJpaRepository.findOneActive(HOME_INFO_UUID);
-    }
-
-    @Override
-    @Transactional
-    public Page<HVACDevice> findAllHvacDevices(Pageable pageable, String search) {
-        return hvacDeviceQueriesJpaRepository.findAllActive(pageable, search);
-    }
-
-    @Override
-    @Transactional
-    public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
-        return hvacDeviceQueriesJpaRepository.findOneByEntityId(entityId);
     }
 
 }

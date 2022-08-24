@@ -1,35 +1,24 @@
 package app.homsai.engine.entities.application.http.ui;
 
 import app.homsai.engine.common.application.http.ui.components.MainLayout;
-import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.common.domain.utils.EnText;
-import app.homsai.engine.entities.application.http.dtos.AreaDto;
 import app.homsai.engine.entities.application.http.dtos.HAEntityDto;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
-import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
-import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.models.HomeInfo;
-import app.homsai.engine.optimizations.application.http.ui.HvacPVOptimizationView;
-import app.homsai.engine.optimizations.domain.models.HvacDevice;
-import app.homsai.engine.optimizations.infrastructure.cache.HVACRunningDevicesCacheRepository;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @PageTitle("Settings")

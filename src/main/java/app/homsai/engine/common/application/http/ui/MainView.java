@@ -3,7 +3,7 @@ package app.homsai.engine.common.application.http.ui;
 
 import app.homsai.engine.common.application.http.ui.components.MainLayout;
 import app.homsai.engine.common.domain.utils.EnText;
-import app.homsai.engine.entities.application.http.cache.HomsaiEntityShowCacheRepository;
+import app.homsai.engine.entities.domain.services.cache.HomsaiEntityShowCacheService;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntityShowDto;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.Grid;
@@ -18,13 +18,13 @@ import java.util.List;
 @Route(value="dashboard", layout = MainLayout.class)
 public class MainView extends VerticalLayout {
 
-    private HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository;
+    private HomsaiEntityShowCacheService homsaiEntityShowCacheService;
 
     final Grid<HomsaiEntityShowDto> grid;
     Label label;
 
-    public MainView(HomsaiEntityShowCacheRepository homsaiEntityShowCacheRepository) {
-        this.homsaiEntityShowCacheRepository = homsaiEntityShowCacheRepository;
+    public MainView(HomsaiEntityShowCacheService homsaiEntityShowCacheService) {
+        this.homsaiEntityShowCacheService = homsaiEntityShowCacheService;
         this.grid = new Grid<>(HomsaiEntityShowDto.class);
         setSizeFull();
         UI.getCurrent().setPollInterval(5000);
@@ -39,7 +39,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void listHomsaiEntities() {
-        List<HomsaiEntityShowDto> homsaiEntityShowDtos = homsaiEntityShowCacheRepository.getHomsaiEntityShowDtoList();
+        List<HomsaiEntityShowDto> homsaiEntityShowDtos = homsaiEntityShowCacheService.getHomsaiEntityShowDtoList();
         if(homsaiEntityShowDtos == null || homsaiEntityShowDtos.size() == 0){
             label.getStyle().set("color", "#00FF00");
             label.setVisible(true);

@@ -40,21 +40,10 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
         return entitiesQueriesRepository.findAllAreaList();
     }
 
-    @Override
-    @Transactional
-    public Page<HVACDevice> findAllHomsaiHvacDevices(Pageable pageable, String search) {
-        return entitiesQueriesRepository.findAllHvacDevices(pageable, search);
-    }
 
     @Override
     public HomeInfo findHomeInfo() {
         return entitiesQueriesRepository.getHomeInfo();
-    }
-
-    @Override
-    @Transactional
-    public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
-        return entitiesQueriesRepository.findOneHvacDeviceByEntityId(entityId);
     }
 
     @Override

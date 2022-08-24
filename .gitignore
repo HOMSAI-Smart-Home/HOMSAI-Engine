@@ -50,4 +50,5 @@ target/
 webpack.config.js
 webpack.generated.js
 frontend/generated
+*.old
 

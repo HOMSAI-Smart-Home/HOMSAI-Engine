@@ -31,15 +31,9 @@ public interface EntitiesCommandsService {
 
     ExcludedHAEntity saveExcludedHAEntity(ExcludedHAEntity excludedHAEntity);
 
-    void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet;
-
-    Double calculateInitTime(Integer deviceSize);
-
-    void deleteFromHvacDevicesByType(Integer type);
 
     void updateHomeInfo(HomeInfo homeInfo) throws BadHomeInfoException;
 
-    HVACDevice updateHvacDevice(HVACDevice hvacDevice);
 
     Area updateArea(Area area);
 }

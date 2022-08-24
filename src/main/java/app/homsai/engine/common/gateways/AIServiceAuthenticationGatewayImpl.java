@@ -15,8 +15,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static app.homsai.engine.optimizations.gateways.AIServiceAPIEndpoints.LOGIN;
-import static app.homsai.engine.optimizations.gateways.AIServiceAPIEndpoints.REFRESH_TOKEN;
+import static app.homsai.engine.pvoptimizer.gateways.AIServiceAPIEndpoints.LOGIN;
+import static app.homsai.engine.pvoptimizer.gateways.AIServiceAPIEndpoints.REFRESH_TOKEN;
 
 @Service
 public class AIServiceAuthenticationGatewayImpl implements AIServiceAuthenticationGateway{

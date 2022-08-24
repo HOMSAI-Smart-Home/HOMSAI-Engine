@@ -1,6 +1,5 @@
 package app.homsai.engine.entities.domain.services;
 
-import app.homsai.engine.entities.application.http.dtos.AreaDto;
 import app.homsai.engine.entities.domain.models.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +16,7 @@ public interface EntitiesQueriesService {
 
     List<Area> findAllAreas();
 
-    Page<HVACDevice> findAllHomsaiHvacDevices(Pageable unpaged, String s);
-
     HomeInfo findHomeInfo();
-
-    HVACDevice findOneHvacDeviceByEntityId(String entityId);
 
     Area getHomeArea();
 }

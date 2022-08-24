@@ -1,9 +1,6 @@
 package app.homsai.engine.entities.application.http.controllers;
 
-import app.homsai.engine.common.domain.models.DocsConsts;
-import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
-import app.homsai.engine.entities.domain.exceptions.HvacEntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,28 +40,4 @@ public class EntitiesQueriesController {
                 entitiesQueriesApplicationService.getAllHomsaiHistoricalStates(pageRequest, search));
     }
 
-    @RequestMapping(value = "/entities/homsai/hvac/init/status", method = RequestMethod.GET)
-    public ResponseEntity getInitStatus() {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                entitiesQueriesApplicationService.getHvacInitStatus());
-    }
-
-    @RequestMapping(value = "/entities/homsai/hvac", method = RequestMethod.GET)
-    public ResponseEntity getHvacEntities() {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                entitiesQueriesApplicationService.getHvacEntities());
-    }
-
-    @RequestMapping(value = "/entities/homsai/hvac/{entityUuid}", method = RequestMethod.GET)
-    public ResponseEntity getOneHvacEntity(
-            @PathVariable("entityUuid") String entityUuid) throws HvacEntityNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(entitiesQueriesApplicationService.getOneHvacEntity(entityUuid));
-    }
-
-    @RequestMapping(value = "/entities/homsai/home/settings", method = RequestMethod.GET)
-    public ResponseEntity getHomsaiHvacSettings() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(entitiesQueriesApplicationService.getHomsaiHvacSettings());
-    }
 }

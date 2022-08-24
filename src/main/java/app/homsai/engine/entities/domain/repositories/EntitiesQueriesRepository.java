@@ -36,8 +36,4 @@ public interface EntitiesQueriesRepository {
     List<ExcludedHAEntity> findAllExcludedHAEntities();
 
     HomeInfo getHomeInfo();
-
-    Page<HVACDevice> findAllHvacDevices(Pageable pageable, String search);
-
-    HVACDevice findOneHvacDeviceByEntityId(String entityId);
 }

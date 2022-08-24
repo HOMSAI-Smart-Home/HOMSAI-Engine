@@ -5,15 +5,12 @@ package app.homsai.engine.entities.application.http.converters;
 import app.homsai.engine.entities.application.http.dtos.*;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
-import app.homsai.engine.optimizations.application.http.dtos.HvacDeviceDto;
-import app.homsai.engine.optimizations.domain.models.HvacDevice;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,17 +70,6 @@ public class EntitiesMapperImpl implements EntitiesMapper {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<HVACDeviceDto> convertToDto(List<HVACDevice> hvacDeviceList) {
-        return hvacDeviceList.stream()
-                .map(h -> modelMapper.map(h, HVACDeviceDto.class))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public HVACDeviceDto convertToDto(HVACDevice syncedDevice) {
-        return modelMapper.map(syncedDevice, HVACDeviceDto.class);
-    }
 
     @Override
     public List<AreaDto> convertToDtoArea(List<Area> allAreas) {
@@ -92,15 +78,5 @@ public class EntitiesMapperImpl implements EntitiesMapper {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public HvacDeviceDto convertToDto(HvacDevice hvacDevice) {
-        return modelMapper.map(hvacDevice, HvacDeviceDto.class);
-    }
 
-    @Override
-    public List<HvacDeviceDto> convertToDto(Collection<HvacDevice> values) {
-        return values.stream()
-                .map(h -> modelMapper.map(h, HvacDeviceDto.class))
-                .collect(Collectors.toList());
-    }
 }
