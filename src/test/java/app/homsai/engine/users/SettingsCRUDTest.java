@@ -4,6 +4,7 @@ import app.homsai.engine.common.application.http.dtos.SettingsDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
+import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

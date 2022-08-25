@@ -34,6 +34,8 @@ public class OptimizerHVACDevice {
 
     private boolean manual;
 
+    private String hvacMode;
+
     private DoubleCircularArray consumptionArray;
 
     public OptimizerHVACDevice() {
@@ -159,5 +161,13 @@ public class OptimizerHVACDevice {
 
     public void setManual(boolean manual) {
         this.manual = manual;
+    }
+
+    public String getHvacMode() {
+        return hvacMode;
+    }
+
+    public void setHvacMode(String hvacMode) {
+        this.hvacMode = hvacMode;
     }
 }

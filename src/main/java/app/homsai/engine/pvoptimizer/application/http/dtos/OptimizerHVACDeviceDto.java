@@ -46,6 +46,9 @@ public class OptimizerHVACDeviceDto {
     @JsonProperty("manual")
     private boolean manual;
 
+    @JsonProperty("hvac_mode")
+    private String hvacMode;
+
 
     public String getEntityId() {
         return entityId;
@@ -149,5 +152,13 @@ public class OptimizerHVACDeviceDto {
 
     public void setManual(boolean manual) {
         this.manual = manual;
+    }
+
+    public String getHvacMode() {
+        return hvacMode;
+    }
+
+    public void setHvacMode(String hvacMode) {
+        this.hvacMode = hvacMode;
     }
 }

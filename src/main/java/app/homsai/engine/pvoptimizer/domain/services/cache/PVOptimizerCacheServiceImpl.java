@@ -91,6 +91,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             optimizerHVACDevice.setActive(false);
+            optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
             optimizerHVACDevice.setStartTime(null);
             optimizerHVACDevice.setEndTime(Instant.EPOCH);
             optimizerHVACDevice.setPowerConsumption(hvacDeviceDto.getPowerConsumption());
@@ -141,12 +142,14 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
-            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
+            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){  // ToDo multi mode heat / cool
                 optimizerHVACDevice.setActive(true);
+                optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);  // ToDo multi mode heat / cool
                 optimizerHVACDevice.setStartTime(Instant.now());
                 optimizerHVACDevice.setManual(true);
             } else if(optimizerHVACDevice.getActive() && Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
                 optimizerHVACDevice.setActive(false);
+                optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
                 optimizerHVACDevice.setEndTime(Instant.now());
                 optimizerHVACDevice.setManual(true);
             }
