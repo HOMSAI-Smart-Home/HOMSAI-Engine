@@ -66,7 +66,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
     @Override
     public void initHvacDevicesCache() {
         hvacDevicesCache = new HashMap<>();
-        List<HVACDeviceDto> hvacDeviceDtoList = pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(Consts.HVAC_DEVICE_CONDITIONING);
+        List<HVACDeviceDto> hvacDeviceDtoList = pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(Consts.PV_OPTIMIZATION_MODE_SUMMER); //ToDo Summer/winter
         List<AreaDto> areaList = entitiesQueriesApplicationService.getAllAreas();
         Double homeSetTemperature = areaList.stream()
                 .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
@@ -106,7 +106,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
 
     @Override
     public void updateHvacDevicesCache(){
-        List<HVACDeviceDto> hvacDeviceDtoList = pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(Consts.HVAC_DEVICE_CONDITIONING);
+        List<HVACDeviceDto> hvacDeviceDtoList = pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(Consts.PV_OPTIMIZATION_MODE_SUMMER); //ToDo Summer/winter
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         if(homeInfo.getHvacPowerMeterId() == null)
             return;
@@ -142,9 +142,9 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
-            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){  // ToDo multi mode heat / cool
+            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){  // ToDo Summer/winter
                 optimizerHVACDevice.setActive(true);
-                optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);  // ToDo multi mode heat / cool
+                optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);  // ToDo Summer/winter
                 optimizerHVACDevice.setStartTime(Instant.now());
                 optimizerHVACDevice.setManual(true);
             } else if(optimizerHVACDevice.getActive() && Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){

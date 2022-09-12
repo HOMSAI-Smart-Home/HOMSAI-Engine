@@ -100,9 +100,9 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 Integer setTemp = hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature().intValue() - HVAC_THRESHOLD_TEMPERATURE.intValue();
                 homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(hvacDeviceEntityId, setTemp.doubleValue());
 
-                homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION); // ToDo multi mode heat / cool
+                homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION); // ToDo Summer/winter
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(true);
-                hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION); // ToDo multi mode heat / cool
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION); // ToDo Summer/winter
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setStartTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned on: "+hvacDeviceEntityId);
             }

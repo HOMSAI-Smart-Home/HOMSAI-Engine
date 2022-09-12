@@ -92,7 +92,7 @@ public class OptimizerHVACDevice {
             deltaTemperature = 0D;
             return;
         }
-        if( Consts.HVAC_MODE.equals("summer"))
+        if( Consts.HVAC_MODE.equals("summer"))  // ToDo Summer/winter
             deltaTemperature = currentTemperature - setTemperature;
         else
             deltaTemperature = setTemperature - currentTemperature;

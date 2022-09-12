@@ -63,7 +63,7 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         Area area = entitiesQueriesApplicationService.getHomeArea();
         HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
-        homeHvacSettingsDto.setSetTemperature(Consts.HVAC_MODE.equals("summer")?area.getDesiredSummerTemperature():area.getDesiredWinterTemperature());
+        homeHvacSettingsDto.setSetTemperature(Consts.HVAC_MODE.equals("summer")?area.getDesiredSummerTemperature():area.getDesiredWinterTemperature());  // ToDo Summer/winter
         homeHvacSettingsDto.setOptimizerEnabled(homeInfo.getPvOptimizationsEnabled());
         return homeHvacSettingsDto;
     }
