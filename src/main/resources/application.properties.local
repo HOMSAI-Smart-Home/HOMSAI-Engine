@@ -8,3 +8,4 @@ mail.mailFrom=
 
 home_assistant.token=
 home_assistant.api_url=
+ai_service.api_url=
