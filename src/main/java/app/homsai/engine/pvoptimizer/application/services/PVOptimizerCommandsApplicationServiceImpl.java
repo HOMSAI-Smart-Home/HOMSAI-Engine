@@ -70,10 +70,10 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
         List<HVACDevice> hvacDeviceList = new ArrayList<>();
         String hvacFunction;
         switch (type){
-            case HVAC_DEVICE_HEATING:
+            case PV_OPTIMIZATION_MODE_WINTER:
                 hvacFunction = HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION;
                 break;
-            case HVAC_DEVICE_CONDITIONING:
+            case PV_OPTIMIZATION_MODE_SUMMER:
             default:
                 hvacFunction = HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION;
         }
@@ -150,7 +150,7 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
             throw new BadRequestException(ErrorCodes.BAD_HOME_INFO, "Home settings cannot be null");
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         Area area = entitiesQueriesService.getHomeArea();
-        if(Consts.HVAC_MODE.equals("summer")){
+        if(Consts.HVAC_MODE.equals("summer")){   // ToDo Summer/winter
             area.setDesiredSummerTemperature(homeHvacSettingsDto.getSetTemperature());
         } else {
             area.setDesiredWinterTemperature(homeHvacSettingsDto.getSetTemperature());
