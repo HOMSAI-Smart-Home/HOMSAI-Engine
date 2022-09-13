@@ -1,0 +1,102 @@
+spring:
+  data:
+    rest:
+      defaultMediaType: application/json
+  hateoas:
+    use-hal-as-default-json-media-type: false
+  http:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  datasource:
+    initialize: true
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+  jpa:
+    #database: HSQL
+    show-sql: false
+    properties:
+      hibernate: dialect:org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  cloud:
+    stream:
+      bindings:
+        domainEventChannel:
+          binder: rabbit
+          output: main-channel
+          input: main-channel
+          contentType: application/json
+  rabbitmq:
+    host: localhost
+    username: springboot_starter_kit
+    password: springboot_starter_kit
+    virtual-host: /
+
+  mvc:
+    dispatch-options-request: true
+  flyway:
+    locations: classpath:/db/migration,classpath:/db/test
+
+users-domain-database:
+  datasource:
+    initialize: true
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+
+server:
+  port: 8080
+  contextPath: /
+
+ad-hoc:
+  hostname: 192.168.2.22
+  port: 49172
+  username: sa
+  password: Password1
+  db-name: ADHOC_TEST_TRX
+
+
+media:
+  path: /home/media
+
+
+mail:
+  domain: smtp.mailtrap.io
+  port: 2525
+  username: b001e0d2788877
+  password: f30444f040b4cf
+  mailFrom: service@hastega.it
+
+mailgun:
+  domain: mg.projectglobe.hastega.it
+  apikey: key-07e54594586bb1ae69fda41e6991d326
+  from: Project Globe
+  mailfrom: projectglobe@hastega.it
+
+websocket:
+  server:
+    endpoint: http://localhost:8082/ws/alan
+
+prometheus:
+  enable: false
+  server:
+    endpoint: localhost:9091
+
+notifications:
+  enable: false
+
+notifier:
+  smtp:
+    camelUrl: smtp://apikey@smtp.sendgrid.net:25?password=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&from=alan@hastega.it&subject=YARN task event notification1&to=agostini@hastega.it
+
+logging:
+  level:
+    root: INFO
+  path: logs/app.log
+  pattern:
+    file: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
+    console: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
