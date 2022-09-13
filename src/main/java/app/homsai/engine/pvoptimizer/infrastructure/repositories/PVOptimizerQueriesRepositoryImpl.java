@@ -6,6 +6,7 @@ import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;
 import app.homsai.engine.entities.infrastructure.repositories.*;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
+import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.repositories.PVOptimizerQueriesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ public class PVOptimizerQueriesRepositoryImpl implements PVOptimizerQueriesRepos
     @Autowired
     HVACDeviceQueriesJpaRepository hvacDeviceQueriesJpaRepository;
 
+    @Autowired
+    HVACEquipmentQueriesJpaRepository hvacEquipmentQueriesJpaRepository;
+
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -43,6 +47,11 @@ public class PVOptimizerQueriesRepositoryImpl implements PVOptimizerQueriesRepos
     @Transactional
     public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
         return hvacDeviceQueriesJpaRepository.findOneByEntityId(entityId);
+    }
+
+    @Override
+    public Page<HVACEquipment> findAllHvacEquipments(Pageable pageable, String search) {
+        return hvacEquipmentQueriesJpaRepository.findAllActive(pageable, search);
     }
 
 }

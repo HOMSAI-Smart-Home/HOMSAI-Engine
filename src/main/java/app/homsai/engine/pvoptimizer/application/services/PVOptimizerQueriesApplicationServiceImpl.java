@@ -75,6 +75,11 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
     }
 
     @Override
+    public List<HVACEquipmentDto> getHvacEquipments() {
+        return pvOptimizerMapper.convertToDtoEquipments(pvOptimizerQueriesService.findAllHomsaiHvacEquipments(Pageable.unpaged(), null).getContent());
+    }
+    
+    @Override
     public HvacOptimizerDeviceInitializationEstimatedDto getHvacInitEstimated(Integer type) {
         HvacOptimizerDeviceInitializationEstimatedDto hvacOptimizerDeviceInitializationEstimatedDto = new HvacOptimizerDeviceInitializationEstimatedDto();
         hvacOptimizerDeviceInitializationEstimatedDto.setTotalTimeSeconds(pvOptimizerCommandsApplicationService.getHvacDeviceInitTimeSeconds(type));

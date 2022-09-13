@@ -3,11 +3,9 @@ package app.homsai.engine.pvoptimizer.application.http.converters;
 
 
 import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HVACEquipmentDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
-import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
-import app.homsai.engine.pvoptimizer.domain.models.HvacDeviceInterval;
-import app.homsai.engine.pvoptimizer.domain.models.OptimizerHVACDevice;
-import app.homsai.engine.pvoptimizer.domain.models.OptimizerHVACInterval;
+import app.homsai.engine.pvoptimizer.domain.models.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,5 +67,17 @@ public class PVOptimizerMapperImpl implements PVOptimizerMapper {
     @Override
     public HVACDeviceDto convertToDto(HVACDevice syncedDevice) {
         return modelMapper.map(syncedDevice, HVACDeviceDto.class);
+    }
+
+    @Override
+    public List<HVACEquipmentDto> convertToDtoEquipments(List<HVACEquipment> hvacEquipmentList) {
+        return hvacEquipmentList.stream()
+                .map(h -> modelMapper.map(h, HVACEquipmentDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public HVACEquipmentDto convertToDto(HVACEquipment hvacEquipment) {
+        return modelMapper.map(hvacEquipment, HVACEquipmentDto.class);
     }
 }
