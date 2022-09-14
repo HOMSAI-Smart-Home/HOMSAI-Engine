@@ -36,4 +36,10 @@ public class PVOptimizerQueriesServiceImpl implements PVOptimizerQueriesService 
         return pvOptimizerQueriesRepository.findAllHvacEquipments(pageable, search);
     }
 
+    @Override
+    @Transactional
+    public HVACEquipment findOneHvacEquipment(String equipmentId) {
+        return pvOptimizerQueriesRepository.findOneHvacEquipment(equipmentId);
+    }
+
 }

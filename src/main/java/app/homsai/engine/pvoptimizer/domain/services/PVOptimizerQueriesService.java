@@ -15,4 +15,6 @@ public interface PVOptimizerQueriesService {
 
     Page<HVACEquipment> findAllHomsaiHvacEquipments(Pageable pageable, String search);
 
+    HVACEquipment findOneHvacEquipment(String equipmentid);
+
 }

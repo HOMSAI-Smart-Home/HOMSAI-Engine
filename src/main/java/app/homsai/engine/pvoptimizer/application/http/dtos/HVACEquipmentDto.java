@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HVACEquipmentDto {
 
+    @JsonProperty("uuid")
+    private String uuid;
+
     @JsonProperty("name")
     private String name;
 
@@ -19,6 +22,14 @@ public class HVACEquipmentDto {
 
     @JsonProperty("minimum_execution_minutes")
     private Integer minimumExecutionMinutes;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getName() {
         return name;

@@ -1,9 +1,7 @@
 package app.homsai.engine.pvoptimizer.application.http.converters;
 
 
-import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
-import app.homsai.engine.pvoptimizer.application.http.dtos.HVACEquipmentDto;
-import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.*;
 import app.homsai.engine.pvoptimizer.domain.models.*;
 
 import java.util.Collection;
@@ -31,5 +29,8 @@ public interface PVOptimizerMapper {
     List<HVACEquipmentDto> convertToDtoEquipments(List<HVACEquipment> hvacEquipmentList);
 
     HVACEquipmentDto convertToDto(HVACEquipment hvacEquipment);
+
+    HomeHvacSettingsDto convertToDto(HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto);
+
 
 }

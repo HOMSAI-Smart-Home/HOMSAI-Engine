@@ -63,8 +63,22 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         Area area = entitiesQueriesApplicationService.getHomeArea();
         HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
-        homeHvacSettingsDto.setSetTemperature(Consts.HVAC_MODE.equals("summer")?area.getDesiredSummerTemperature():area.getDesiredWinterTemperature());  // ToDo Summer/winter
+        homeHvacSettingsDto.setSetTemperature(
+                homeInfo.getOptimizerMode() == null || Consts.HVAC_MODE_SUMMER_ID == homeInfo.getOptimizerMode() ?
+                        area.getDesiredSummerTemperature() : area.getDesiredWinterTemperature()
+        );
         homeHvacSettingsDto.setOptimizerEnabled(homeInfo.getPvOptimizationsEnabled());
+        homeHvacSettingsDto.setOptimizerMode(homeInfo.getOptimizerMode());
+        if (homeInfo.getCurrentWinterHVACEquipment() != null) {
+            homeHvacSettingsDto.setCurrentWinterHVACEquipment(
+                    pvOptimizerMapper.convertToDto(homeInfo.getCurrentWinterHVACEquipment())
+            );
+        }
+        if (homeInfo.getCurrentSummerHVACEquipment() != null) {
+            homeHvacSettingsDto.setCurrentSummerHVACEquipment(
+                    pvOptimizerMapper.convertToDto(homeInfo.getCurrentSummerHVACEquipment())
+            );
+        }
         return homeHvacSettingsDto;
     }
 
@@ -84,6 +98,11 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
         HvacOptimizerDeviceInitializationEstimatedDto hvacOptimizerDeviceInitializationEstimatedDto = new HvacOptimizerDeviceInitializationEstimatedDto();
         hvacOptimizerDeviceInitializationEstimatedDto.setTotalTimeSeconds(pvOptimizerCommandsApplicationService.getHvacDeviceInitTimeSeconds(type));
         return hvacOptimizerDeviceInitializationEstimatedDto;
+    }
+
+    @Override
+    public HVACEquipmentDto getHvacEquipment(String equipmentUuid) {
+        return pvOptimizerMapper.convertToDto(pvOptimizerQueriesService.findOneHvacEquipment(equipmentUuid));
     }
 
 }

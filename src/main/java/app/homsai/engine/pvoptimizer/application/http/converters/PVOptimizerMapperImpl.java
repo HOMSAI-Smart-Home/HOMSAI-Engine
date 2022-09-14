@@ -2,9 +2,7 @@ package app.homsai.engine.pvoptimizer.application.http.converters;
 
 
 
-import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
-import app.homsai.engine.pvoptimizer.application.http.dtos.HVACEquipmentDto;
-import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.*;
 import app.homsai.engine.pvoptimizer.domain.models.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,5 +77,10 @@ public class PVOptimizerMapperImpl implements PVOptimizerMapper {
     @Override
     public HVACEquipmentDto convertToDto(HVACEquipment hvacEquipment) {
         return modelMapper.map(hvacEquipment, HVACEquipmentDto.class);
+    }
+
+    @Override
+    public HomeHvacSettingsDto convertToDto(HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto) {
+        return modelMapper.map(homeHvacSettingsUpdateDto, HomeHvacSettingsDto.class);
     }
 }

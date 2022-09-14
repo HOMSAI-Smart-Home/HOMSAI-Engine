@@ -6,9 +6,11 @@ import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsUpdateDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
+import app.homsai.engine.pvoptimizer.domain.services.cache.PVOptimizerCacheService;
 import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
 import app.homsai.engine.pvoptimizer.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
 import org.junit.jupiter.api.Test;
@@ -84,11 +86,37 @@ public class HvacOptimizerTest {
 
     }
 
+    @Test
+    public void whenSwitchOptimizerMode_thenReadRightStates() {
+        final String winterEquipmentUuid = "1142fa99-9b4d-4ce5-ab1f-5694664fd881";
+        final String summerEquipmentUuid = "fa3a5e07-df74-4c45-83cd-693d002548a7";
+        HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
+        homeHvacSettingsUpdateDto.setOptimizerEnabled(true);
+        homeHvacSettingsUpdateDto.setSetTemperature(30.0);
+        homeHvacSettingsUpdateDto.setOptimizerMode(Consts.HVAC_MODE_SUMMER_ID);
+        homeHvacSettingsUpdateDto.setCurrentWinterHVACEquipmentUuid(winterEquipmentUuid);
+        homeHvacSettingsUpdateDto.setCurrentSummerHVACEquipmentUuid(summerEquipmentUuid);
+        HttpEntity<HomeHvacSettingsUpdateDto> request = new HttpEntity<>(homeHvacSettingsUpdateDto);
+        ResponseEntity<HomeHvacSettingsDto> updateSettingsResponse  =
+                restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
+                        request, HomeHvacSettingsDto.class);
+        assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(updateSettingsResponse.getBody()).getCurrentWinterHVACEquipment().getUuid()).isEqualTo(winterEquipmentUuid);
+        assertThat(Objects.requireNonNull(updateSettingsResponse.getBody()).getCurrentSummerHVACEquipment().getUuid()).isEqualTo(summerEquipmentUuid);
+
+        ResponseEntity<HomeHvacSettingsDto> newHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
+        assertThat(newHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerMode()).isEqualTo(Consts.HVAC_MODE_SUMMER_ID);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getCurrentWinterHVACEquipment().getUuid()).isEqualTo(winterEquipmentUuid);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getCurrentSummerHVACEquipment().getUuid()).isEqualTo(summerEquipmentUuid);
+    }
+
+
     private void enableOptimizer() {
-        HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
-        homeHvacSettingsDto.setOptimizerEnabled(true);
-        homeHvacSettingsDto.setSetTemperature(30.0);
-        HttpEntity<HomeHvacSettingsDto> request = new HttpEntity<>(homeHvacSettingsDto);
+        HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
+        homeHvacSettingsUpdateDto.setOptimizerEnabled(true);
+        homeHvacSettingsUpdateDto.setSetTemperature(30.0);
+        HttpEntity<HomeHvacSettingsUpdateDto> request = new HttpEntity<>(homeHvacSettingsUpdateDto);
         ResponseEntity<HomeHvacSettingsDto> updateSettingsResponse  =
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
                         request, HomeHvacSettingsDto.class);
@@ -102,10 +130,10 @@ public class HvacOptimizerTest {
 
 
     private void disableOptimizer(){
-        HomeHvacSettingsDto homeHvacSettingsDto = new HomeHvacSettingsDto();
-        homeHvacSettingsDto.setOptimizerEnabled(false);
-        homeHvacSettingsDto.setSetTemperature(26.0);
-        HttpEntity<HomeHvacSettingsDto> request = new HttpEntity<>(homeHvacSettingsDto);
+        HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
+        homeHvacSettingsUpdateDto.setOptimizerEnabled(false);
+        homeHvacSettingsUpdateDto.setSetTemperature(26.0);
+        HttpEntity<HomeHvacSettingsUpdateDto> request = new HttpEntity<>(homeHvacSettingsUpdateDto);
         ResponseEntity<HomeHvacSettingsDto> updateSettingsResponse  =
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
                         request, HomeHvacSettingsDto.class);
