@@ -114,8 +114,21 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
     }
 
     @Override
-    public Integer getHvacDeviceInitTimeSeconds(){
-        return pvOptimizerCommandsService.calculateInitTime((int) entitiesQueriesService.findAllEntities(Pageable.unpaged(), "domain:climate").getTotalElements()).intValue();
+    public Integer getHvacDeviceInitTimeSeconds(Integer type){
+        String hvacFunction;
+        switch (type){
+            case PV_OPTIMIZATION_MODE_WINTER:
+                hvacFunction = HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION;
+                break;
+            case PV_OPTIMIZATION_MODE_SUMMER:
+            default:
+                hvacFunction = HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION;
+        }
+        List<HomeAssistantEntityDto> homeAssistantEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities("climate");
+        int deviceCount = (int) homeAssistantEntityDtoList.stream()
+                .filter(h -> h.getAttributes().getHvacModes() != null && h.getAttributes().getHvacModes().contains(hvacFunction))
+                .count();
+        return pvOptimizerCommandsService.calculateInitTime(deviceCount).intValue();
     }
 
 

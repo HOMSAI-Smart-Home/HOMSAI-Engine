@@ -1,8 +1,13 @@
 package app.homsai.engine.users;
 
+import app.homsai.engine.common.application.http.dtos.LoggedDto;
+import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
+import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationCacheDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationEstimatedDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
 import org.junit.jupiter.api.Test;
@@ -19,6 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +53,7 @@ public class InitCycleTest {
 
     private final String startInitEndpoint = "/entities/homsai/hvac/init";
     private final String getStatusEndpoint = "/entities/homsai/hvac/init/status";
+    private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
 
 
     @Test
@@ -82,7 +90,71 @@ public class InitCycleTest {
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getElapsedPercent()).isNotEqualTo(0D);
     }
 
+    @Test
+    public void whenAskForEstimatedTime_thenReadRightTime() {
+        configureMockServices();
+        String urlHvacInitEstimatedTimeSummer = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
+                .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
+                .queryParam("type", Consts.PV_OPTIMIZATION_MODE_SUMMER)
+                .encode()
+                .toUriString();
+
+        ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTime = restTemplate.getForEntity(urlHvacInitEstimatedTimeSummer, HvacOptimizerDeviceInitializationEstimatedDto.class);
+        assertThat(initEstimatedTime.getBody().getTotalTimeSeconds()).isEqualTo(10740);
+        String urlHvacInitEstimatedTimeWinter = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
+                .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
+                .queryParam("type", Consts.PV_OPTIMIZATION_MODE_WINTER)
+                .encode()
+                .toUriString();
+
+        ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTimeWinter = restTemplate.getForEntity(urlHvacInitEstimatedTimeWinter, HvacOptimizerDeviceInitializationEstimatedDto.class);
+        assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(9210);
+    }
+
     private void configureMockServices(){
-        when(homeAssistantRestAPIGateway.getAllHomeAssistantEntities()).thenReturn(new ArrayList<>());
+        HomeAssistantAttributesDto attributesCoolingHeating = new HomeAssistantAttributesDto();
+        HomeAssistantAttributesDto attributesCooling = new HomeAssistantAttributesDto();
+        HomeAssistantAttributesDto attributesHeating = new HomeAssistantAttributesDto();
+        attributesCoolingHeating.setHvacModes(Arrays.asList(Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION, Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION));
+        attributesCooling.setHvacModes(Collections.singletonList(Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION));
+        attributesHeating.setHvacModes(Collections.singletonList(Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION));
+        HomeAssistantEntityDto homeAssistantClimateWinter1 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateWinter2 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateSummer1 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateSummer2 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateSummer3 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateWinterSummer1 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateWinterSummer2 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateWinterSummer3 =  new HomeAssistantEntityDto();
+        HomeAssistantEntityDto homeAssistantClimateWinterSummer4 =  new HomeAssistantEntityDto();
+        homeAssistantClimateWinter1.setAttributes(attributesHeating);
+        homeAssistantClimateWinter2.setAttributes(attributesHeating);
+        homeAssistantClimateSummer1.setAttributes(attributesCooling);
+        homeAssistantClimateSummer2.setAttributes(attributesCooling);
+        homeAssistantClimateSummer3.setAttributes(attributesCooling);
+        homeAssistantClimateWinterSummer1.setAttributes(attributesCoolingHeating);
+        homeAssistantClimateWinterSummer2.setAttributes(attributesCoolingHeating);
+        homeAssistantClimateWinterSummer3.setAttributes(attributesCoolingHeating);
+        homeAssistantClimateWinterSummer4.setAttributes(attributesCoolingHeating);
+        homeAssistantClimateWinter1.setEntityId("climate.clima1");
+        homeAssistantClimateWinter2.setEntityId("climate.clima1");
+        homeAssistantClimateSummer1.setEntityId("climate.clima1");
+        homeAssistantClimateSummer2.setEntityId("climate.clima1");
+        homeAssistantClimateSummer3.setEntityId("climate.clima1");
+        homeAssistantClimateWinterSummer1.setEntityId("climate.clima1");
+        homeAssistantClimateWinterSummer2.setEntityId("climate.clima1");
+        homeAssistantClimateWinterSummer3.setEntityId("climate.clima1");
+        homeAssistantClimateWinterSummer4.setEntityId("climate.clima1");
+        when(homeAssistantRestAPIGateway.getAllHomeAssistantEntities()).thenReturn(Arrays.asList(
+                homeAssistantClimateWinter1,
+                homeAssistantClimateWinter2,
+                homeAssistantClimateSummer1,
+                homeAssistantClimateSummer2,
+                homeAssistantClimateSummer3,
+                homeAssistantClimateWinterSummer1,
+                homeAssistantClimateWinterSummer2,
+                homeAssistantClimateWinterSummer3,
+                homeAssistantClimateWinterSummer4
+        ));
     }
 }

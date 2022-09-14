@@ -15,7 +15,7 @@ public interface PVOptimizerCommandsApplicationService {
     @Transactional
     HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet;
 
-    Integer getHvacDeviceInitTimeSeconds();
+    Integer getHvacDeviceInitTimeSeconds(Integer type);
 
     HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException;
 

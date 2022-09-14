@@ -25,6 +25,12 @@ public class PVOptimizerQueriesController {
                 pvOptimizerQueriesApplicationService.getHvacInitStatus());
     }
 
+    @RequestMapping(value = "/entities/homsai/hvac/init/estimated", method = RequestMethod.GET)
+    public ResponseEntity getInitEstimatedTime(@RequestParam(value = "type", required = true) Integer type) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                pvOptimizerQueriesApplicationService.getHvacInitEstimated(type));
+    }
+
     @RequestMapping(value = "/entities/homsai/hvac", method = RequestMethod.GET)
     public ResponseEntity getHvacEntities() {
         return ResponseEntity.status(HttpStatus.OK).body(

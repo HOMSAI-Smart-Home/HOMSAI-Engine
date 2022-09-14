@@ -87,7 +87,7 @@ public class HvacDevicesInitView extends VerticalLayout {
         if(homsaiOptimizerHVACDeviceInitializationCacheService.getHvacDeviceCacheDto().getInProgress())
             return;
         startInitButton.addClickListener( e -> {
-            int timeRequiredMinutes = pvOptimizerCommandsApplicationService.getHvacDeviceInitTimeSeconds()/60;
+            int timeRequiredMinutes = pvOptimizerCommandsApplicationService.getHvacDeviceInitTimeSeconds(Consts.PV_OPTIMIZATION_MODE_SUMMER)/60;
             CustomConfirmDialog d1 = new CustomConfirmDialog(EnText.START_HVAC_DEVICE_INIT_TITLE, EnText.START_HVAC_DEVICE_INIT_DESCRIPTION, Collections.singletonList(Integer.toString(timeRequiredMinutes)));
             d1.setOnConfirmListener(() -> {
                 try {

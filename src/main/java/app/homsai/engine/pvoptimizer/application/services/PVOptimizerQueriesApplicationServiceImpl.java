@@ -1,9 +1,7 @@
 package app.homsai.engine.pvoptimizer.application.services;
 
 import app.homsai.engine.common.domain.utils.Consts;
-import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
-import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
-import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationCacheDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.*;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerQueriesService;
 import app.homsai.engine.pvoptimizer.domain.services.cache.HomsaiOptimizerHVACDeviceInitializationCacheService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
@@ -11,7 +9,6 @@ import app.homsai.engine.pvoptimizer.application.http.converters.PVOptimizerMapp
 import app.homsai.engine.pvoptimizer.domain.exceptions.HvacEntityNotFoundException;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.pvoptimizer.domain.services.cache.PVOptimizerCacheService;
-import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
 import app.homsai.engine.pvoptimizer.domain.models.OptimizerHVACDevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +35,9 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
 
     @Autowired
     PVOptimizerQueriesService pvOptimizerQueriesService;
+
+    @Autowired
+    PVOptimizerCommandsApplicationService pvOptimizerCommandsApplicationService;
 
 
     @Override
@@ -72,6 +72,13 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
     @Transactional
     public List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning) {
         return pvOptimizerMapper.convertToDto(pvOptimizerQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), hvacDeviceConditioning == null ? null : "type:"+hvacDeviceConditioning).getContent());
+    }
+
+    @Override
+    public HvacOptimizerDeviceInitializationEstimatedDto getHvacInitEstimated(Integer type) {
+        HvacOptimizerDeviceInitializationEstimatedDto hvacOptimizerDeviceInitializationEstimatedDto = new HvacOptimizerDeviceInitializationEstimatedDto();
+        hvacOptimizerDeviceInitializationEstimatedDto.setTotalTimeSeconds(pvOptimizerCommandsApplicationService.getHvacDeviceInitTimeSeconds(type));
+        return hvacOptimizerDeviceInitializationEstimatedDto;
     }
 
 }

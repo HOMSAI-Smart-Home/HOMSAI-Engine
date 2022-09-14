@@ -37,6 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final String hvacDetailEndpoint = "/entities/homsai/hvac/*";
   private final String hvacDeviceSetSettingsEndpoint = "/entities/homsai/hvac/settings/*";
   private final String hvacHomeSettingsEndpoint = "/entities/homsai/home/settings";
+  private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
 
   @Autowired
   AIServiceAuthenticationProvider aiServiceAuthenticationProvider;
@@ -67,6 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET, hvacInitStatusEndpoint).permitAll()
             .antMatchers(HttpMethod.GET, hvacListEndpoint).permitAll()
             .antMatchers(HttpMethod.GET, hvacDetailEndpoint).permitAll()
+            .antMatchers(HttpMethod.GET, getInitEstimatedTime).permitAll()
             .antMatchers(HttpMethod.POST, hvacDeviceSetSettingsEndpoint).permitAll()
             .antMatchers(hvacHomeSettingsEndpoint).permitAll()
             .antMatchers(settingsEndpoint).permitAll()
