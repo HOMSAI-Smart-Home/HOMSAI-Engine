@@ -26,12 +26,13 @@ public class HomsaiOptimizerHVACDeviceInitializationCacheServiceImpl implements 
     }
 
     @Override
-    public void startHvacDeviceInit(Integer totalTimeSeconds){
+    public void startHvacDeviceInit(Integer totalTimeSeconds, Integer type){
         hvacOptimizerDeviceInitializationCacheDto.setInProgress(true);
         hvacOptimizerDeviceInitializationCacheDto.setLog("");
         hvacOptimizerDeviceInitializationCacheDto.setRemainingTimeSeconds(totalTimeSeconds);
         hvacOptimizerDeviceInitializationCacheDto.setTotalTimeSeconds(totalTimeSeconds);
         hvacOptimizerDeviceInitializationCacheDto.setSyncedHvacDevices(new ArrayList<>());
+        hvacOptimizerDeviceInitializationCacheDto.setType(type);
     }
 
     @Override

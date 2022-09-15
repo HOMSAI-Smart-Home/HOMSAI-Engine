@@ -7,7 +7,7 @@ public interface HomsaiOptimizerHVACDeviceInitializationCacheService {
 
     HvacOptimizerDeviceInitializationCacheDto getHvacDeviceCacheDto();
 
-    void startHvacDeviceInit(Integer totalTimeSeconds);
+    void startHvacDeviceInit(Integer totalTimeSeconds, Integer type);
 
     void onProgress(Integer elapsedTimeDelta, String log, HVACDevice syncedDevice);
 

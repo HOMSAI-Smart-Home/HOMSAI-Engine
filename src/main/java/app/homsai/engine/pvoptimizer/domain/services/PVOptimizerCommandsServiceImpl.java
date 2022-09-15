@@ -46,7 +46,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     @Async("threadPoolTaskExecutor")
     public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
 
-        homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue());
+        homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue(), type);
         //TODO levare sta riga e mettere set mintemp -> restore e dialog
         Collections.reverse(hvacDeviceList);
 

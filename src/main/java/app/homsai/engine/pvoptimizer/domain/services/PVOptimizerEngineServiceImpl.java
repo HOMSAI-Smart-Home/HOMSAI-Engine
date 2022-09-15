@@ -9,6 +9,7 @@ import app.homsai.engine.homeassistant.application.services.HomeAssistantQueries
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.converters.PVOptimizerMapper;
 import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
+import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.models.OptimizerHVACDevice;
 import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
 import app.homsai.engine.pvoptimizer.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
@@ -63,7 +64,11 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         if(!homeInfo.getPvOptimizationsEnabled())
             return;
-        if(homeInfo.getGeneralPowerMeterId() == null || homeInfo.getHvacPowerMeterId() == null || homeInfo.getPvProductionSensorId() == null){
+        if(homeInfo.getGeneralPowerMeterId() == null ||
+                (homeInfo.getHvacPowerMeterId() == null &&
+                        homeInfo.getHvacSummerPowerMeterId() == null &&
+                        homeInfo.getHvacWinterPowerMeterId() == null) ||
+                homeInfo.getPvProductionSensorId() == null) {
             homeInfo.setPvOptimizationsEnabled(false);
             entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
             return;
@@ -88,8 +93,20 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
         hvacOptimizationPVRequestDto.setGeneralPowerMeterValue(globalConsumptionPower);
         hvacOptimizationPVRequestDto.setPhotovoltaicPowerMeterValue(solarProductionPower);
         hvacOptimizationPVRequestDto.setStoragePowerMeterValue(storagePower);
-        hvacOptimizationPVRequestDto.setMinimumIdleTimeMinutes(HVAC_PV_OPTIMIZATION_MINIMUM_IDLE_MINUTES);
-        hvacOptimizationPVRequestDto.setMinimumExecutionTimeMinutes(HVAC_PV_OPTIMIZATION_MINIMUM_EXECUTION_MINUTES);
+
+        Integer minimumIdleMinutes = HVAC_PV_OPTIMIZATION_MINIMUM_IDLE_MINUTES;
+        Integer minimumExecutionMinutes = HVAC_PV_OPTIMIZATION_MINIMUM_EXECUTION_MINUTES;
+        HVACEquipment currentHVACEquipment = homeInfo.getOptimizerMode() == null ||
+                homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
+                homeInfo.getCurrentSummerHVACEquipment() : homeInfo.getCurrentWinterHVACEquipment();
+        if (currentHVACEquipment != null) {
+            minimumIdleMinutes = currentHVACEquipment.getMinimumIdleMinutes();
+            minimumExecutionMinutes = currentHVACEquipment.getMinimumExecutionMinutes();
+        }
+
+        hvacOptimizationPVRequestDto.setMinimumIdleTimeMinutes(minimumIdleMinutes);
+        hvacOptimizationPVRequestDto.setMinimumExecutionTimeMinutes(minimumExecutionMinutes);
+
         HvacDevicesOptimizationPVResponseDto hvacDevicesOptimizationPVResponseDto = homsaiAIServiceGateway.getHvacDevicesOptimizationPV(hvacOptimizationPVRequestDto);
         if(hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn() != null) {
             if(hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn().size() > 0) {
@@ -100,9 +117,13 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 Integer setTemp = hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature().intValue() - HVAC_THRESHOLD_TEMPERATURE.intValue();
                 homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(hvacDeviceEntityId, setTemp.doubleValue());
 
-                homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION); // ToDo Summer/winter
+                String hvacDeviceFunction = homeInfo.getOptimizerMode() == null ||
+                        homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
+                        Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION :
+                        Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION;
+                homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, hvacDeviceFunction);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(true);
-                hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION); // ToDo Summer/winter
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(hvacDeviceFunction);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setStartTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned on: "+hvacDeviceEntityId);
             }

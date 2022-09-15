@@ -109,6 +109,14 @@ public class HvacOptimizerTest {
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerMode()).isEqualTo(Consts.HVAC_MODE_SUMMER_ID);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getCurrentWinterHVACEquipment().getUuid()).isEqualTo(winterEquipmentUuid);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getCurrentSummerHVACEquipment().getUuid()).isEqualTo(summerEquipmentUuid);
+
+        homeHvacSettingsUpdateDto.setOptimizerEnabled(false);
+        homeHvacSettingsUpdateDto.setSetTemperature(26.0);
+        request = new HttpEntity<>(homeHvacSettingsUpdateDto);
+        updateSettingsResponse  =
+                restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
+                        request, HomeHvacSettingsDto.class);
+        assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
 
