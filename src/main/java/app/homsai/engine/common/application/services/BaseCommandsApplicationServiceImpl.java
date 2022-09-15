@@ -121,8 +121,7 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
     @Override
     public SettingsDto readSettings() {
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
-        SettingsDto settingsDto = modelMapper.map(homeInfo, SettingsDto.class);
-        return getSettingsDtoWithPowerMeterIds(settingsDto);
+        return modelMapper.map(homeInfo, SettingsDto.class);
     }
 
     private SettingsDto getSettingsDtoWithPowerMeterIds(SettingsDto settingsDto) {

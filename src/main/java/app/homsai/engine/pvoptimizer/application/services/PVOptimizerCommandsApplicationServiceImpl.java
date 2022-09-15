@@ -108,7 +108,7 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
             hvacDevice.setEnabled(true);
             hvacDeviceList.add(hvacDevice);
         }
-        pvOptimizerCommandsService.initHomsaiHvacDevices(hvacDeviceList, hvacFunction);
+        pvOptimizerCommandsService.initHomsaiHvacDevices(hvacDeviceList, type, hvacFunction);
         HVACDeviceInitDto hvacDeviceInitDto = new HVACDeviceInitDto();
         hvacDeviceInitDto.setHvacDeviceDtoList(pvOptimizerMapper.convertToDto(hvacDeviceList));
         hvacDeviceInitDto.setInitTimeSecs(pvOptimizerCommandsService.calculateInitTime(hvacDeviceList.size()).intValue());
