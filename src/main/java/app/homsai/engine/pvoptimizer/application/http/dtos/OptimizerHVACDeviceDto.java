@@ -50,7 +50,7 @@ public class OptimizerHVACDeviceDto {
     private String hvacMode;
 
     @JsonProperty("type")
-    private String type;
+    private Integer type;
 
 
     public String getEntityId() {
@@ -165,11 +165,11 @@ public class OptimizerHVACDeviceDto {
         this.hvacMode = hvacMode;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 }

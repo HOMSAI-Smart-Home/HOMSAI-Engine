@@ -102,7 +102,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                 optimizerHVACDevice.setEnabled(false);
             else
                 optimizerHVACDevice.setEnabled(hvacDeviceDto.getEnabled());
-            optimizerHVACDevice.setType(homeInfo.getOptimizerMode());
+            optimizerHVACDevice.setType(hvacDeviceDto.getType());
             hvacDevicesCache.put(optimizerHVACDevice.getEntityId(), optimizerHVACDevice);
         }
     }

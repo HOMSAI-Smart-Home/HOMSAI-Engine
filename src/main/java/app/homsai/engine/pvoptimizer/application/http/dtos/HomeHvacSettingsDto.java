@@ -13,6 +13,9 @@ public class HomeHvacSettingsDto {
     @JsonProperty("optimizer_mode")
     private Integer optimizerMode;
 
+    @JsonProperty("hvac_switch_entity_id")
+    private String hvacSwitchEntityId;
+
     @JsonProperty("current_winter_hvac_equipment")
     private HVACEquipmentDto currentWinterHVACEquipment;
 
@@ -41,6 +44,14 @@ public class HomeHvacSettingsDto {
 
     public void setOptimizerMode(Integer optimizerMode) {
         this.optimizerMode = optimizerMode;
+    }
+
+    public String getHvacSwitchEntityId() {
+        return hvacSwitchEntityId;
+    }
+
+    public void setHvacSwitchEntityId(String hvacSwitchEntityId) {
+        this.hvacSwitchEntityId = hvacSwitchEntityId;
     }
 
     public HVACEquipmentDto getCurrentWinterHVACEquipment() {

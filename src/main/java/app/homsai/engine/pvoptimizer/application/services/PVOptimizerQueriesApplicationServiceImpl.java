@@ -69,6 +69,7 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
         );
         homeHvacSettingsDto.setOptimizerEnabled(homeInfo.getPvOptimizationsEnabled());
         homeHvacSettingsDto.setOptimizerMode(homeInfo.getOptimizerMode());
+        homeHvacSettingsDto.setHvacSwitchEntityId(homeInfo.getHvacSwitchEntityId());
         if (homeInfo.getCurrentWinterHVACEquipment() != null) {
             homeHvacSettingsDto.setCurrentWinterHVACEquipment(
                     pvOptimizerMapper.convertToDto(homeInfo.getCurrentWinterHVACEquipment())

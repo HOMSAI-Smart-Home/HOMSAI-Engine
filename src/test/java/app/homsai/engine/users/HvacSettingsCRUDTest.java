@@ -9,6 +9,7 @@ import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributes
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
+import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, PVOptimizerScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class HvacSettingsCRUDTest {
 
     @Autowired
@@ -50,19 +51,6 @@ public class HvacSettingsCRUDTest {
     @Test
     public void whenUpdateHvacSettings_thenReadRightValues() {
         configureMockServices();
-
-        // Check right init values
-        ResponseEntity<OptimizerHVACDeviceDto> defaultHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, OptimizerHVACDeviceDto.class);
-        assertThat(defaultHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
-        //assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getActualPowerConsumption()).isZero();
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getPowerConsumption()).isEqualTo(1090.63);
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getActive()).isFalse();
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getEnabled()).isTrue();
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).isManual()).isFalse();
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getAreaId()).isEqualTo("area1");
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getCurrentTemperature()).isNull();
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getSetTemperature()).isEqualTo(26.0);
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getIntervals().size()).isZero();
 
         // Updating settings
         HvacDeviceSettingDto hvacDeviceSettingDto = new HvacDeviceSettingDto();
@@ -120,13 +108,6 @@ public class HvacSettingsCRUDTest {
 
     @Test
     public void whenUpdateHomeSettings_thenReadRightValues() {
-
-        // Check right init values
-        ResponseEntity<HomeHvacSettingsDto> defaultHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
-        assertThat(defaultHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getSetTemperature()).isEqualTo(26.0);
-        assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getOptimizerEnabled()).isEqualTo(false);
-
         HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
         homeHvacSettingsUpdateDto.setOptimizerEnabled(true);
         homeHvacSettingsUpdateDto.setSetTemperature(30.0);
@@ -178,5 +159,8 @@ public class HvacSettingsCRUDTest {
         when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area4")).thenReturn(climateHomeAssistantEntityDto);
         when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area5")).thenReturn(climateHomeAssistantEntityDto);
         when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area6")).thenReturn(climateHomeAssistantEntityDto);
+        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area7")).thenReturn(climateHomeAssistantEntityDto);
+        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area8")).thenReturn(climateHomeAssistantEntityDto);
+        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area9")).thenReturn(climateHomeAssistantEntityDto);
     }
 }

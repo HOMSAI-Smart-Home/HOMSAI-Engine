@@ -22,7 +22,7 @@ public class Consts {
     public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 20;
     public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5;
     public static final Integer HVAC_INITIALIZATION_WATT_THRESHOLD = 200;
-    public static final String HVAC_MODE = "summer";
+    public static final int HVAC_MODE_WINTER_ID = 0;
     public static final int HVAC_MODE_SUMMER_ID = 1;
 
     public static final int PV_OPTIMIZATION_MODE_WINTER = 0;
