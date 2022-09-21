@@ -1,10 +1,9 @@
 package app.homsai.engine.pvoptimizer.domain.models;
 
-
-import app.homsai.engine.common.domain.utils.Consts;
-
 import java.time.Instant;
 import java.util.List;
+
+import static app.homsai.engine.common.domain.utils.Consts.HVAC_MODE_SUMMER_ID;
 
 public class OptimizerHVACDevice {
 
@@ -37,6 +36,8 @@ public class OptimizerHVACDevice {
     private String hvacMode;
 
     private DoubleCircularArray consumptionArray;
+
+    private Integer type;
 
     public OptimizerHVACDevice() {
     }
@@ -92,7 +93,7 @@ public class OptimizerHVACDevice {
             deltaTemperature = 0D;
             return;
         }
-        if( Consts.HVAC_MODE.equals("summer"))  // ToDo Summer/winter
+        if(type == HVAC_MODE_SUMMER_ID)
             deltaTemperature = currentTemperature - setTemperature;
         else
             deltaTemperature = setTemperature - currentTemperature;
@@ -169,5 +170,21 @@ public class OptimizerHVACDevice {
 
     public void setHvacMode(String hvacMode) {
         this.hvacMode = hvacMode;
+    }
+
+    public DoubleCircularArray getConsumptionArray() {
+        return consumptionArray;
+    }
+
+    public void setConsumptionArray(DoubleCircularArray consumptionArray) {
+        this.consumptionArray = consumptionArray;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

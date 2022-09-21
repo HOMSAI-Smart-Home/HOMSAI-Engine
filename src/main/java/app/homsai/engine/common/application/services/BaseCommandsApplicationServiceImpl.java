@@ -106,6 +106,8 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         homeInfo.setGeneralPowerMeterId(settingsDto.getGeneralPowerMeterId());
         homeInfo.setHvacPowerMeterId(settingsDto.getHvacPowerMeterId());
+        homeInfo.setHvacSummerPowerMeterId(settingsDto.getHvacSummerPowerMeterId());
+        homeInfo.setHvacWinterPowerMeterId(settingsDto.getHvacWinterPowerMeterId());
         homeInfo.setPvProductionSensorId(settingsDto.getPvProductionSensorId());
         homeInfo.setPvStorageSensorId(settingsDto.getPvStorageSensorId());
         homeInfo.setLatitude(settingsDto.getLatitude());
@@ -113,7 +115,7 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
         homeInfo.setPvPeakPower(settingsDto.getPvPeakPower());
         homeInfo.setPvInstallDate(settingsDto.getPvInstallDate());
         entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
-        return settingsDto;
+        return getSettingsDtoWithPowerMeterIds(settingsDto);
     }
 
     @Override
@@ -122,5 +124,16 @@ public class BaseCommandsApplicationServiceImpl implements BaseCommandsApplicati
         return modelMapper.map(homeInfo, SettingsDto.class);
     }
 
+    private SettingsDto getSettingsDtoWithPowerMeterIds(SettingsDto settingsDto) {
+        if (settingsDto.getHvacPowerMeterId() != null) {
+            if (settingsDto.getHvacSummerPowerMeterId() == null) {
+                settingsDto.setHvacSummerPowerMeterId(settingsDto.getHvacPowerMeterId());
+            }
+            if (settingsDto.getHvacWinterPowerMeterId() == null) {
+                settingsDto.setHvacWinterPowerMeterId(settingsDto.getHvacPowerMeterId());
+            }
+        }
+        return settingsDto;
+    }
 
 }

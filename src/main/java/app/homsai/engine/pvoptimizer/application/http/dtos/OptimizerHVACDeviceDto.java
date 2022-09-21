@@ -49,6 +49,9 @@ public class OptimizerHVACDeviceDto {
     @JsonProperty("hvac_mode")
     private String hvacMode;
 
+    @JsonProperty("type")
+    private Integer type;
+
 
     public String getEntityId() {
         return entityId;
@@ -160,5 +163,13 @@ public class OptimizerHVACDeviceDto {
 
     public void setHvacMode(String hvacMode) {
         this.hvacMode = hvacMode;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

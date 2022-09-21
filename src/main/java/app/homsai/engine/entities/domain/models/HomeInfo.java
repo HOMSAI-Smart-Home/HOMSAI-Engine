@@ -1,6 +1,8 @@
 package app.homsai.engine.entities.domain.models;
 
 import app.homsai.engine.common.domain.models.BaseEntity;
+import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -21,6 +23,12 @@ public class HomeInfo extends BaseEntity {
 
     @Column(name = "hvac_power_meter_id")
     private String hvacPowerMeterId;
+
+    @Column(name = "hvac_summer_power_meter_id")
+    private String hvacSummerPowerMeterId;
+
+    @Column(name = "hvac_winter_power_meter_id")
+    private String hvacWinterPowerMeterId;
 
     @Column(name = "photovoltaic_production_sensor_id")
     private String pvProductionSensorId;
@@ -52,6 +60,20 @@ public class HomeInfo extends BaseEntity {
     @Column(name = "aiservice_refresh_token")
     private String aiserviceRefreshToken;
 
+    @Column(name= "optimizer_Mode")
+    private Integer optimizerMode;
+
+    @Column(name = "hvac_switch_entity_id")
+    private String hvacSwitchEntityId;
+
+    @ManyToOne
+    @JoinColumn(name = "current_winter_hvac_equipment_uuid")
+    private HVACEquipment currentWinterHVACEquipment;
+
+    @ManyToOne
+    @JoinColumn(name = "current_summer_hvac_equipment_uuid")
+    private HVACEquipment currentSummerHVACEquipment;
+
 
     public Boolean getHasPV() {
         return hasPV;
@@ -75,6 +97,22 @@ public class HomeInfo extends BaseEntity {
 
     public void setHvacPowerMeterId(String hvacPowerMeterId) {
         this.hvacPowerMeterId = hvacPowerMeterId;
+    }
+
+    public String getHvacSummerPowerMeterId() {
+        return hvacSummerPowerMeterId;
+    }
+
+    public void setHvacSummerPowerMeterId(String hvacSummerPowerMeterId) {
+        this.hvacSummerPowerMeterId = hvacSummerPowerMeterId;
+    }
+
+    public String getHvacWinterPowerMeterId() {
+        return hvacWinterPowerMeterId;
+    }
+
+    public void setHvacWinterPowerMeterId(String hvacWinterPowerMeterId) {
+        this.hvacWinterPowerMeterId = hvacWinterPowerMeterId;
     }
 
     public Double getPvPeakPower() {
@@ -155,6 +193,38 @@ public class HomeInfo extends BaseEntity {
 
     public void setAiserviceEmail(String aiserviceEmail) {
         this.aiserviceEmail = aiserviceEmail;
+    }
+
+    public Integer getOptimizerMode() {
+        return optimizerMode;
+    }
+
+    public void setOptimizerMode(Integer optimizerMode) {
+        this.optimizerMode = optimizerMode;
+    }
+
+    public String getHvacSwitchEntityId() {
+        return hvacSwitchEntityId;
+    }
+
+    public void setHvacSwitchEntityId(String hvacSwitchEntityId) {
+        this.hvacSwitchEntityId = hvacSwitchEntityId;
+    }
+
+    public HVACEquipment getCurrentWinterHVACEquipment() {
+        return currentWinterHVACEquipment;
+    }
+
+    public void setCurrentWinterHVACEquipment(HVACEquipment currentWinterHVACEquipment) {
+        this.currentWinterHVACEquipment = currentWinterHVACEquipment;
+    }
+
+    public HVACEquipment getCurrentSummerHVACEquipment() {
+        return currentSummerHVACEquipment;
+    }
+
+    public void setCurrentSummerHVACEquipment(HVACEquipment currentSummerHVACEquipment) {
+        this.currentSummerHVACEquipment = currentSummerHVACEquipment;
     }
 }
 

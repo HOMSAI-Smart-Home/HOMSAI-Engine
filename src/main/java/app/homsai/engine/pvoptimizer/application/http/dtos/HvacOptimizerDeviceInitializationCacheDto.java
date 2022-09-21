@@ -22,6 +22,9 @@ public class HvacOptimizerDeviceInitializationCacheDto {
     @JsonProperty("log")
     private String log;
 
+    @JsonProperty("type")
+    private Integer type;
+
     @JsonProperty("synchronized_hvac_devices")
     List<HVACDeviceDto> syncedHvacDevices;
 
@@ -70,6 +73,14 @@ public class HvacOptimizerDeviceInitializationCacheDto {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public Integer getTotalTimeSeconds() {

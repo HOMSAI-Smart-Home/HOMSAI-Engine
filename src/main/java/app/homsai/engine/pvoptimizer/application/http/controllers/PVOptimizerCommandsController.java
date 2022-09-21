@@ -5,6 +5,7 @@ import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.BadIntervalsException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsUpdateDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerCommandsApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,8 @@ public class PVOptimizerCommandsController {
     @RequestMapping(value = "/entities/homsai/home/settings", method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity editHomeHvacSettings(@RequestBody HomeHvacSettingsDto homeHvacSettingsDto) throws BadRequestException, BadHomeInfoException {
-        return ResponseEntity.status(HttpStatus.OK).body(pvOptimizerCommandsApplicationService.updateHomeHvacSettings(homeHvacSettingsDto));
+    public ResponseEntity editHomeHvacSettings(@RequestBody HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto) throws BadRequestException, BadHomeInfoException {
+        return ResponseEntity.status(HttpStatus.OK).body(pvOptimizerCommandsApplicationService.updateHomeHvacSettings(homeHvacSettingsUpdateDto));
     }
 
 }

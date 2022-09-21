@@ -17,6 +17,7 @@ import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.converters.PVOptimizerMapper;
 import app.homsai.engine.pvoptimizer.application.http.dtos.*;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
+import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.models.HvacDeviceInterval;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerCommandsService;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerQueriesService;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static app.homsai.engine.common.domain.utils.Consts.*;
 import static app.homsai.engine.common.domain.utils.Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION;
@@ -106,7 +108,7 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
             hvacDevice.setEnabled(true);
             hvacDeviceList.add(hvacDevice);
         }
-        pvOptimizerCommandsService.initHomsaiHvacDevices(hvacDeviceList, hvacFunction);
+        pvOptimizerCommandsService.initHomsaiHvacDevices(hvacDeviceList, type, hvacFunction);
         HVACDeviceInitDto hvacDeviceInitDto = new HVACDeviceInitDto();
         hvacDeviceInitDto.setHvacDeviceDtoList(pvOptimizerMapper.convertToDto(hvacDeviceList));
         hvacDeviceInitDto.setInitTimeSecs(pvOptimizerCommandsService.calculateInitTime(hvacDeviceList.size()).intValue());
@@ -158,22 +160,59 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
     }
 
     @Override
-    public HomeHvacSettingsDto updateHomeHvacSettings(HomeHvacSettingsDto homeHvacSettingsDto) throws BadRequestException, BadHomeInfoException {
-        if (homeHvacSettingsDto.getOptimizerEnabled() == null || homeHvacSettingsDto.getSetTemperature() == null)
+    public HomeHvacSettingsDto updateHomeHvacSettings(HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto) throws BadRequestException, BadHomeInfoException {
+        if (homeHvacSettingsUpdateDto.getOptimizerEnabled() == null || homeHvacSettingsUpdateDto.getSetTemperature() == null)
             throw new BadRequestException(ErrorCodes.BAD_HOME_INFO, "Home settings cannot be null");
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         Area area = entitiesQueriesService.getHomeArea();
-        if(Consts.HVAC_MODE.equals("summer")){   // ToDo Summer/winter
-            area.setDesiredSummerTemperature(homeHvacSettingsDto.getSetTemperature());
-        } else {
-            area.setDesiredWinterTemperature(homeHvacSettingsDto.getSetTemperature());
+
+        boolean invalidateCache = false;
+        if (homeHvacSettingsUpdateDto.getOptimizerMode() != null &&
+                !Objects.equals(homeHvacSettingsUpdateDto.getOptimizerMode(), homeInfo.getOptimizerMode())) {
+            invalidateCache = true;
         }
-        homeInfo.setPvOptimizationsEnabled(homeHvacSettingsDto.getOptimizerEnabled());
+
+        if(homeHvacSettingsUpdateDto.getOptimizerMode() == null ||
+                homeHvacSettingsUpdateDto.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID) {
+            area.setDesiredSummerTemperature(homeHvacSettingsUpdateDto.getSetTemperature());
+        } else {
+            area.setDesiredWinterTemperature(homeHvacSettingsUpdateDto.getSetTemperature());
+        }
+        homeInfo.setPvOptimizationsEnabled(homeHvacSettingsUpdateDto.getOptimizerEnabled());
+        homeInfo.setOptimizerMode(homeHvacSettingsUpdateDto.getOptimizerMode());
+        homeInfo.setHvacSwitchEntityId(homeHvacSettingsUpdateDto.getHvacSwitchEntityId());
+
+        HVACEquipment winterHvacEquipment = null;
+        HVACEquipment summerHvacEquipment = null;
+        if (homeHvacSettingsUpdateDto.getCurrentWinterHVACEquipmentUuid() != null) {
+            winterHvacEquipment = pvOptimizerQueriesService.findOneHvacEquipment(
+                    homeHvacSettingsUpdateDto.getCurrentWinterHVACEquipmentUuid()
+            );
+        }
+        if (homeHvacSettingsUpdateDto.getCurrentSummerHVACEquipmentUuid() != null) {
+            summerHvacEquipment = pvOptimizerQueriesService.findOneHvacEquipment(
+                    homeHvacSettingsUpdateDto.getCurrentSummerHVACEquipmentUuid()
+            );
+        }
+        homeInfo.setCurrentWinterHVACEquipment(winterHvacEquipment);
+        homeInfo.setCurrentSummerHVACEquipment(summerHvacEquipment);
+
         entitiesCommandsService.updateHomeInfo(homeInfo);
         entitiesCommandsService.updateArea(area);
+
+        if (invalidateCache) {
+            pvOptimizerCacheService.initHvacDevicesCache();
+        }
+
+        HomeHvacSettingsDto homeHvacSettingsDto = pvOptimizerMapper.convertToDto(homeHvacSettingsUpdateDto);
+        if (winterHvacEquipment != null) {
+            homeHvacSettingsDto.setCurrentWinterHVACEquipment(pvOptimizerMapper.convertToDto(winterHvacEquipment));
+        }
+        if (summerHvacEquipment != null) {
+            homeHvacSettingsDto.setCurrentSummerHVACEquipment(pvOptimizerMapper.convertToDto(summerHvacEquipment));
+        }
+
         return homeHvacSettingsDto;
     }
-
-
 
 }

@@ -5,6 +5,7 @@ import app.homsai.engine.entities.application.services.EntitiesScheduledApplicat
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
+import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, PVOptimizerScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class SettingsCRUDTest {
 
     @Autowired
@@ -78,6 +79,8 @@ public class SettingsCRUDTest {
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateSettingsEndpoint,
                         request, SettingsDto.class);
         assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(updateSettingsResponse.getBody()).getHvacSummerPowerMeterId()).isEqualTo(hvacPowerMeterId);
+        assertThat(Objects.requireNonNull(updateSettingsResponse.getBody()).getHvacWinterPowerMeterId()).isEqualTo(hvacPowerMeterId);
 
         // check read settings values
         ResponseEntity<SettingsDto> newSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, SettingsDto.class);
@@ -90,10 +93,14 @@ public class SettingsCRUDTest {
         assertThat(Objects.requireNonNull(newSettings.getBody()).getLongitude()).isEqualTo(getLongitude);
         assertThat(Objects.requireNonNull(newSettings.getBody()).getPvPeakPower()).isEqualTo(getPvPeakPower);
         assertThat(Objects.requireNonNull(newSettings.getBody()).getPvInstallDate()).isEqualTo(getPvInstallDate);
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getHvacSummerPowerMeterId()).isEqualTo(hvacPowerMeterId);
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getHvacWinterPowerMeterId()).isEqualTo(hvacPowerMeterId);
 
         // set settings back to null
         settingsDto.setGeneralPowerMeterId(null);
         settingsDto.setHvacPowerMeterId(null);
+        settingsDto.setHvacSummerPowerMeterId(null);
+        settingsDto.setHvacWinterPowerMeterId(null);
         settingsDto.setPvProductionSensorId(null);
         settingsDto.setPvStorageSensorId(null);
         settingsDto.setLatitude(null);
@@ -111,6 +118,8 @@ public class SettingsCRUDTest {
         assertThat(nullSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(nullSettings.getBody()).getGeneralPowerMeterId()).isNull();
         assertThat(Objects.requireNonNull(nullSettings.getBody()).getHvacPowerMeterId()).isNull();
+        assertThat(Objects.requireNonNull(nullSettings.getBody()).getHvacSummerPowerMeterId()).isNull();
+        assertThat(Objects.requireNonNull(nullSettings.getBody()).getHvacWinterPowerMeterId()).isNull();
         assertThat(Objects.requireNonNull(nullSettings.getBody()).getPvProductionSensorId()).isNull();
         assertThat(Objects.requireNonNull(nullSettings.getBody()).getPvStorageSensorId()).isNull();
         assertThat(Objects.requireNonNull(nullSettings.getBody()).getLatitude()).isNull();

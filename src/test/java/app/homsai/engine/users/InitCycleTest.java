@@ -1,6 +1,5 @@
 package app.homsai.engine.users;
 
-import app.homsai.engine.common.application.http.dtos.LoggedDto;
 import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
@@ -9,7 +8,7 @@ import app.homsai.engine.entities.application.services.EntitiesScheduledApplicat
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationEstimatedDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
-import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
+import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -33,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, PVOptimizerScheduledApplicationService.class, HomeAssistantRestAPIGateway.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class InitCycleTest {
 
 
@@ -57,7 +55,7 @@ public class InitCycleTest {
 
 
     @Test
-    public void whenStartHVACInit_thenReadRightStatus() {
+    public void whenStartHVACInit_thenReadRightStatus() throws InterruptedException {
 
         // Check right init values
         ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
@@ -78,6 +76,8 @@ public class InitCycleTest {
                 restTemplate.postForEntity(urlStartHvacInit,
                         null, String.class);
         assertThat(startHvacInit.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Thread.sleep(1000);
 
         // check read settings values
         ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> postInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);

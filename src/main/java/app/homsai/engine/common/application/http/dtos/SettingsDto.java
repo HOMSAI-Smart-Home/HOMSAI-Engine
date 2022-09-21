@@ -12,6 +12,12 @@ public class SettingsDto {
     @JsonProperty("hvac_power_meter_id")
     private String hvacPowerMeterId;
 
+    @JsonProperty("hvac_summer_power_meter_id")
+    private String hvacSummerPowerMeterId;
+
+    @JsonProperty("hvac_winter_power_meter_id")
+    private String hvacWinterPowerMeterId;
+
     @JsonProperty("photovoltaic_production_meter_id")
     private String pvProductionSensorId;
 
@@ -44,6 +50,22 @@ public class SettingsDto {
 
     public void setHvacPowerMeterId(String hvacPowerMeterId) {
         this.hvacPowerMeterId = hvacPowerMeterId;
+    }
+
+    public String getHvacSummerPowerMeterId() {
+        return hvacSummerPowerMeterId;
+    }
+
+    public void setHvacSummerPowerMeterId(String hvacSummerPowerMeterId) {
+        this.hvacSummerPowerMeterId = hvacSummerPowerMeterId;
+    }
+
+    public String getHvacWinterPowerMeterId() {
+        return hvacWinterPowerMeterId;
+    }
+
+    public void setHvacWinterPowerMeterId(String hvacWinterPowerMeterId) {
+        this.hvacWinterPowerMeterId = hvacWinterPowerMeterId;
     }
 
     public String getPvProductionSensorId() {
