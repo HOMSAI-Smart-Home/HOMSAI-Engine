@@ -54,7 +54,6 @@ public class HvacSettingsCRUDTest {
         // Check right init values
         ResponseEntity<OptimizerHVACDeviceDto> defaultHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint, OptimizerHVACDeviceDto.class);
         assertThat(defaultHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
-        //assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getActualPowerConsumption()).isZero();
         assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getPowerConsumption()).isEqualTo(1090.63);
         assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getActive()).isFalse();
         assertThat(Objects.requireNonNull(defaultHvacSettings.getBody()).getEnabled()).isTrue();

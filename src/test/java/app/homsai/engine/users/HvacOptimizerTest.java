@@ -59,7 +59,7 @@ public class HvacOptimizerTest {
     @Test
     public void whenAIServiceTurnsOnDevices_thenReadRightStates() {
         List<String> devicesToTurnOn = new ArrayList<>();
-        devicesToTurnOn.add("climate.area1");
+        devicesToTurnOn.add("climate.area2");
         devicesToTurnOn.add("climate.area3");
         devicesToTurnOn.add("climate.area4");
         configureMockHomeAssistantGateway();
