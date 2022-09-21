@@ -2,6 +2,7 @@ package app.homsai.engine.pvoptimizer.domain.services;
 
 import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
+import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.entities.domain.models.SampledSignal;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantCommandsApplicationService;
@@ -43,18 +44,18 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
     @Override
     @Async("threadPoolTaskExecutor")
-    public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
+    public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
 
-        homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue());
+        homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue(), type);
         //TODO levare sta riga e mettere set mintemp -> restore e dialog
         Collections.reverse(hvacDeviceList);
 
-        Double baseConsumption = readBaseConsumption(hvacDeviceList);
+        Double baseConsumption = readBaseConsumption(hvacDeviceList, type);
         logger.info("average base consumption: "+baseConsumption);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average base consumption: "+baseConsumption, null);
         int c = 0;
         for(HVACDevice hvacDevice : hvacDeviceList){
-            Double hvacGrossDeviceConsumption = readHvacDeviceConsumption(hvacDevice.getEntityId(), hvacFunction);
+            Double hvacGrossDeviceConsumption = readHvacDeviceConsumption(hvacDevice.getEntityId(), type, hvacFunction);
             Double hvacNetDeviceConsumption = hvacGrossDeviceConsumption - baseConsumption;
             logger.info(hvacDevice.getEntityId()+": average gross climate consumption: "+hvacGrossDeviceConsumption);
             homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average gross consumption: "+hvacGrossDeviceConsumption, null);
@@ -80,8 +81,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     }
 
 
-    private Double readBaseConsumption(List<HVACDevice> hvacDeviceList) throws InterruptedException, HvacPowerMeterIdNotSet {
-        String meterEntityId = entitiesQueriesService.findHomeInfo().getHvacPowerMeterId();
+    private Double readBaseConsumption(List<HVACDevice> hvacDeviceList, Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        String meterEntityId = type == PV_OPTIMIZATION_MODE_WINTER ? homeInfo.getHvacWinterPowerMeterId() : homeInfo.getHvacSummerPowerMeterId();
         SampledSignal baseConsumption = new SampledSignal();
         if(meterEntityId == null)
             throw new HvacPowerMeterIdNotSet();
@@ -104,8 +106,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         return baseConsumption.getAverage();
     }
 
-    private Double readHvacDeviceConsumption(String climateEntityId, String hvacMode) throws InterruptedException, HvacPowerMeterIdNotSet {
-        String meterEntityId = entitiesQueriesService.findHomeInfo().getHvacPowerMeterId();
+    private Double readHvacDeviceConsumption(String climateEntityId, Integer type, String hvacMode) throws InterruptedException, HvacPowerMeterIdNotSet {
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        String meterEntityId = type == PV_OPTIMIZATION_MODE_WINTER ? homeInfo.getHvacWinterPowerMeterId() : homeInfo.getHvacSummerPowerMeterId();
         if(meterEntityId == null)
             throw new HvacPowerMeterIdNotSet();
         SampledSignal climateConsumption = new SampledSignal();

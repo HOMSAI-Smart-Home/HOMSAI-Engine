@@ -66,7 +66,9 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
     @Override
     public void initHvacDevicesCache() {
         hvacDevicesCache = new HashMap<>();
-        List<HVACDeviceDto> hvacDeviceDtoList = pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(Consts.PV_OPTIMIZATION_MODE_SUMMER); //ToDo Summer/winter
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        List<HVACDeviceDto> hvacDeviceDtoList =
+                pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(homeInfo.getOptimizerMode());
         List<AreaDto> areaList = entitiesQueriesApplicationService.getAllAreas();
         Double homeSetTemperature = areaList.stream()
                 .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
@@ -100,14 +102,16 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                 optimizerHVACDevice.setEnabled(false);
             else
                 optimizerHVACDevice.setEnabled(hvacDeviceDto.getEnabled());
+            optimizerHVACDevice.setType(hvacDeviceDto.getType());
             hvacDevicesCache.put(optimizerHVACDevice.getEntityId(), optimizerHVACDevice);
         }
     }
 
     @Override
     public void updateHvacDevicesCache(){
-        List<HVACDeviceDto> hvacDeviceDtoList = pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(Consts.PV_OPTIMIZATION_MODE_SUMMER); //ToDo Summer/winter
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        List<HVACDeviceDto> hvacDeviceDtoList =
+                pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(homeInfo.getOptimizerMode());
         if(homeInfo.getHvacPowerMeterId() == null)
             return;
         if(HomsaiOptimizerHVACDeviceInitializationCacheService.getHvacDeviceCacheDto().getInProgress())
@@ -142,9 +146,12 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
-            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){  // ToDo Summer/winter
+            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
                 optimizerHVACDevice.setActive(true);
-                optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);  // ToDo Summer/winter
+                optimizerHVACDevice.setHvacMode(
+                        homeInfo.getOptimizerMode() == null || homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
+                                Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION :
+                                Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION);
                 optimizerHVACDevice.setStartTime(Instant.now());
                 optimizerHVACDevice.setManual(true);
             } else if(optimizerHVACDevice.getActive() && Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
@@ -160,7 +167,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             OptimizerHVACDevice optimizerHVACDevice = getHvacDevicesCache().get(hvacDeviceDto.getEntityId());
             if(optimizerHVACDevice.getActive())
-                optimizerHVACDevice.setActualPowerConsumption(currentClimateConsumption);;
+                optimizerHVACDevice.setActualPowerConsumption(currentClimateConsumption);
         }
     }
 

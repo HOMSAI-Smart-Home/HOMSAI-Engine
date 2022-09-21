@@ -2,7 +2,9 @@ package app.homsai.engine.pvoptimizer.application.http.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class HomeHvacSettingsDto {
+import javax.persistence.Column;
+
+public class HomeHvacSettingsUpdateDto {
 
     @JsonProperty("set_temperature")
     private Double setTemperature;
@@ -16,11 +18,11 @@ public class HomeHvacSettingsDto {
     @JsonProperty("hvac_switch_entity_id")
     private String hvacSwitchEntityId;
 
-    @JsonProperty("current_winter_hvac_equipment")
-    private HVACEquipmentDto currentWinterHVACEquipment;
+    @JsonProperty("current_winter_hvac_equipment_uuid")
+    private String currentWinterHVACEquipmentUuid;
 
-    @JsonProperty("current_summer_hvac_equipment")
-    private HVACEquipmentDto currentSummerHVACEquipment;
+    @JsonProperty("current_summer_hvac_equipment_uuid")
+    private String currentSummerHVACEquipmentUuid;
 
     public Double getSetTemperature() {
         return setTemperature;
@@ -54,19 +56,19 @@ public class HomeHvacSettingsDto {
         this.hvacSwitchEntityId = hvacSwitchEntityId;
     }
 
-    public HVACEquipmentDto getCurrentWinterHVACEquipment() {
-        return currentWinterHVACEquipment;
+    public String getCurrentWinterHVACEquipmentUuid() {
+        return currentWinterHVACEquipmentUuid;
     }
 
-    public void setCurrentWinterHVACEquipment(HVACEquipmentDto currentWinterHVACEquipment) {
-        this.currentWinterHVACEquipment = currentWinterHVACEquipment;
+    public void setCurrentWinterHVACEquipmentUuid(String currentWinterHVACEquipmentUuid) {
+        this.currentWinterHVACEquipmentUuid = currentWinterHVACEquipmentUuid;
     }
 
-    public HVACEquipmentDto getCurrentSummerHVACEquipment() {
-        return currentSummerHVACEquipment;
+    public String getCurrentSummerHVACEquipmentUuid() {
+        return currentSummerHVACEquipmentUuid;
     }
 
-    public void setCurrentSummerHVACEquipment(HVACEquipmentDto currentSummerHVACEquipment) {
-        this.currentSummerHVACEquipment = currentSummerHVACEquipment;
+    public void setCurrentSummerHVACEquipmentUuid(String currentSummerHVACEquipmentUuid) {
+        this.currentSummerHVACEquipmentUuid = currentSummerHVACEquipmentUuid;
     }
 }
