@@ -78,6 +78,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             OptimizerHVACDevice optimizerHVACDevice = new OptimizerHVACDevice();
             optimizerHVACDevice.setEntityId(hvacDeviceDto.getEntityId());
             optimizerHVACDevice.setAreaId(hvacDeviceDto.getArea().getName());
+            optimizerHVACDevice.setType(hvacDeviceDto.getType());
             Double currentTemperature = homsaiEntityShowCacheService.getHomsaiEntityShowDtoList().stream()
                     .filter(hD -> hD.getArea().equals(hvacDeviceDto.getArea().getName()))
                     .map(HomsaiEntityShowDto::getTemperatureD)
