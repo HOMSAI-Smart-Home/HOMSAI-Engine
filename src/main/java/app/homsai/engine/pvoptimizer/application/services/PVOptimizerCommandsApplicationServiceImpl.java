@@ -143,7 +143,8 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
         LocalTime startTimeValue = hvacDeviceSettingDto.getStartTime();
         LocalTime endTimeValue = hvacDeviceSettingDto.getEndTime();
         hvacDevice.setEnabled(enabledValue);
-        pvOptimizerCacheService.getHvacDevicesCache().get(hvacDevice.getEntityId()).setManual(autoMode);
+        if(pvOptimizerCacheService.getHvacDevicesCache().get(hvacDevice.getEntityId()) != null)
+            pvOptimizerCacheService.getHvacDevicesCache().get(hvacDevice.getEntityId()).setManual(autoMode);
         hvacDevice.getArea().setDesiredSummerTemperature(desiredTemperature);
         if(startTimeValue != null && endTimeValue != null) {
             HvacDeviceInterval hvacInterval = new HvacDeviceInterval(startTimeValue, endTimeValue);

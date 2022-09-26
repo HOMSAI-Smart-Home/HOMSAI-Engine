@@ -127,6 +127,8 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
         int active = 0;
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             OptimizerHVACDevice optimizerHVACDevice = getHvacDevicesCache().get(hvacDeviceDto.getEntityId());
+            if(optimizerHVACDevice == null)
+                continue;
             if(hvacDeviceDto.getEnabled() == null)
                 optimizerHVACDevice.setEnabled(false);
             else
@@ -167,7 +169,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
         Double currentClimateConsumption = currentTotalClimateConsumption / active;
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             OptimizerHVACDevice optimizerHVACDevice = getHvacDevicesCache().get(hvacDeviceDto.getEntityId());
-            if(optimizerHVACDevice.getActive())
+            if(optimizerHVACDevice != null && optimizerHVACDevice.getActive())
                 optimizerHVACDevice.setActualPowerConsumption(currentClimateConsumption);
         }
     }

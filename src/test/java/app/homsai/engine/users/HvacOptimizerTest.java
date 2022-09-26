@@ -103,7 +103,7 @@ public class HvacOptimizerTest {
 
     @Test
     public void whenSwitchOptimizerMode_thenReadRightStatesAndInvalidateCache() {
-        final String summerEquipmentUuid = "fa3a5e07-df74-4c45-83cd-693d002548a7";
+        final String summerEquipmentUuid = "f98c301b-6ff2-41ba-b5df-f0e2e00e96c8";
         final String hvacSwitchEntityId = "entityID";
         HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
         homeHvacSettingsUpdateDto.setOptimizerEnabled(true);
