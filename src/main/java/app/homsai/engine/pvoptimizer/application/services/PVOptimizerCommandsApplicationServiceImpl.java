@@ -3,6 +3,7 @@ package app.homsai.engine.pvoptimizer.application.services;
 import app.homsai.engine.common.domain.exceptions.BadRequestException;
 import app.homsai.engine.common.domain.models.ErrorCodes;
 import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.BadIntervalsException;
@@ -16,6 +17,7 @@ import app.homsai.engine.homeassistant.application.services.HomeAssistantQueries
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.converters.PVOptimizerMapper;
 import app.homsai.engine.pvoptimizer.application.http.dtos.*;
+import app.homsai.engine.pvoptimizer.domain.exceptions.ClimateEntityNotFoundException;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.models.HvacDeviceInterval;
@@ -43,6 +45,9 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
     EntitiesQueriesApplicationService entitiesQueriesApplicationService;
 
     @Autowired
+    EntitiesCommandsApplicationService entitiesCommandsApplicationService;
+
+    @Autowired
     HomeAssistantQueriesApplicationService homeAssistantQueriesApplicationService;
 
     @Autowired
@@ -65,7 +70,8 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
 
     @Override
     @Transactional
-    public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
+    public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException {
+        entitiesCommandsApplicationService.syncHomeAssistantEntities();
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         if(homeInfo.getHvacPowerMeterId(type) == null)
             throw new HvacPowerMeterIdNotSet();
@@ -108,6 +114,8 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
             hvacDevice.setEnabled(true);
             hvacDeviceList.add(hvacDevice);
         }
+        if(hvacDeviceList.size() == 0)
+            throw new ClimateEntityNotFoundException(type);
         pvOptimizerCommandsService.initHomsaiHvacDevices(hvacDeviceList, type, hvacFunction);
         HVACDeviceInitDto hvacDeviceInitDto = new HVACDeviceInitDto();
         hvacDeviceInitDto.setHvacDeviceDtoList(pvOptimizerMapper.convertToDto(hvacDeviceList));

@@ -8,6 +8,7 @@ import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsUpdateDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerCommandsApplicationService;
+import app.homsai.engine.pvoptimizer.domain.exceptions.ClimateEntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +24,7 @@ public class PVOptimizerCommandsController {
 
     @RequestMapping(value = "/entities/homsai/hvac/init", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
+    public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(pvOptimizerCommandsApplicationService.initHVACDevices(type));
     }
 

@@ -22,7 +22,7 @@ public class ErrorCodes {
     public static final int HVAC_POWER_METER_NOT_SET = 34;
     public static final int BAD_INTERVALS = 35;
     public static final int HVAC_ENTITY_NOT_FOUND = 36;
-
+    public static final int CLIMATE_ENTITY_NOT_FOUND = 37;
 
 
     /*

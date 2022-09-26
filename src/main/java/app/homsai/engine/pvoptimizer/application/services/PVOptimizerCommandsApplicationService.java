@@ -5,6 +5,7 @@ import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.BadIntervalsException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.pvoptimizer.application.http.dtos.*;
+import app.homsai.engine.pvoptimizer.domain.exceptions.ClimateEntityNotFoundException;
 import app.homsai.engine.pvoptimizer.domain.exceptions.HvacEntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +14,7 @@ import java.util.List;
 public interface PVOptimizerCommandsApplicationService {
 
     @Transactional
-    HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet;
+    HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException;
 
     Integer getHvacDeviceInitTimeSeconds(Integer type);
 
