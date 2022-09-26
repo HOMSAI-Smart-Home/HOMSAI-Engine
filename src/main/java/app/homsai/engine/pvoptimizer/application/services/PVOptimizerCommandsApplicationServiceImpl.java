@@ -67,7 +67,7 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
     @Transactional
     public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
-        if(homeInfo.getHvacPowerMeterId() == null)
+        if(homeInfo.getHvacPowerMeterId(type) == null)
             throw new HvacPowerMeterIdNotSet();
         List<HVACDevice> hvacDeviceList = new ArrayList<>();
         String hvacFunction;

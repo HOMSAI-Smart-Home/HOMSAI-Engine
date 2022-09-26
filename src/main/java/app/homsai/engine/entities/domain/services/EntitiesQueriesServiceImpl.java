@@ -43,16 +43,7 @@ public class EntitiesQueriesServiceImpl implements EntitiesQueriesService {
 
     @Override
     public HomeInfo findHomeInfo() {
-        HomeInfo homeInfo = entitiesQueriesRepository.getHomeInfo();
-        if (homeInfo.getHvacPowerMeterId() != null) {
-            if (homeInfo.getHvacSummerPowerMeterId() == null) {
-                homeInfo.setHvacSummerPowerMeterId(homeInfo.getHvacPowerMeterId());
-            }
-            if (homeInfo.getHvacWinterPowerMeterId() == null) {
-                homeInfo.setHvacWinterPowerMeterId(homeInfo.getHvacPowerMeterId());
-            }
-        }
-        return homeInfo;
+        return entitiesQueriesRepository.getHomeInfo();
     }
 
     @Override

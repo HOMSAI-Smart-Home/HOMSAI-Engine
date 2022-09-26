@@ -91,7 +91,7 @@ public class HvacDevicesInitView extends VerticalLayout {
             CustomConfirmDialog d1 = new CustomConfirmDialog(EnText.START_HVAC_DEVICE_INIT_TITLE, EnText.START_HVAC_DEVICE_INIT_DESCRIPTION, Collections.singletonList(Integer.toString(timeRequiredMinutes)));
             d1.setOnConfirmListener(() -> {
                 try {
-                    pvOptimizerCommandsApplicationService.initHVACDevices(Consts.PV_OPTIMIZATION_MODE_SUMMER);
+                    pvOptimizerCommandsApplicationService.initHVACDevices(Consts.PV_OPTIMIZATION_MODE_WINTER);
                     startInitButton.setEnabled(false);
                     startInitButton.setText("Initialization in progress...");
                 } catch (InterruptedException ex) {

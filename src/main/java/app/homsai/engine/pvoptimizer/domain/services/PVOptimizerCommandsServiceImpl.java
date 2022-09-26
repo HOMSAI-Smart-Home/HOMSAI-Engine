@@ -45,17 +45,13 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     @Override
     @Async("threadPoolTaskExecutor")
     public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
-
         homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue(), type);
-        //TODO levare sta riga e mettere set mintemp -> restore e dialog
-        Collections.reverse(hvacDeviceList);
-
         Double baseConsumption = readBaseConsumption(hvacDeviceList, type);
         logger.info("average base consumption: "+baseConsumption);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average base consumption: "+baseConsumption, null);
         int c = 0;
         for(HVACDevice hvacDevice : hvacDeviceList){
-            Double hvacGrossDeviceConsumption = readHvacDeviceConsumption(hvacDevice.getEntityId(), type, hvacFunction);
+            Double hvacGrossDeviceConsumption = readHvacDeviceConsumption(hvacDevice, type, hvacFunction);
             Double hvacNetDeviceConsumption = hvacGrossDeviceConsumption - baseConsumption;
             logger.info(hvacDevice.getEntityId()+": average gross climate consumption: "+hvacGrossDeviceConsumption);
             homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average gross consumption: "+hvacGrossDeviceConsumption, null);
@@ -106,12 +102,18 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         return baseConsumption.getAverage();
     }
 
-    private Double readHvacDeviceConsumption(String climateEntityId, Integer type, String hvacMode) throws InterruptedException, HvacPowerMeterIdNotSet {
+    private Double readHvacDeviceConsumption(HVACDevice hvacDevice, Integer type, String hvacMode) throws InterruptedException, HvacPowerMeterIdNotSet {
+        String climateEntityId = hvacDevice.getEntityId();
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         String meterEntityId = type == PV_OPTIMIZATION_MODE_WINTER ? homeInfo.getHvacWinterPowerMeterId() : homeInfo.getHvacSummerPowerMeterId();
         if(meterEntityId == null)
             throw new HvacPowerMeterIdNotSet();
         SampledSignal climateConsumption = new SampledSignal();
+        Double oldSetTemp = getSetTemp(climateEntityId);
+        Double initSetTemp = type == HVAC_MODE_WINTER_ID ? hvacDevice.getMaxTemp() : hvacDevice.getMinTemp();
+        homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(climateEntityId, initSetTemp);
+        logger.info("sent "+initSetTemp+"° to: "+climateEntityId);
+        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent "+initSetTemp+"° to: "+climateEntityId, null);
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, hvacMode);
         logger.info("sent cmd cooling to: "+climateEntityId);
         logger.info("waiting 30s to init");
@@ -126,6 +128,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             Thread.sleep(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS);
         }
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+        logger.info("sent "+oldSetTemp+"° to: "+climateEntityId);
+        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent "+oldSetTemp+"° to: "+climateEntityId, null);
+        homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(climateEntityId, oldSetTemp);
         logger.info("finish "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "finish "+climateEntityId, null);
         return climateConsumption.getAverage();
@@ -137,6 +142,15 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
     private int calcInitBaseConsumptionCycles(){
         return  HVAC_BC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
+    }
+
+    private double getSetTemp(String entityId){
+        try {
+            return Double.parseDouble(homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(entityId).getAttributes().getTemperature());
+        } catch (Exception e){
+            e.printStackTrace();
+            return 24D;
+        }
     }
 
     @Override

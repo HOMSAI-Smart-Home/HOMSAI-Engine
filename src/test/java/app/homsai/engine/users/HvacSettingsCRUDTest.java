@@ -111,6 +111,8 @@ public class HvacSettingsCRUDTest {
         HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
         homeHvacSettingsUpdateDto.setOptimizerEnabled(true);
         homeHvacSettingsUpdateDto.setSetTemperature(30.0);
+        homeHvacSettingsUpdateDto.setOptimizerMode(0);
+        homeHvacSettingsUpdateDto.setHvacSwitchEntityId("switch.entity");
         HttpEntity<HomeHvacSettingsUpdateDto> request = new HttpEntity<>(homeHvacSettingsUpdateDto);
         ResponseEntity<HomeHvacSettingsDto> updateSettingsResponse  =
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
@@ -121,6 +123,8 @@ public class HvacSettingsCRUDTest {
         assertThat(newHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getSetTemperature()).isEqualTo(30);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerEnabled()).isEqualTo(true);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerMode()).isEqualTo(0);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getHvacSwitchEntityId()).isEqualTo("switch.entity");
 
         homeHvacSettingsUpdateDto.setOptimizerEnabled(null);
         homeHvacSettingsUpdateDto.setSetTemperature(null);
@@ -133,6 +137,8 @@ public class HvacSettingsCRUDTest {
 
         homeHvacSettingsUpdateDto.setOptimizerEnabled(false);
         homeHvacSettingsUpdateDto.setSetTemperature(26.0);
+        homeHvacSettingsUpdateDto.setOptimizerMode(1);
+        homeHvacSettingsUpdateDto.setHvacSwitchEntityId("switch.entity");
         request = new HttpEntity<>(homeHvacSettingsUpdateDto);
         updateSettingsResponse  =
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,

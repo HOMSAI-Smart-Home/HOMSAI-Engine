@@ -70,10 +70,17 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
         List<HVACDeviceDto> hvacDeviceDtoList =
                 pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(homeInfo.getOptimizerMode());
         List<AreaDto> areaList = entitiesQueriesApplicationService.getAllAreas();
-        Double homeSetTemperature = areaList.stream()
-                .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
-                .map(AreaDto::getDesiredSummerTemperature)
-                .findFirst().orElse(null);
+        Double homeSetTemperature;
+        if(homeInfo.getOptimizerMode() != null && homeInfo.getOptimizerMode() == Consts.HVAC_MODE_WINTER_ID)
+            homeSetTemperature = areaList.stream()
+                    .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
+                    .map(AreaDto::getDesiredWinterTemperature)
+                    .findFirst().orElse(null);
+        else
+            homeSetTemperature = areaList.stream()
+                    .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
+                    .map(AreaDto::getDesiredSummerTemperature)
+                    .findFirst().orElse(null);
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
             OptimizerHVACDevice optimizerHVACDevice = new OptimizerHVACDevice();
             optimizerHVACDevice.setEntityId(hvacDeviceDto.getEntityId());
@@ -85,12 +92,21 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                     .map(Optional::ofNullable)
                     .findFirst().flatMap(Function.identity()).orElse(null);
             optimizerHVACDevice.setCurrentTemperature(currentTemperature);
-            Double setTemperature = areaList.stream()
+            Double setTemperature;
+            if(homeInfo.getOptimizerMode() != null && homeInfo.getOptimizerMode() == Consts.HVAC_MODE_WINTER_ID)
+                setTemperature = areaList.stream()
                     .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
-                    .map(AreaDto::getDesiredSummerTemperature)
+                    .map(AreaDto::getDesiredWinterTemperature)
                     .map(Optional::ofNullable)
                     .findFirst().flatMap(Function.identity())
                     .orElse(null);
+            else
+                setTemperature = areaList.stream()
+                        .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
+                        .map(AreaDto::getDesiredSummerTemperature)
+                        .map(Optional::ofNullable)
+                        .findFirst().flatMap(Function.identity())
+                        .orElse(null);
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             optimizerHVACDevice.setActive(false);
@@ -113,16 +129,23 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         List<HVACDeviceDto> hvacDeviceDtoList =
                 pvOptimizerQueriesApplicationService.getAllHomsaiHvacDevices(homeInfo.getOptimizerMode());
-        if(homeInfo.getHvacPowerMeterId() == null)
+        if(homeInfo.getHvacPowerMeterId(homeInfo.getOptimizerMode()) == null)
             return;
         if(HomsaiOptimizerHVACDeviceInitializationCacheService.getHvacDeviceCacheDto().getInProgress())
             return;
         List<AreaDto> areaList = entitiesQueriesApplicationService.getAllAreas();
-        Double homeSetTemperature = areaList.stream()
-                .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
-                .map(AreaDto::getDesiredSummerTemperature)
-                .findFirst().orElse(null);
-        HomeAssistantEntityDto climatePowerEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(homeInfo.getHvacPowerMeterId());
+        Double homeSetTemperature;
+        if(homeInfo.getOptimizerMode() != null && homeInfo.getOptimizerMode() == Consts.HVAC_MODE_WINTER_ID)
+            homeSetTemperature = areaList.stream()
+                    .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
+                    .map(AreaDto::getDesiredWinterTemperature)
+                    .findFirst().orElse(null);
+        else
+            homeSetTemperature = areaList.stream()
+                    .filter(area -> area.getUuid().equals(Consts.HOME_AREA_UUID))
+                    .map(AreaDto::getDesiredSummerTemperature)
+                    .findFirst().orElse(null);
+        HomeAssistantEntityDto climatePowerEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(homeInfo.getHvacPowerMeterId(homeInfo.getOptimizerMode()));
         double currentTotalClimateConsumption = HOME_ASSISTANT_WATT.equals(climatePowerEntityDto.getAttributes().getUnitOfMeasurement())? Double.parseDouble(climatePowerEntityDto.getState()) : Double.parseDouble(climatePowerEntityDto.getState()) * 1000;
         int active = 0;
         for(HVACDeviceDto hvacDeviceDto : hvacDeviceDtoList){
@@ -140,12 +163,21 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                     .map(Optional::ofNullable)
                     .findFirst().flatMap(Function.identity()).orElse(null);
             optimizerHVACDevice.setCurrentTemperature(currentTemperature);
-            Double setTemperature = areaList.stream()
-                    .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
-                    .map(AreaDto::getDesiredSummerTemperature)
-                    .map(Optional::ofNullable)
-                    .findFirst().flatMap(Function.identity())
-                    .orElse(null);
+            Double setTemperature;
+            if(homeInfo.getOptimizerMode() != null && homeInfo.getOptimizerMode() == Consts.HVAC_MODE_WINTER_ID)
+                setTemperature = areaList.stream()
+                        .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
+                        .map(AreaDto::getDesiredWinterTemperature)
+                        .map(Optional::ofNullable)
+                        .findFirst().flatMap(Function.identity())
+                        .orElse(null);
+            else
+                setTemperature = areaList.stream()
+                        .filter(area -> area.getName().equals(hvacDeviceDto.getArea().getName()))
+                        .map(AreaDto::getDesiredSummerTemperature)
+                        .map(Optional::ofNullable)
+                        .findFirst().flatMap(Function.identity())
+                        .orElse(null);
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());

@@ -86,10 +86,10 @@ public class SettingsView extends VerticalLayout {
         else
             generalMeterSensorSelect.setValue(findHAEntityDtoByEntityId(powerMeterEntities, homeInfo.getGeneralPowerMeterId()));
 
-        if(homeInfo.getHvacPowerMeterId() == null)
+        if(homeInfo.getHvacPowerMeterId(0) == null)
             hvacMeterSensorSelect.setValue(null);
         else
-            hvacMeterSensorSelect.setValue(findHAEntityDtoByEntityId(powerMeterEntities, homeInfo.getHvacPowerMeterId()));
+            hvacMeterSensorSelect.setValue(findHAEntityDtoByEntityId(powerMeterEntities, homeInfo.getHvacPowerMeterId(0)));
 
         if(homeInfo.getPvProductionSensorId() == null)
             pvMeterSensorSelect.setValue(null);

@@ -1,6 +1,7 @@
 package app.homsai.engine.entities.domain.models;
 
 import app.homsai.engine.common.domain.models.BaseEntity;
+import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -91,6 +92,14 @@ public class HomeInfo extends BaseEntity {
         this.generalPowerMeterId = generalPowerMeterId;
     }
 
+    public String getHvacPowerMeterId(Integer type) {
+        if(type == Consts.HVAC_MODE_WINTER_ID && hvacWinterPowerMeterId != null)
+            return hvacWinterPowerMeterId;
+        if(type == Consts.HVAC_MODE_SUMMER_ID && hvacSummerPowerMeterId != null)
+            return hvacSummerPowerMeterId;
+        return hvacPowerMeterId;
+    }
+
     public String getHvacPowerMeterId() {
         return hvacPowerMeterId;
     }
@@ -100,6 +109,8 @@ public class HomeInfo extends BaseEntity {
     }
 
     public String getHvacSummerPowerMeterId() {
+        if(hvacSummerPowerMeterId == null)
+            return hvacPowerMeterId;
         return hvacSummerPowerMeterId;
     }
 
@@ -108,6 +119,8 @@ public class HomeInfo extends BaseEntity {
     }
 
     public String getHvacWinterPowerMeterId() {
+        if(hvacWinterPowerMeterId == null)
+            return hvacPowerMeterId;
         return hvacWinterPowerMeterId;
     }
 

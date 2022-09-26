@@ -65,9 +65,7 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
         if(!homeInfo.getPvOptimizationsEnabled())
             return;
         if(homeInfo.getGeneralPowerMeterId() == null ||
-                (homeInfo.getHvacPowerMeterId() == null &&
-                        homeInfo.getHvacSummerPowerMeterId() == null &&
-                        homeInfo.getHvacWinterPowerMeterId() == null) ||
+                (homeInfo.getHvacPowerMeterId(homeInfo.getOptimizerMode()) == null) ||
                 homeInfo.getPvProductionSensorId() == null) {
             homeInfo.setPvOptimizationsEnabled(false);
             entitiesCommandsApplicationService.saveHomeInfo(homeInfo);
