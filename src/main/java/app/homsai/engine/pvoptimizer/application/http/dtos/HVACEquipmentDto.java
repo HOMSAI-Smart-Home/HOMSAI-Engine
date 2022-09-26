@@ -2,6 +2,7 @@ package app.homsai.engine.pvoptimizer.application.http.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 /**
  * Created by Giacomo Agostini on 17/01/17.
  */
@@ -22,6 +23,9 @@ public class HVACEquipmentDto {
 
     @JsonProperty("minimum_execution_minutes")
     private Integer minimumExecutionMinutes;
+
+    @JsonProperty("switch_required")
+    private Boolean switchRequired;
 
     public String getUuid() {
         return uuid;
@@ -61,6 +65,14 @@ public class HVACEquipmentDto {
 
     public void setMinimumExecutionMinutes(Integer minimumExecutionMinutes) {
         this.minimumExecutionMinutes = minimumExecutionMinutes;
+    }
+
+    public Boolean getSwitchRequired() {
+        return switchRequired;
+    }
+
+    public void setSwitchRequired(Boolean switchRequired) {
+        this.switchRequired = switchRequired;
     }
 }
 

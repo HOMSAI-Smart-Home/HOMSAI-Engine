@@ -20,6 +20,9 @@ public class HVACEquipment extends BaseEntity {
     @Column(name = "minimum_execution_minutes")
     private Integer minimumExecutionMinutes;
 
+    @Column(name = "switch_required")
+    private Boolean switchRequired;
+
     public String getName() {
         return name;
     }
@@ -50,6 +53,14 @@ public class HVACEquipment extends BaseEntity {
 
     public void setMinimumExecutionMinutes(Integer minimumExecutionMinutes) {
         this.minimumExecutionMinutes = minimumExecutionMinutes;
+    }
+
+    public Boolean getSwitchRequired() {
+        return switchRequired;
+    }
+
+    public void setSwitchRequired(Boolean switchRequired) {
+        this.switchRequired = switchRequired;
     }
 }
 

@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final String hvacInitEndpoint = "/entities/homsai/hvac/init";
   private final String hvacInitStatusEndpoint = "/entities/homsai/hvac/init/status";
   private final String hvacListEndpoint = "/entities/homsai/hvac";
-  private final String equipmentListEndpoint = "/entities/homsai/equipment";
+  private final String equipmentListEndpoint = "/entities/homsai/equipments";
   private final String hvacDetailEndpoint = "/entities/homsai/hvac/*";
   private final String hvacDeviceSetSettingsEndpoint = "/entities/homsai/hvac/settings/*";
   private final String hvacHomeSettingsEndpoint = "/entities/homsai/home/settings";

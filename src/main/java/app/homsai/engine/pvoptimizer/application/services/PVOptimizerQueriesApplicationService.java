@@ -20,7 +20,7 @@ public interface PVOptimizerQueriesApplicationService {
     @Transactional
     List<HVACDeviceDto> getAllHomsaiHvacDevices(Integer hvacDeviceConditioning);
 
-    List<HVACEquipmentDto> getHvacEquipments();
+    List<HVACEquipmentDto> getHvacEquipments(String search);
 
     HVACEquipmentDto getHvacEquipment(String equipmentUuid);
 

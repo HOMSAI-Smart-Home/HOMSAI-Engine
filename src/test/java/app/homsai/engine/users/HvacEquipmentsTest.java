@@ -31,13 +31,13 @@ public class HvacEquipmentsTest {
     @Autowired
     private Environment env;
 
-    private final String readEquipmentsEndpoint = "/entities/homsai/equipment";
+    private final String readEquipmentsEndpoint = "/entities/homsai/equipments";
 
     @Test
     public void whenGetHVACEquipments_thenReadRightOnes() {
         // Check right init values
         ResponseEntity<HVACEquipmentDto[]> hvacEquipments = restTemplate.getForEntity(env.getProperty("server.contextPath") + readEquipmentsEndpoint, HVACEquipmentDto[].class);
         assertThat(hvacEquipments.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(hvacEquipments.getBody())).hasSize(4);
+        assertThat(Objects.requireNonNull(hvacEquipments.getBody())).hasSize(5);
     }
 }

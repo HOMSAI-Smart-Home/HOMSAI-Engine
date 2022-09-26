@@ -90,8 +90,8 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
     }
 
     @Override
-    public List<HVACEquipmentDto> getHvacEquipments() {
-        return pvOptimizerMapper.convertToDtoEquipments(pvOptimizerQueriesService.findAllHomsaiHvacEquipments(Pageable.unpaged(), null).getContent());
+    public List<HVACEquipmentDto> getHvacEquipments(String search) {
+        return pvOptimizerMapper.convertToDtoEquipments(pvOptimizerQueriesService.findAllHomsaiHvacEquipments(Pageable.unpaged(), search).getContent());
     }
     
     @Override

@@ -50,10 +50,10 @@ public class PVOptimizerQueriesController {
                 .body(pvOptimizerQueriesApplicationService.getHomsaiHvacSettings());
     }
 
-    @RequestMapping(value = "/entities/homsai/equipment", method = RequestMethod.GET)
-    public ResponseEntity getHvacEquipments() {
+    @RequestMapping(value = "/entities/homsai/equipments", method = RequestMethod.GET)
+    public ResponseEntity getHvacEquipments(@RequestParam(value = "search", required = false) String search) {
         return ResponseEntity.status(HttpStatus.OK).body(
-                pvOptimizerQueriesApplicationService.getHvacEquipments());
+                pvOptimizerQueriesApplicationService.getHvacEquipments(search));
     }
 }
 
