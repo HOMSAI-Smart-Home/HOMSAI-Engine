@@ -10,15 +10,15 @@ spring:
       max-request-size: 20MB
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:file:~/homsai-engine-db
-    username:
-    password:
+    url: jdbc:h2:file:/data/homsai-engine-db;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+    username: sa
+    password: sa
   jpa:
     show-sql: false
     properties:
       hibernate: dialect:org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
   cloud:
     stream:
       bindings:
@@ -35,9 +35,11 @@ spring:
   mvc:
     dispatch-options-request: true
 
+
 server:
-  port: 8080
+  port: 8099
   contextPath: /api
 
 media:
-  path: /home/media
+  path: /data/media
+

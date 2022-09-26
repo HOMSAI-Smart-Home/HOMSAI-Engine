@@ -1,11 +1,12 @@
-useSwagger=false
+mail.domain=domain
+mail.port=2525
+mail.username=username
+mail.password=password
+mail.mailFrom=mailFrom
 
-mail.domain=
-mail.port=
-mail.username=
-mail.password=
-mail.mailFrom=
+vaadin.servlet.productionMode=true
+home_assistant.token=token
 
-home_assistant.token=
-home_assistant.api_url=
-ai_service.api_url=
+home_assistant.api_url=url
+
+ai_service.api_url=https://aiservice.homsai.app:8443/aiservice
