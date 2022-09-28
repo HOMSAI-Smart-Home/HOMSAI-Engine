@@ -93,6 +93,8 @@ public class HomeInfo extends BaseEntity {
     }
 
     public String getHvacPowerMeterId(Integer type) {
+        if(type == null)
+            type = Consts.HVAC_MODE_SUMMER_ID;
         if(type == Consts.HVAC_MODE_WINTER_ID && hvacWinterPowerMeterId != null)
             return hvacWinterPowerMeterId;
         if(type == Consts.HVAC_MODE_SUMMER_ID && hvacSummerPowerMeterId != null)
