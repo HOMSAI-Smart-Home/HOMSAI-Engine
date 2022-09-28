@@ -3,6 +3,7 @@ package app.homsai.engine.users;
 import app.homsai.engine.common.application.http.dtos.SettingsDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
+import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
 import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class SettingsCRUDTest {
 
     @Autowired

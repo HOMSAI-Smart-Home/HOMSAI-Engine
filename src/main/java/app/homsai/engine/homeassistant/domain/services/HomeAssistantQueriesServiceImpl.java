@@ -1,7 +1,7 @@
 package app.homsai.engine.homeassistant.domain.services;
 
 import app.homsai.engine.entities.domain.models.HAEntity;
-import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGatewayImpl;
+import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class HomeAssistantQueriesServiceImpl implements HomeAssistantQueriesServ
     HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
 
     @Autowired
-    HomeAssistantWSAPIGatewayImpl homeAssistantWSAPIGateway;
+    HomeAssistantWSAPIGateway homeAssistantWSAPIGateway;
 
     @Override
     public List<HomeAssistantEntityDto> getHomeAssistantEntities(String domain) {

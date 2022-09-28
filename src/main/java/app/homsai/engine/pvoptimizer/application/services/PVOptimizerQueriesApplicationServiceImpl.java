@@ -102,6 +102,11 @@ public class PVOptimizerQueriesApplicationServiceImpl implements PVOptimizerQuer
     }
 
     @Override
+    public List<HVACDeviceDto> getAllHomsaiHvacDevicesFromDB(String search) {
+        return pvOptimizerMapper.convertToDto(pvOptimizerQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), search).getContent());
+    }
+
+    @Override
     public HVACEquipmentDto getHvacEquipment(String equipmentUuid) {
         return pvOptimizerMapper.convertToDto(pvOptimizerQueriesService.findOneHvacEquipment(equipmentUuid));
     }

@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface HomeAssistantWSAPIGateway {
 
-    void syncEntityAreas(List<HAEntity> entityList, Object lock);
+    int syncEntityAreas(List<HAEntity> entityList, Object lock);
 
 }

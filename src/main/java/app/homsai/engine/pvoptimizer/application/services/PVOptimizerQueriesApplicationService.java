@@ -25,4 +25,6 @@ public interface PVOptimizerQueriesApplicationService {
     HVACEquipmentDto getHvacEquipment(String equipmentUuid);
 
     HvacOptimizerDeviceInitializationEstimatedDto getHvacInitEstimated(Integer type);
+
+    List<HVACDeviceDto> getAllHomsaiHvacDevicesFromDB(String search);
 }

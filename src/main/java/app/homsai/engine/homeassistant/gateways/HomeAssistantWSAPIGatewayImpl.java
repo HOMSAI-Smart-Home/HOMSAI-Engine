@@ -46,13 +46,14 @@ public class HomeAssistantWSAPIGatewayImpl implements HomeAssistantWSAPIGateway 
     private Object lock;
 
     @Override
-    public void syncEntityAreas(List<HAEntity> entityList, Object lock){
+    public int syncEntityAreas(List<HAEntity> entityList, Object lock){
         this.entityList = entityList;
         this.lock = lock;
         requestsSent = 0;
         answersReceive = 0;
         String wsUrl = apiUrl.replace("http", "ws")+"/api/websocket";
         connect(URI.create(wsUrl));
+        return 0;
     }
     
     public void connect(URI serverUri){

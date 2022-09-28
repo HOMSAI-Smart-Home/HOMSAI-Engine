@@ -1,6 +1,12 @@
 package app.homsai.engine.users;
 
 import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.entities.domain.models.Area;
+import app.homsai.engine.entities.domain.models.HAEntity;
+import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
+import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
+import app.homsai.engine.entities.infrastructure.repositories.HAEntityCommandsJpaRepository;
+import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationCacheDto;
@@ -11,6 +17,9 @@ import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledAp
 import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,16 +31,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class InitCycleTest {
 
 
@@ -49,6 +58,12 @@ public class InitCycleTest {
     @Autowired
     HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
 
+    @Autowired
+    HomeAssistantWSAPIGateway homeAssistantWSAPIGateway;
+
+    @Autowired
+    EntitiesCommandsService entitiesCommandsService;
+
     private final String startInitEndpoint = "/entities/homsai/hvac/init";
     private final String getStatusEndpoint = "/entities/homsai/hvac/init/status";
     private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
@@ -57,6 +72,7 @@ public class InitCycleTest {
     @Test
     public void whenStartHVACInit_thenReadRightStatus() throws InterruptedException {
 
+        configureMockServices();
         // Check right init values
         ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
         assertThat(preInitStatus.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -69,7 +85,7 @@ public class InitCycleTest {
 
         String urlStartHvacInit = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+startInitEndpoint)
-                .queryParam("type", "1")
+                .queryParam("type", "0")
                 .encode()
                 .toUriString();
         ResponseEntity<String> startHvacInit   =
@@ -86,7 +102,6 @@ public class InitCycleTest {
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getLog()).isNotEqualTo("");
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getElapsedTimeSeconds()).isNotEqualTo(0);
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getTotalTimeSeconds()).isNotEqualTo(0);
-        assertThat(Objects.requireNonNull(postInitStatus.getBody()).getRemainingTimeSeconds()).isEqualTo(0);
         assertThat(Objects.requireNonNull(postInitStatus.getBody()).getElapsedPercent()).isNotEqualTo(0D);
     }
 
@@ -156,5 +171,21 @@ public class InitCycleTest {
                 homeAssistantClimateWinterSummer3,
                 homeAssistantClimateWinterSummer4
         ));
+        when(homeAssistantWSAPIGateway.syncEntityAreas(anyList(), any())).then(
+                (Answer<Integer>) i -> {
+                    List<HAEntity> entities = (List<HAEntity>) i.getArguments()[0];
+                    Object lock = i.getArguments()[1];
+                    for(HAEntity haEntity : entities){
+                        Area area = entitiesCommandsService.getAreaByNameOrCreate("area1");
+                        if (haEntity.getAreas() == null)
+                            haEntity.setAreas(new ArrayList<>());
+                        haEntity.getAreas().add(area);
+                    }
+                    synchronized (lock) {
+                        lock.notifyAll();
+                    }
+                    return 0;
+                }
+        );
     }
 }

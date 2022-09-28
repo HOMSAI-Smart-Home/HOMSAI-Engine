@@ -1,5 +1,6 @@
 package app.homsai.engine.users;
 
+import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsUpdateDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacDeviceSettingDto;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class HvacSettingsCRUDTest {
 
     @Autowired
