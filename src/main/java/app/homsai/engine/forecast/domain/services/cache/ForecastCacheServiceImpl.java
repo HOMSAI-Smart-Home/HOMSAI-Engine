@@ -58,7 +58,7 @@ public class ForecastCacheServiceImpl implements ForecastCacheService{
     @Override
     public void syncHomsaiOptimizationForecast(){
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
-        String currency = "EUR".equals(homeAssistantQueriesApplicationService.getConfig().getCurrency()) ?
+        String currency = Consts.HOME_ASSISTANT_EUR_UNIT.equals(homeAssistantQueriesApplicationService.getConfig().getCurrency()) ?
                 Consts.EUR_UNIT :
                 Consts.US_UNIT;
         String generalPowerMeterId = homeInfo.getGeneralPowerMeterId();

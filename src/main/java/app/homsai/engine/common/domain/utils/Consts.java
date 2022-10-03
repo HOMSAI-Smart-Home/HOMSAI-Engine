@@ -30,6 +30,7 @@ public class Consts {
 
     public static final Double HVAC_THRESHOLD_TEMPERATURE = 2D;
 
-    public static String EUR_UNIT = "EU";
-    public static String US_UNIT = "US";
+    public static final String HOME_ASSISTANT_EUR_UNIT = "EUR";
+    public static final String EUR_UNIT = "EU";
+    public static final String US_UNIT = "US";
 }
