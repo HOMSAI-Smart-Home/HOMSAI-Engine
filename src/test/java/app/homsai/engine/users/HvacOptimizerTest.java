@@ -13,7 +13,7 @@ import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledAp
 import app.homsai.engine.pvoptimizer.domain.models.OptimizerHVACDevice;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerEngineService;
 import app.homsai.engine.pvoptimizer.domain.services.cache.PVOptimizerCacheService;
-import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
+import app.homsai.engine.pvoptimizer.gateways.PVOptimizerHomsaiAIServiceGateway;
 import app.homsai.engine.pvoptimizer.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, PVOptimizerHomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class HvacOptimizerTest {
 
     @Autowired
@@ -52,7 +52,7 @@ public class HvacOptimizerTest {
     HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
 
     @Autowired
-    HomsaiAIServiceGateway homsaiAIServiceGateway;
+    PVOptimizerHomsaiAIServiceGateway PVOptimizerHomsaiAIServiceGateway;
 
     @Autowired
     PVOptimizerEngineService pvOptimizerEngineService;
@@ -229,6 +229,6 @@ public class HvacOptimizerTest {
         HvacDevicesOptimizationPVResponseDto hvacDevicesOptimizationPVResponseDto = new HvacDevicesOptimizationPVResponseDto();
         hvacDevicesOptimizationPVResponseDto.setDevicesToTurnOn(devicesToTurnOn);
 
-        when(homsaiAIServiceGateway.getHvacDevicesOptimizationPV(any())).thenReturn(hvacDevicesOptimizationPVResponseDto);
+        when(PVOptimizerHomsaiAIServiceGateway.getHvacDevicesOptimizationPV(any())).thenReturn(hvacDevicesOptimizationPVResponseDto);
     }
 }

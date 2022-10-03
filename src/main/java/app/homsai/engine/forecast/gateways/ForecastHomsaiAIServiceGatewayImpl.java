@@ -1,9 +1,9 @@
-package app.homsai.engine.pvoptimizer.gateways;
+package app.homsai.engine.forecast.gateways;
 
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.models.HomeInfo;
-import app.homsai.engine.pvoptimizer.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
-import app.homsai.engine.pvoptimizer.gateways.dtos.HvacOptimizationPVRequestDto;
+import app.homsai.engine.forecast.gateways.dtos.SelfConsumptionOptimizationsForecastQueriesDto;
+import app.homsai.engine.forecast.gateways.dtos.SelfConsumptionOptimizationsForecastRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -15,10 +15,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static app.homsai.engine.pvoptimizer.gateways.AIServiceAPIEndpoints.POST_HVAC_DEVICES_TURN_ON_OFF;
+import static app.homsai.engine.forecast.gateways.AIServiceAPIEndpoints.POST_PV_SELF_CONSUMPTION_OPTIMIZATION_FORECAST;
+
 
 @Service
-public class HomsaiAIServiceGatewayImpl implements HomsaiAIServiceGateway {
+public class ForecastHomsaiAIServiceGatewayImpl implements ForecastHomsaiAIServiceGateway {
 
     @Value("${ai_service.api_url}")
     private String apiUrl;
@@ -27,17 +28,18 @@ public class HomsaiAIServiceGatewayImpl implements HomsaiAIServiceGateway {
     private EntitiesQueriesApplicationService entitiesQueriesApplicationService;
 
     @Override
-    public HvacDevicesOptimizationPVResponseDto getHvacDevicesOptimizationPV(HvacOptimizationPVRequestDto hvacOptimizationPVRequestDto){
+    public SelfConsumptionOptimizationsForecastQueriesDto getPhotovoltaicSelfConsumptionOptimizerForecast(SelfConsumptionOptimizationsForecastRequestDto selfConsumptionOptimizationsForecastRequestDto, String currency){
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         RestTemplate restTemplate = new RestTemplate();
-        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+POST_HVAC_DEVICES_TURN_ON_OFF)
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+POST_PV_SELF_CONSUMPTION_OPTIMIZATION_FORECAST)
+                .queryParam("unit", currency)
                 .encode()
                 .toUriString();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Authorization", "Bearer "+homeInfo.getAiserviceToken());
-        ResponseEntity<HvacDevicesOptimizationPVResponseDto> response =
+        ResponseEntity<SelfConsumptionOptimizationsForecastQueriesDto> response =
                 restTemplate
-                        .exchange(url, HttpMethod.POST,  new HttpEntity<>(hvacOptimizationPVRequestDto, headers), HvacDevicesOptimizationPVResponseDto.class);
+                        .exchange(url, HttpMethod.POST,  new HttpEntity<>(selfConsumptionOptimizationsForecastRequestDto, headers), SelfConsumptionOptimizationsForecastQueriesDto.class);
         return response.getBody();
     }
 

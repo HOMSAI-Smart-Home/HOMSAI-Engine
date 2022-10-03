@@ -1,0 +1,9 @@
+package app.homsai.engine.forecast.gateways;
+
+import app.homsai.engine.forecast.gateways.dtos.SelfConsumptionOptimizationsForecastQueriesDto;
+import app.homsai.engine.forecast.gateways.dtos.SelfConsumptionOptimizationsForecastRequestDto;
+
+public interface ForecastHomsaiAIServiceGateway {
+
+    SelfConsumptionOptimizationsForecastQueriesDto getPhotovoltaicSelfConsumptionOptimizerForecast(SelfConsumptionOptimizationsForecastRequestDto selfConsumptionOptimizationsForecastRequestDto, String currency);
+}

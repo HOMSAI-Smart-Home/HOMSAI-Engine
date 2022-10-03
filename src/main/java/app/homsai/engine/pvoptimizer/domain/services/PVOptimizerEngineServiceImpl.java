@@ -11,14 +11,13 @@ import app.homsai.engine.pvoptimizer.application.http.converters.PVOptimizerMapp
 import app.homsai.engine.pvoptimizer.application.http.dtos.OptimizerHVACDeviceDto;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.models.OptimizerHVACDevice;
-import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
+import app.homsai.engine.pvoptimizer.gateways.PVOptimizerHomsaiAIServiceGateway;
 import app.homsai.engine.pvoptimizer.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
 import app.homsai.engine.pvoptimizer.gateways.dtos.HvacOptimizationPVRequestDto;
 import app.homsai.engine.pvoptimizer.domain.services.cache.PVOptimizerCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -35,7 +34,7 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
     PVOptimizerCacheService pvoptimizerCacheService;
 
     @Autowired
-    HomsaiAIServiceGateway homsaiAIServiceGateway;
+    PVOptimizerHomsaiAIServiceGateway PVOptimizerHomsaiAIServiceGateway;
 
     @Autowired
     HomeAssistantQueriesApplicationService homeAssistantQueriesApplicationService;
@@ -105,7 +104,7 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
         hvacOptimizationPVRequestDto.setMinimumIdleTimeMinutes(minimumIdleMinutes);
         hvacOptimizationPVRequestDto.setMinimumExecutionTimeMinutes(minimumExecutionMinutes);
 
-        HvacDevicesOptimizationPVResponseDto hvacDevicesOptimizationPVResponseDto = homsaiAIServiceGateway.getHvacDevicesOptimizationPV(hvacOptimizationPVRequestDto);
+        HvacDevicesOptimizationPVResponseDto hvacDevicesOptimizationPVResponseDto = PVOptimizerHomsaiAIServiceGateway.getHvacDevicesOptimizationPV(hvacOptimizationPVRequestDto);
         if(hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn() != null) {
             if(hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn().size() > 0) {
                 logger.info("[HVAC Optimizer] Home consumption:" + globalConsumptionPower + ",PV Production:" + solarProductionPower + ", Storage power:" + storagePower);

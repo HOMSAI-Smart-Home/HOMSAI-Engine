@@ -4,8 +4,6 @@ import app.homsai.engine.common.domain.utils.Consts;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
-import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
-import app.homsai.engine.entities.infrastructure.repositories.HAEntityCommandsJpaRepository;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
@@ -14,11 +12,9 @@ import app.homsai.engine.entities.application.services.EntitiesScheduledApplicat
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationEstimatedDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerScheduledApplicationService;
-import app.homsai.engine.pvoptimizer.gateways.HomsaiAIServiceGateway;
+import app.homsai.engine.pvoptimizer.gateways.PVOptimizerHomsaiAIServiceGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,12 +31,11 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, HomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, PVOptimizerHomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
 public class InitCycleTest {
 
 

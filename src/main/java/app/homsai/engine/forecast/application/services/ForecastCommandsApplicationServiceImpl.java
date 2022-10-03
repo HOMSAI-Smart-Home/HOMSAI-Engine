@@ -1,0 +1,12 @@
+package app.homsai.engine.forecast.application.services;
+
+import org.springframework.stereotype.Service;
+
+/**
+ * @author Giacomo Agostini on 03/10/2022
+ */
+
+@Service
+public class ForecastCommandsApplicationServiceImpl implements ForecastCommandsApplicationService{
+
+}

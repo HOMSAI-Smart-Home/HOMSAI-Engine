@@ -29,4 +29,7 @@ public class Consts {
     public static final int PV_OPTIMIZATION_MODE_SUMMER = 1;
 
     public static final Double HVAC_THRESHOLD_TEMPERATURE = 2D;
+
+    public static String EUR_UNIT = "EU";
+    public static String US_UNIT = "US";
 }
