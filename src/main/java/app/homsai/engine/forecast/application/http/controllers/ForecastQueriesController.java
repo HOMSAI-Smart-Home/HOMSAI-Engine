@@ -26,4 +26,10 @@ public class ForecastQueriesController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 forecastQueriesApplicationService.getOptimizerForecast());
     }
+
+    @RequestMapping(value = "/forecast/production-consumption", method = RequestMethod.GET)
+    public ResponseEntity getProductionConsumptionForecast() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                forecastQueriesApplicationService.getProductionConsumptionForecast());
+    }
 }
