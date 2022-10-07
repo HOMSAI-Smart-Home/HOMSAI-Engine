@@ -8,4 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 public interface ForecastScheduledApplicationService {
     @Scheduled(fixedRate = 5*60*1000)
     void syncHomsaiOptimizationForecast();
+
+    @Scheduled(cron = "0 1 0 * * ?")
+    void syncHomsaiProductionConsumptionForecast();
 }

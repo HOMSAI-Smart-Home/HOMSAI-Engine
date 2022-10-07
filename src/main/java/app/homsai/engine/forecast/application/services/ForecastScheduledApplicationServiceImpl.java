@@ -21,4 +21,10 @@ public class ForecastScheduledApplicationServiceImpl implements ForecastSchedule
     public void syncHomsaiOptimizationForecast(){
         forecastCacheService.syncHomsaiOptimizationForecast();
     }
+
+    @Override
+    @Scheduled(cron = "0 1 0 * * ?")
+    public void syncHomsaiProductionConsumptionForecast(){
+        forecastCacheService.syncHomsaiProductionConsumptionForecast();
+    }
 }
