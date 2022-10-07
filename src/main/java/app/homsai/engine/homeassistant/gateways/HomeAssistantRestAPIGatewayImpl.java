@@ -38,7 +38,7 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
         headers.add("Authorization", "Bearer "+token);
         ResponseEntity<HomeAssistantEntityDto[]> homeAssistantResponse =
                 restTemplate
-                        .exchange(url, HttpMethod.GET, new HttpEntity<Object>(headers), HomeAssistantEntityDto[].class);
+                        .exchange(url, HttpMethod.GET, new HttpEntity<>(headers), HomeAssistantEntityDto[].class);
         return Arrays.asList(homeAssistantResponse.getBody());
     }
 
@@ -52,7 +52,7 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
         headers.add("Authorization", "Bearer "+token);
         ResponseEntity<HomeAssistantConfigDto> homeAssistantResponse =
                 restTemplate
-                        .exchange(url, HttpMethod.GET, new HttpEntity<Object>(headers), HomeAssistantConfigDto.class);
+                        .exchange(url, HttpMethod.GET, new HttpEntity<>(headers), HomeAssistantConfigDto.class);
         return homeAssistantResponse.getBody();
     }
 
@@ -67,7 +67,7 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
         headers.add("Authorization", "Bearer "+token);
         ResponseEntity<HomeAssistantEntityDto> homeAssistantResponse =
                 restTemplate
-                        .exchange(url, HttpMethod.GET, new HttpEntity<Object>(headers), HomeAssistantEntityDto.class);
+                        .exchange(url, HttpMethod.GET, new HttpEntity<>(headers), HomeAssistantEntityDto.class);
         return homeAssistantResponse.getBody();
     }
 

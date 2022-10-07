@@ -51,7 +51,13 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average base consumption: "+baseConsumption, null);
         int c = 0;
         for(HVACDevice hvacDevice : hvacDeviceList){
-            Double hvacGrossDeviceConsumption = readHvacDeviceConsumption(hvacDevice, type, hvacFunction);
+            Double hvacGrossDeviceConsumption = 0D;
+            try {
+                hvacGrossDeviceConsumption = readHvacDeviceConsumption(hvacDevice, type, hvacFunction);
+            }catch (Exception e){
+                e.printStackTrace();
+                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_DURATION_MINUTES*60, hvacDevice.getEntityId()+": error on communication", null);
+            }
             Double hvacNetDeviceConsumption = hvacGrossDeviceConsumption - baseConsumption;
             logger.info(hvacDevice.getEntityId()+": average gross climate consumption: "+hvacGrossDeviceConsumption);
             homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average gross consumption: "+hvacGrossDeviceConsumption, null);
