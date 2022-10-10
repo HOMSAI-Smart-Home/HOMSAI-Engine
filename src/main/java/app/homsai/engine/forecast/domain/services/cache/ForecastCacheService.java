@@ -14,4 +14,6 @@ public interface ForecastCacheService {
     void syncHomsaiOptimizationForecast();
 
     void syncHomsaiProductionConsumptionForecast();
+
+    void syncHomeAssistantProductionConsumptionHistorical();
 }

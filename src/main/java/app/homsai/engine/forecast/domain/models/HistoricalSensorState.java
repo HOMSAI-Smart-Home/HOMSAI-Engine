@@ -10,12 +10,15 @@ import java.time.Instant;
  */
 public class HistoricalSensorState {
 
+    @JsonProperty("entity_id")
     private String entityId;
 
     private String state;
 
+    @JsonProperty("last_changed")
     private Instant lastChanged;
 
+    @JsonProperty("last_updated")
     private String lastUpdated;
 
     public String getEntityId() {

@@ -11,4 +11,7 @@ public interface ForecastScheduledApplicationService {
 
     @Scheduled(cron = "0 1 0 * * ?")
     void syncHomsaiProductionConsumptionForecast();
+
+    @Scheduled(cron = "0 1 0 * * ?")
+    void syncHomeAssistantProductionConsumptionHistorical();
 }

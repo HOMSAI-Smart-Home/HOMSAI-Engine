@@ -66,8 +66,10 @@ public class ForecastCacheServiceImpl implements ForecastCacheService{
     @Override
     public ProductionConsumptionCache getProductionConsumptionCache() {
         ProductionConsumptionCache productionConsumptionCache = getProductionConsumptionCacheInstance();
-        if(productionConsumptionCache.getDate() == null || !productionConsumptionCache.getDate().equals(Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS))))
+        if(productionConsumptionCache.getDate() == null || !productionConsumptionCache.getDate().equals(Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS)))) {
             syncHomsaiProductionConsumptionForecast();
+            syncHomeAssistantProductionConsumptionHistorical();
+        }
         return productionConsumptionCache;
     }
 
@@ -136,6 +138,21 @@ public class ForecastCacheServiceImpl implements ForecastCacheService{
 
         getProductionConsumptionCacheInstance().setDate(Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS)));
 
+    }
+
+    @Override
+    public void syncHomeAssistantProductionConsumptionHistorical() {
+        Instant startDate = Instant.now().truncatedTo(ChronoUnit.DAYS).minusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
+        Instant endDate = null;//Instant.now().minusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
+        HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
+        String pvProductionSensorId = homeInfo.getPvProductionSensorId();
+        String generalPowerMeterId = homeInfo.getGeneralPowerMeterId();
+        if(pvProductionSensorId == null || generalPowerMeterId == null)
+            return;
+        List<HomeAssistantHistoryDto> pvProductionHistoricalStates = homeAssistantQueriesApplicationService.getHomeAssistantHistoryState(startDate, endDate, pvProductionSensorId);
+        List<HomeAssistantHistoryDto> consumptionHistoricalStates = homeAssistantQueriesApplicationService.getHomeAssistantHistoryState(startDate, endDate, generalPowerMeterId);
+        getProductionConsumptionCacheInstance().setPvProductionHistoricalStates(forecastMapper.convertFromHomeAssistantHistoryDto(pvProductionHistoricalStates));
+        getProductionConsumptionCacheInstance().setConsumptionHistoricalStates(forecastMapper.convertFromHomeAssistantHistoryDto(consumptionHistoricalStates));
     }
 
 

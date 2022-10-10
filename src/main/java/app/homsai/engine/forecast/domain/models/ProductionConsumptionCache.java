@@ -1,5 +1,7 @@
 package app.homsai.engine.forecast.domain.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 import java.util.List;
 
@@ -10,12 +12,16 @@ public class ProductionConsumptionCache {
 
     private Date date;
 
+    @JsonProperty("pv_production_historical_states")
     private List<HistoricalSensorState> pvProductionHistoricalStates;
 
+    @JsonProperty("consumption_historical_states")
     private List<HistoricalSensorState> consumptionHistoricalStates;
 
+    @JsonProperty("pv_production_forecast_states")
     private List<HistoricalSensorState> pvProductionForecastStates;
 
+    @JsonProperty("consumption_forecast_states")
     private List<HistoricalSensorState> consumptionForecastStates;
 
     public Date getDate() {

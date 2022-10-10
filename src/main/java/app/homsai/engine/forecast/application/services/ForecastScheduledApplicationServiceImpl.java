@@ -23,8 +23,14 @@ public class ForecastScheduledApplicationServiceImpl implements ForecastSchedule
     }
 
     @Override
-    @Scheduled(cron = "0 1 0 * * ?")
+    @Scheduled(cron = "0 1 */3 * * ?")
     public void syncHomsaiProductionConsumptionForecast(){
         forecastCacheService.syncHomsaiProductionConsumptionForecast();
+    }
+
+    @Override
+    @Scheduled(cron = "0 */15 * * * ?")
+    public void syncHomeAssistantProductionConsumptionHistorical(){
+        forecastCacheService.syncHomeAssistantProductionConsumptionHistorical();
     }
 }

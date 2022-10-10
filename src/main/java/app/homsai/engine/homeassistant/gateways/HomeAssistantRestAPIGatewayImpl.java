@@ -111,7 +111,9 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
     @Override
     public List<HomeAssistantHistoryDto> getHomeAssistantHistoryState(Instant startDatetime, Instant endDatetime, String entityId) {
         String startDateTimeStr = startDatetime.truncatedTo(ChronoUnit.MILLIS).toString();
-        String endDatetimeStr = endDatetime.toString();
+        String endDatetimeStr = null;
+        if(endDatetime != null)
+            endDatetimeStr = endDatetime.toString();
         RestTemplate restTemplate = new RestTemplate();
         String url = UriComponentsBuilder.fromHttpUrl(apiUrl+GET_HISTORY_STATES.replace("{start_datetime}", startDateTimeStr))
                 .encode()
