@@ -33,4 +33,8 @@ public class Consts {
     public static final String HOME_ASSISTANT_EUR_UNIT = "EUR";
     public static final String EUR_UNIT = "EU";
     public static final String US_UNIT = "US";
+
+    public static final String INIT_HVAC_DEVICE_COMSUMPTION = "hvaCDeviceConsumption";
+    public static final String INIT_COUPLED_HVAC_DEVICE_COMSUMPTION = "coupledHvaCDeviceConsumption";
+    public static final String INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP = "nextHvaCDeviceOldSetTemp";
 }
