@@ -20,6 +20,9 @@ public class HVACDevice extends BaseEntity {
     @Column(name = "power_consumption")
     private Double powerConsumption;
 
+    @Column(name = "coupled_power_consumption")
+    private Double coupledPowerConsumption;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_uuid")
     private Area area;
@@ -59,6 +62,14 @@ public class HVACDevice extends BaseEntity {
 
     public void setPowerConsumption(Double powerConsumption) {
         this.powerConsumption = powerConsumption;
+    }
+
+    public Double getCoupledPowerConsumption() {
+        return coupledPowerConsumption;
+    }
+
+    public void setCoupledPowerConsumption(Double coupledPowerConsumption) {
+        this.coupledPowerConsumption = coupledPowerConsumption;
     }
 
     public Area getArea() {

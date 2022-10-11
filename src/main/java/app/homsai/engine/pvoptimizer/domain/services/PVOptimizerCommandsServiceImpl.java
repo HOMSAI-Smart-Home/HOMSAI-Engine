@@ -48,7 +48,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
         homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue(), type);
         Double baseConsumption = readBaseConsumption(hvacDeviceList, type);
-        logger.info("average base consumption: "+baseConsumption);
+        logger.info("average base consumption: {}", baseConsumption);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average base consumption: "+baseConsumption, null);
 
         Double nextHvacDeviceSetTemp = null;
@@ -65,25 +65,32 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                 e.printStackTrace();
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_DURATION_MINUTES*60, hvacDevice.getEntityId()+": error on communication", null);
             }
-            Double hvacNetDeviceConsumption = hvacGrossDeviceConsumption - baseConsumption;
-            logger.info(hvacDevice.getEntityId()+": average gross climate consumption: "+hvacGrossDeviceConsumption);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average gross consumption: "+hvacGrossDeviceConsumption, null);
-            logger.info(hvacDevice.getEntityId()+": average net climate device consumption: "+hvacNetDeviceConsumption);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average net consumption: "+hvacNetDeviceConsumption, null);
+            Double hvacNetDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossDeviceConsumption, baseConsumption);
+
+            Double hvacNetCoupledDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossCoupledDeviceConsumption, baseConsumption);
+
             if(hvacNetDeviceConsumption >= HVAC_INITIALIZATION_WATT_THRESHOLD){
                 hvacDevice.setPowerConsumption(hvacNetDeviceConsumption);
-                //TODO: setCoupledPowerConsumption
+                hvacDevice.setCoupledPowerConsumption(hvacNetCoupledDeviceConsumption);
                 pvOptimizerCommandsRepository.saveHvacDevice(hvacDevice);
-                logger.info(hvacDevice.getEntityId()+": successfully saved");
+                logger.info("{}: successfully saved", hvacDevice.getEntityId());
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": successfully saved", hvacDevice);
             } else {
-                logger.info(hvacDevice.getEntityId()+": under threshold, discarded");
+                logger.info("{}: under threshold, discarded", hvacDevice.getEntityId());
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": under threshold, discarded", null);
             }
         }
         homsaiOptimizerHVACDeviceInitializationCacheService.endHvacDeviceInit();
     }
 
+    private Double handleNetConsumption(HVACDevice hvacDevice, Double grossConsumption, Double baseConsumption) {
+        Double hvacNetDeviceConsumption = grossConsumption - baseConsumption;
+        logger.info("{}: average gross climate consumption: {}", hvacDevice.getEntityId(), grossConsumption);
+        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average gross consumption: "+grossConsumption, null);
+        logger.info("{}: average net climate device consumption: {}", hvacDevice.getEntityId(), hvacNetDeviceConsumption);
+        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average net consumption: "+hvacNetDeviceConsumption, null);
+        return hvacNetDeviceConsumption;
+    }
 
     private Double readBaseConsumption(List<HVACDevice> hvacDeviceList, Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
