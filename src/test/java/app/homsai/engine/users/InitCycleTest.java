@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
+import static app.homsai.engine.common.domain.utils.Consts.HOME_ASSISTANT_WATT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -119,6 +120,120 @@ public class InitCycleTest {
 
         ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTimeWinter = restTemplate.getForEntity(urlHvacInitEstimatedTimeWinter, HvacOptimizerDeviceInitializationEstimatedDto.class);
         assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(9210);
+    }
+
+    @Test
+    public void whenStartHVACInit_thenReadRightDeviceValues() throws InterruptedException {
+        configureMockServices();
+        configureCoupledInitMockServices();
+
+        String urlStartHvacInit = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
+                .path(env.getProperty("server.contextPath")+startInitEndpoint)
+                .queryParam("type", "0")
+                .encode()
+                .toUriString();
+        ResponseEntity<String> startHvacInit   =
+                restTemplate.postForEntity(urlStartHvacInit,
+                        null, String.class);
+        assertThat(startHvacInit.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Thread.sleep(120000);
+    }
+
+    private void configureCoupledInitMockServices() {
+        // Invocazioni di homeAssistantRestAPIGateway.syncHomeAssistantEntityValue
+        // N volte per il calcolo della baseConsumption (calcInitBaseConsumptionCycles())
+        // 1 volta per calcolare il setTemp del primo device
+            // X volte per calcolare il consumo (calcInitHvacDeviceCycles())
+            //
+
+        final int[] baseConsumptionTimes = {0};
+        final boolean[] calculatedFirstDeviceSetTemp = {false};
+        final int[] consumptionCalculatedForDevices = {0};
+        final int[] initHvacDeviceCycles = {0};
+
+        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(any())).then(
+                (Answer<HomeAssistantEntityDto>) i -> {
+                    HomeAssistantEntityDto homeAssistantConsumption =  new HomeAssistantEntityDto();
+                    HomeAssistantAttributesDto homeAssistantAttributesDto = new HomeAssistantAttributesDto();
+                    homeAssistantAttributesDto.setUnitOfMeasurement(HOME_ASSISTANT_WATT);
+                    homeAssistantAttributesDto.setTemperature("24.0");
+                    homeAssistantConsumption.setAttributes(homeAssistantAttributesDto);
+
+                    if (baseConsumptionTimes[0] < calcInitBaseConsumptionCycles()) {
+                        // Returned in case of readBaseConsumption()
+                        homeAssistantConsumption.setState("0.00");
+                        baseConsumptionTimes[0]++;
+                    } else {
+                        if (!calculatedFirstDeviceSetTemp[0]){
+                            homeAssistantConsumption.setState("10.00");
+                            calculatedFirstDeviceSetTemp[0] = true;
+                        }
+                        if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
+                            homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(consumptionCalculatedForDevices[0])));
+                        } else if (initHvacDeviceCycles[0] == calcHvacDeviceCyclesForNextInit() + 1) {
+                            // In case we're calling getSetTemp for the next device
+                            homeAssistantConsumption.setState("10.00");
+                            initHvacDeviceCycles[0]++;
+                        } else {
+                            homeAssistantConsumption.setState(
+                                    String.valueOf(
+                                            getConsumptionForDevice(consumptionCalculatedForDevices[0]) +
+                                                    getConsumptionForDevice(consumptionCalculatedForDevices[0] + 1))
+                            );
+                            if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles() + 1) {
+                                // In case we're calling getSetTemp for the next device
+                                consumptionCalculatedForDevices[0]++;
+                                initHvacDeviceCycles[0] = 0;
+                            }
+                        }
+                    }
+
+                    return homeAssistantConsumption;
+                }
+        );
+    }
+
+    private int calcInitBaseConsumptionCycles(){
+        return 1;// HVAC_BC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
+    }
+
+    private int calcInitHvacDeviceCycles(){
+        return 4;// HVAC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
+    }
+
+    private int calcHvacDeviceCyclesForNextInit(){
+        return calcInitHvacDeviceCycles() / 2;
+    }
+
+    private double getConsumptionForDevice(int index) {
+        double consumption = 0.00;
+
+        switch (index) {
+            case 0:
+                consumption = 1090.63;
+                break;
+            case 1:
+                consumption = 755.21;
+                break;
+            case 2:
+                consumption = 1093.92;
+                break;
+            case 3:
+                consumption = 1097.7199999999998;
+                break;
+            case 4:
+                consumption = 1095.625;
+                break;
+            case 5:
+                consumption = 1136.9;
+                break;
+            default:
+                consumption = 0.00;
+                break;
+        }
+
+        return consumption;
     }
 
     private void configureMockServices(){
