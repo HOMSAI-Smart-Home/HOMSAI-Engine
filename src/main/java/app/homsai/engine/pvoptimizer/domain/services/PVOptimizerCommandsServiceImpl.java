@@ -59,7 +59,10 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                 HashMap<String, Double> hvacDeviceInitInfo =
                         readHvacDeviceConsumption(hvacDevice, hvacDeviceList, type, hvacFunction, nextHvacDeviceSetTemp);
                 hvacGrossDeviceConsumption = hvacDeviceInitInfo.get(INIT_HVAC_DEVICE_COMSUMPTION);
-                hvacGrossCoupledDeviceConsumption = hvacDeviceInitInfo.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION);
+                hvacGrossCoupledDeviceConsumption =
+                        hvacDeviceInitInfo.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) != 0D ?
+                                hvacDeviceInitInfo.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) :
+                                hvacDeviceInitInfo.get(INIT_HVAC_DEVICE_COMSUMPTION);
                 nextHvacDeviceSetTemp = hvacDeviceInitInfo.get(INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP);
             }catch (Exception e){
                 e.printStackTrace();
@@ -153,10 +156,10 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
             boolean isNextHvacDeviceStartingPhase = false;
 
-            if (i < calcHvacDeviceCyclesForNextInit()) {
+            if (hvacDeviceList.size() == 1 || i < calcHvacDeviceCyclesForNextInit()) {
                 climateConsumption.addEntry(value);
-            } else {
-                if (hvacDeviceList.size() > 1 && !nextHvacDeviceStarted) {
+            } else if (hvacDeviceList.size() > 1) {
+                if (!nextHvacDeviceStarted) {
                     climateConsumption.addEntry(value);
 
                     int currentHvacDeviceIndex = hvacDeviceList.indexOf(hvacDevice);

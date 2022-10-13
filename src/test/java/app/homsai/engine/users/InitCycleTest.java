@@ -71,7 +71,7 @@ public class InitCycleTest {
     @Test
     public void whenStartHVACInit_thenReadRightStatus() throws InterruptedException {
 
-        configureMockServices();
+        configureMockServices(9);
         // Check right init values
         ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
         assertThat(preInitStatus.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -106,7 +106,7 @@ public class InitCycleTest {
 
     @Test
     public void whenAskForEstimatedTime_thenReadRightTime() {
-        configureMockServices();
+        configureMockServices(9);
         String urlHvacInitEstimatedTimeSummer = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
                 .queryParam("type", Consts.PV_OPTIMIZATION_MODE_SUMMER)
@@ -126,9 +126,23 @@ public class InitCycleTest {
     }
 
     @Test
+    public void whenStartHVACInit_thenReadRightSingleDeviceValues() throws InterruptedException {
+        callInitAPI(1);
+    }
+
+    @Test
+    public void whenStartHVACInit_thenReadRightTwoDeviceValues() throws InterruptedException {
+        callInitAPI(2);
+    }
+
+    @Test
     public void whenStartHVACInit_thenReadRightDeviceValues() throws InterruptedException {
-        configureMockServices();
-        configureCoupledInitMockServices();
+        callInitAPI(6);
+    }
+
+    private void callInitAPI(int entitiesNumber) throws InterruptedException {
+        configureMockServices(entitiesNumber);
+        configureCoupledInitMockServices(entitiesNumber);
 
         String urlStartHvacInit = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+startInitEndpoint)
@@ -144,21 +158,28 @@ public class InitCycleTest {
 
         ResponseEntity<HVACDeviceDto[]> hvacDevices = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHVACDevicesEndpoint, HVACDeviceDto[].class);
         assertThat(hvacDevices.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(hvacDevices.getBody())).hasSize(6);
+        assertThat(Objects.requireNonNull(hvacDevices.getBody())).hasSize(entitiesNumber);
 
         List<HVACDeviceDto> hvacDeviceDtos = Arrays.asList(hvacDevices.getBody());
         hvacDeviceDtos.sort(Comparator.comparing(HVACDeviceDto::getEntityId));
-        for (HVACDeviceDto hvacDeviceDto: hvacDeviceDtos) {
-            int index = hvacDeviceDtos.indexOf(hvacDeviceDto);
-            HVACDeviceDto nextHVACDeviceDto =
-                    index == hvacDeviceDtos.size() - 1 ? hvacDeviceDtos.get(0) : hvacDeviceDtos.get(index + 1);
-            assertThat(hvacDeviceDto.getCoupledPowerConsumption()).isEqualTo(
-                    hvacDeviceDto.getPowerConsumption() + nextHVACDeviceDto.getPowerConsumption()
+
+        if (hvacDeviceDtos.size() == 1) {
+            assertThat(hvacDeviceDtos.get(0).getCoupledPowerConsumption()).isEqualTo(
+                    hvacDeviceDtos.get(0).getPowerConsumption()
             );
+        } else {
+            for (HVACDeviceDto hvacDeviceDto : hvacDeviceDtos) {
+                int index = hvacDeviceDtos.indexOf(hvacDeviceDto);
+                HVACDeviceDto nextHVACDeviceDto =
+                        index == hvacDeviceDtos.size() - 1 ? hvacDeviceDtos.get(0) : hvacDeviceDtos.get(index + 1);
+                assertThat(hvacDeviceDto.getCoupledPowerConsumption()).isEqualTo(
+                        hvacDeviceDto.getPowerConsumption() + nextHVACDeviceDto.getPowerConsumption()
+                );
+            }
         }
     }
 
-    private void configureCoupledInitMockServices() {
+    private void configureCoupledInitMockServices(int entitiesNumber) {
         // Invocazioni di homeAssistantRestAPIGateway.syncHomeAssistantEntityValue
         // N volte per il calcolo della baseConsumption (calcInitBaseConsumptionCycles())
         // X volte per calcolare il consumo (calcInitHvacDeviceCycles())
@@ -183,13 +204,15 @@ public class InitCycleTest {
                         baseConsumptionTimes[0]++;
                     } else {
                         if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
-                            homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(consumptionCalculatedForDevices[0])));
+                            homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0])));
                             initHvacDeviceCycles[0]++;
                         } else {
                             homeAssistantConsumption.setState(
                                     String.valueOf(
-                                            getConsumptionForDevice(consumptionCalculatedForDevices[0]) +
-                                                    getConsumptionForDevice(consumptionCalculatedForDevices[0] + 1))
+                                            entitiesNumber == 1 ?
+                                                    getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) :
+                                                    getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) +
+                                                            getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0] + 1))
                             );
                             if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles() - 1) {
                                 // In case we're calling getSetTemp for the next device
@@ -229,12 +252,12 @@ public class InitCycleTest {
         return calcInitHvacDeviceCycles() / 2;
     }
 
-    private double getConsumptionForDevice(int index) {
+    private double getConsumptionForDevice(int entitiesNumber, int index) {
         double consumption = 0.00;
 
+        index = index == entitiesNumber ? 0 : index;
         switch (index) {
             case 0:
-            case 6:
                 consumption = 700;
                 break;
             case 1:
@@ -260,7 +283,28 @@ public class InitCycleTest {
         return consumption;
     }
 
-    private void configureMockServices(){
+    private void configureMockServices(int entitiesNumber){
+        when(homeAssistantRestAPIGateway.getAllHomeAssistantEntities())
+                .thenReturn(getMockHomeAssistanEntitiesDto(entitiesNumber));
+        when(homeAssistantWSAPIGateway.syncEntityAreas(anyList(), any())).then(
+                (Answer<Integer>) i -> {
+                    List<HAEntity> entities = (List<HAEntity>) i.getArguments()[0];
+                    Object lock = i.getArguments()[1];
+                    for(HAEntity haEntity : entities){
+                        Area area = entitiesCommandsService.getAreaByNameOrCreate("area1");
+                        if (haEntity.getAreas() == null)
+                            haEntity.setAreas(new ArrayList<>());
+                        haEntity.getAreas().add(area);
+                    }
+                    synchronized (lock) {
+                        lock.notifyAll();
+                    }
+                    return 0;
+                }
+        );
+    }
+
+    private List<HomeAssistantEntityDto> getMockHomeAssistanEntitiesDto(int entitiesNumber) {
         HomeAssistantAttributesDto attributesCoolingHeating = new HomeAssistantAttributesDto();
         HomeAssistantAttributesDto attributesCooling = new HomeAssistantAttributesDto();
         HomeAssistantAttributesDto attributesHeating = new HomeAssistantAttributesDto();
@@ -294,7 +338,8 @@ public class InitCycleTest {
         homeAssistantClimateWinterSummer2.setEntityId("climate.clima7");
         homeAssistantClimateWinterSummer3.setEntityId("climate.clima8");
         homeAssistantClimateWinterSummer4.setEntityId("climate.clima9");
-        when(homeAssistantRestAPIGateway.getAllHomeAssistantEntities()).thenReturn(Arrays.asList(
+
+        List<HomeAssistantEntityDto> entityDtos = Arrays.asList(
                 homeAssistantClimateWinter1,
                 homeAssistantClimateWinter2,
                 homeAssistantClimateSummer1,
@@ -304,22 +349,31 @@ public class InitCycleTest {
                 homeAssistantClimateWinterSummer2,
                 homeAssistantClimateWinterSummer3,
                 homeAssistantClimateWinterSummer4
-        ));
-        when(homeAssistantWSAPIGateway.syncEntityAreas(anyList(), any())).then(
-                (Answer<Integer>) i -> {
-                    List<HAEntity> entities = (List<HAEntity>) i.getArguments()[0];
-                    Object lock = i.getArguments()[1];
-                    for(HAEntity haEntity : entities){
-                        Area area = entitiesCommandsService.getAreaByNameOrCreate("area1");
-                        if (haEntity.getAreas() == null)
-                            haEntity.setAreas(new ArrayList<>());
-                        haEntity.getAreas().add(area);
-                    }
-                    synchronized (lock) {
-                        lock.notifyAll();
-                    }
-                    return 0;
-                }
         );
+
+        switch (entitiesNumber) {
+            case 1:
+                entityDtos = Collections.singletonList(homeAssistantClimateWinter1);
+                break;
+            case 2:
+                entityDtos = Arrays.asList(
+                        homeAssistantClimateWinter1,
+                        homeAssistantClimateWinter2
+                );
+                break;
+            case 6:
+                entityDtos = Arrays.asList(
+                        homeAssistantClimateWinter1,
+                        homeAssistantClimateWinter2,
+                        homeAssistantClimateWinterSummer1,
+                        homeAssistantClimateWinterSummer2,
+                        homeAssistantClimateWinterSummer3,
+                        homeAssistantClimateWinterSummer4
+                );
+            default:
+                break;
+        }
+
+        return entityDtos;
     }
 }
