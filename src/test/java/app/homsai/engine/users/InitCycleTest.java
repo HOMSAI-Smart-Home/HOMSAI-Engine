@@ -161,18 +161,15 @@ public class InitCycleTest {
     private void configureCoupledInitMockServices() {
         // Invocazioni di homeAssistantRestAPIGateway.syncHomeAssistantEntityValue
         // N volte per il calcolo della baseConsumption (calcInitBaseConsumptionCycles())
-        // 1 volta per calcolare il setTemp del primo device
-            // X volte per calcolare il consumo (calcInitHvacDeviceCycles())
-            //
+        // X volte per calcolare il consumo (calcInitHvacDeviceCycles())
+        // di cui X/2 volte con il device i-esimo ON
+        // e le restanti con il device i-esimo e il successivo ON
 
         final int[] baseConsumptionTimes = {0};
-        final boolean[] calculatedFirstDeviceSetTemp = {false};
         final int[] consumptionCalculatedForDevices = {0};
         final int[] initHvacDeviceCycles = {0};
 
-        //"sensor.hvac"
-        // any if (climate.)
-        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(any())).then(
+        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(contains("sensor.hvac"))).then(
                 (Answer<HomeAssistantEntityDto>) i -> {
                     HomeAssistantEntityDto homeAssistantConsumption =  new HomeAssistantEntityDto();
                     HomeAssistantAttributesDto homeAssistantAttributesDto = new HomeAssistantAttributesDto();
@@ -185,15 +182,8 @@ public class InitCycleTest {
                         homeAssistantConsumption.setState("0.00");
                         baseConsumptionTimes[0]++;
                     } else {
-                        if (!calculatedFirstDeviceSetTemp[0]){
-                            homeAssistantConsumption.setState("10.00");
-                            calculatedFirstDeviceSetTemp[0] = true;
-                        } else if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
+                        if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
                             homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(consumptionCalculatedForDevices[0])));
-                            initHvacDeviceCycles[0]++;
-                        } else if (initHvacDeviceCycles[0] == calcHvacDeviceCyclesForNextInit() + 1) {
-                            // In case we're calling getSetTemp for the next device
-                            homeAssistantConsumption.setState("10.00");
                             initHvacDeviceCycles[0]++;
                         } else {
                             homeAssistantConsumption.setState(
@@ -201,14 +191,27 @@ public class InitCycleTest {
                                             getConsumptionForDevice(consumptionCalculatedForDevices[0]) +
                                                     getConsumptionForDevice(consumptionCalculatedForDevices[0] + 1))
                             );
-                            if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles()) {
+                            if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles() - 1) {
                                 // In case we're calling getSetTemp for the next device
                                 consumptionCalculatedForDevices[0]++;
                                 initHvacDeviceCycles[0] = 0;
+                            } else {
+                                initHvacDeviceCycles[0]++;
                             }
                         }
                     }
 
+                    return homeAssistantConsumption;
+                }
+        );
+
+        when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(contains("climate."))).then(
+                (Answer<HomeAssistantEntityDto>) i -> {
+                    HomeAssistantEntityDto homeAssistantConsumption = new HomeAssistantEntityDto();
+                    HomeAssistantAttributesDto homeAssistantAttributesDto = new HomeAssistantAttributesDto();
+                    homeAssistantAttributesDto.setUnitOfMeasurement(HOME_ASSISTANT_WATT);
+                    homeAssistantAttributesDto.setTemperature("24.0");
+                    homeAssistantConsumption.setAttributes(homeAssistantAttributesDto);
                     return homeAssistantConsumption;
                 }
         );
