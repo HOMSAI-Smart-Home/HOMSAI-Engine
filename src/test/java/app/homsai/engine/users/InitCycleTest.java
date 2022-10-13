@@ -7,6 +7,7 @@ import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationCacheDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
@@ -28,6 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static app.homsai.engine.common.domain.utils.Consts.HOME_ASSISTANT_WATT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,6 +65,7 @@ public class InitCycleTest {
     private final String startInitEndpoint = "/entities/homsai/hvac/init";
     private final String getStatusEndpoint = "/entities/homsai/hvac/init/status";
     private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
+    private final String readHVACDevicesEndpoint = "/entities/homsai/hvac";
 
 
     @Test
@@ -137,7 +140,22 @@ public class InitCycleTest {
                         null, String.class);
         assertThat(startHvacInit.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        Thread.sleep(120000);
+        Thread.sleep(1000);
+
+        ResponseEntity<HVACDeviceDto[]> hvacDevices = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHVACDevicesEndpoint, HVACDeviceDto[].class);
+        assertThat(hvacDevices.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(hvacDevices.getBody())).hasSize(6);
+
+        List<HVACDeviceDto> hvacDeviceDtos = Arrays.asList(hvacDevices.getBody());
+        hvacDeviceDtos.sort(Comparator.comparing(HVACDeviceDto::getEntityId));
+        for (HVACDeviceDto hvacDeviceDto: hvacDeviceDtos) {
+            int index = hvacDeviceDtos.indexOf(hvacDeviceDto);
+            HVACDeviceDto nextHVACDeviceDto =
+                    index == hvacDeviceDtos.size() - 1 ? hvacDeviceDtos.get(0) : hvacDeviceDtos.get(index + 1);
+            assertThat(hvacDeviceDto.getCoupledPowerConsumption()).isEqualTo(
+                    hvacDeviceDto.getPowerConsumption() + nextHVACDeviceDto.getPowerConsumption()
+            );
+        }
     }
 
     private void configureCoupledInitMockServices() {
@@ -152,6 +170,8 @@ public class InitCycleTest {
         final int[] consumptionCalculatedForDevices = {0};
         final int[] initHvacDeviceCycles = {0};
 
+        //"sensor.hvac"
+        // any if (climate.)
         when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(any())).then(
                 (Answer<HomeAssistantEntityDto>) i -> {
                     HomeAssistantEntityDto homeAssistantConsumption =  new HomeAssistantEntityDto();
@@ -168,9 +188,9 @@ public class InitCycleTest {
                         if (!calculatedFirstDeviceSetTemp[0]){
                             homeAssistantConsumption.setState("10.00");
                             calculatedFirstDeviceSetTemp[0] = true;
-                        }
-                        if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
+                        } else if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
                             homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(consumptionCalculatedForDevices[0])));
+                            initHvacDeviceCycles[0]++;
                         } else if (initHvacDeviceCycles[0] == calcHvacDeviceCyclesForNextInit() + 1) {
                             // In case we're calling getSetTemp for the next device
                             homeAssistantConsumption.setState("10.00");
@@ -181,7 +201,7 @@ public class InitCycleTest {
                                             getConsumptionForDevice(consumptionCalculatedForDevices[0]) +
                                                     getConsumptionForDevice(consumptionCalculatedForDevices[0] + 1))
                             );
-                            if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles() + 1) {
+                            if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles()) {
                                 // In case we're calling getSetTemp for the next device
                                 consumptionCalculatedForDevices[0]++;
                                 initHvacDeviceCycles[0] = 0;
@@ -211,22 +231,23 @@ public class InitCycleTest {
 
         switch (index) {
             case 0:
-                consumption = 1090.63;
+            case 6:
+                consumption = 700;
                 break;
             case 1:
-                consumption = 755.21;
+                consumption = 200;
                 break;
             case 2:
-                consumption = 1093.92;
+                consumption = 300;
                 break;
             case 3:
-                consumption = 1097.7199999999998;
+                consumption = 400;
                 break;
             case 4:
-                consumption = 1095.625;
+                consumption = 500;
                 break;
             case 5:
-                consumption = 1136.9;
+                consumption = 600;
                 break;
             default:
                 consumption = 0.00;
@@ -262,14 +283,14 @@ public class InitCycleTest {
         homeAssistantClimateWinterSummer3.setAttributes(attributesCoolingHeating);
         homeAssistantClimateWinterSummer4.setAttributes(attributesCoolingHeating);
         homeAssistantClimateWinter1.setEntityId("climate.clima1");
-        homeAssistantClimateWinter2.setEntityId("climate.clima1");
-        homeAssistantClimateSummer1.setEntityId("climate.clima1");
-        homeAssistantClimateSummer2.setEntityId("climate.clima1");
-        homeAssistantClimateSummer3.setEntityId("climate.clima1");
-        homeAssistantClimateWinterSummer1.setEntityId("climate.clima1");
-        homeAssistantClimateWinterSummer2.setEntityId("climate.clima1");
-        homeAssistantClimateWinterSummer3.setEntityId("climate.clima1");
-        homeAssistantClimateWinterSummer4.setEntityId("climate.clima1");
+        homeAssistantClimateWinter2.setEntityId("climate.clima2");
+        homeAssistantClimateSummer1.setEntityId("climate.clima3");
+        homeAssistantClimateSummer2.setEntityId("climate.clima4");
+        homeAssistantClimateSummer3.setEntityId("climate.clima5");
+        homeAssistantClimateWinterSummer1.setEntityId("climate.clima6");
+        homeAssistantClimateWinterSummer2.setEntityId("climate.clima7");
+        homeAssistantClimateWinterSummer3.setEntityId("climate.clima8");
+        homeAssistantClimateWinterSummer4.setEntityId("climate.clima9");
         when(homeAssistantRestAPIGateway.getAllHomeAssistantEntities()).thenReturn(Arrays.asList(
                 homeAssistantClimateWinter1,
                 homeAssistantClimateWinter2,

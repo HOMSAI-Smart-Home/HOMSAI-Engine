@@ -31,6 +31,9 @@ public class OptimizerHVACDeviceDto {
     @JsonProperty("power_consumption")
     private Double powerConsumption;
 
+    @JsonProperty("coupled_power_consumption")
+    private Double coupledPowerConsumption;
+
     @JsonProperty("actual_power_consumption")
     private Double actualPowerConsumption;
 
@@ -115,6 +118,14 @@ public class OptimizerHVACDeviceDto {
 
     public void setPowerConsumption(Double powerConsumption) {
         this.powerConsumption = powerConsumption;
+    }
+
+    public Double getCoupledPowerConsumption() {
+        return coupledPowerConsumption;
+    }
+
+    public void setCoupledPowerConsumption(Double coupledPowerConsumption) {
+        this.coupledPowerConsumption = coupledPowerConsumption;
     }
 
     public Double getActualPowerConsumption() {
