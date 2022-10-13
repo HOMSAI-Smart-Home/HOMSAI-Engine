@@ -114,6 +114,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             optimizerHVACDevice.setStartTime(null);
             optimizerHVACDevice.setEndTime(Instant.EPOCH);
             optimizerHVACDevice.setPowerConsumption(hvacDeviceDto.getPowerConsumption());
+            optimizerHVACDevice.setCoupledPowerConsumption(hvacDeviceDto.getCoupledPowerConsumption());
             optimizerHVACDevice.setIntervals(pvoptimizerMapper.convertToDtoIntervals(hvacDeviceDto.getIntervals()));
             if(hvacDeviceDto.getEnabled() == null)
                 optimizerHVACDevice.setEnabled(false);

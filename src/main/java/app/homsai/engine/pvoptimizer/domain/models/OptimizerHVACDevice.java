@@ -23,6 +23,8 @@ public class OptimizerHVACDevice {
 
     private Double powerConsumption;
 
+    private Double coupledPowerConsumption;
+
     private Double actualPowerConsumption;
 
     private Instant startTime;
@@ -115,6 +117,14 @@ public class OptimizerHVACDevice {
     public void setPowerConsumption(Double powerConsumption) {
         this.powerConsumption = powerConsumption;
         this.consumptionArray = new DoubleCircularArray(30, powerConsumption);
+    }
+
+    public Double getCoupledPowerConsumption() {
+        return coupledPowerConsumption;
+    }
+
+    public void setCoupledPowerConsumption(Double coupledPowerConsumption) {
+        this.coupledPowerConsumption = coupledPowerConsumption;
     }
 
     public Double getActualPowerConsumption() {
