@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static app.homsai.engine.common.domain.utils.Consts.*;
+import static app.homsai.engine.common.domain.utils.constants.Consts.*;
 import static app.homsai.engine.common.domain.utils.HomsaiEntityTypesOperators.AVG;
 
 @Service

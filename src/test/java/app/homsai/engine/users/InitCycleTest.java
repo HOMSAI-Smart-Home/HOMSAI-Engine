@@ -1,6 +1,7 @@
 package app.homsai.engine.users;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
+import app.homsai.engine.common.domain.utils.constants.ConstsUtils;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HAEntity;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
@@ -29,16 +30,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static app.homsai.engine.common.domain.utils.Consts.HOME_ASSISTANT_WATT;
+import static app.homsai.engine.common.domain.utils.constants.Consts.HOME_ASSISTANT_WATT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, PVOptimizerHomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class})
+@MockBean(classes = {EntitiesScheduledApplicationService.class, HomeAssistantRestAPIGateway.class, HomeAssistantWSAPIGateway.class, PVOptimizerHomsaiAIServiceGateway.class, PVOptimizerScheduledApplicationService.class, ConstsUtils.class})
 public class InitCycleTest {
 
 
@@ -62,6 +62,9 @@ public class InitCycleTest {
     @Autowired
     EntitiesCommandsService entitiesCommandsService;
 
+    @Autowired
+    ConstsUtils constsUtils;
+
     private final String startInitEndpoint = "/entities/homsai/hvac/init";
     private final String getStatusEndpoint = "/entities/homsai/hvac/init/status";
     private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
@@ -71,7 +74,7 @@ public class InitCycleTest {
     @Test
     public void whenStartHVACInit_thenReadRightStatus() throws InterruptedException {
 
-        configureMockServices(9);
+        configureMockServices(9, false);
         // Check right init values
         ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
         assertThat(preInitStatus.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -106,7 +109,7 @@ public class InitCycleTest {
 
     @Test
     public void whenAskForEstimatedTime_thenReadRightTime() {
-        configureMockServices(9);
+        configureMockServices(9, true);
         String urlHvacInitEstimatedTimeSummer = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
                 .queryParam("type", Consts.PV_OPTIMIZATION_MODE_SUMMER)
@@ -114,7 +117,7 @@ public class InitCycleTest {
                 .toUriString();
 
         ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTime = restTemplate.getForEntity(urlHvacInitEstimatedTimeSummer, HvacOptimizerDeviceInitializationEstimatedDto.class);
-        assertThat(initEstimatedTime.getBody().getTotalTimeSeconds()).isEqualTo(10740);
+        assertThat(initEstimatedTime.getBody().getTotalTimeSeconds()).isEqualTo(420);
         String urlHvacInitEstimatedTimeWinter = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
                 .queryParam("type", Consts.PV_OPTIMIZATION_MODE_WINTER)
@@ -122,7 +125,7 @@ public class InitCycleTest {
                 .toUriString();
 
         ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTimeWinter = restTemplate.getForEntity(urlHvacInitEstimatedTimeWinter, HvacOptimizerDeviceInitializationEstimatedDto.class);
-        assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(9210);
+        assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(360);
     }
 
     @Test
@@ -141,8 +144,7 @@ public class InitCycleTest {
     }
 
     private void callInitAPI(int entitiesNumber) throws InterruptedException {
-        configureMockServices(entitiesNumber);
-        configureCoupledInitMockServices(entitiesNumber);
+        configureMockServices(entitiesNumber, true);
 
         String urlStartHvacInit = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+startInitEndpoint)
@@ -198,12 +200,12 @@ public class InitCycleTest {
                     homeAssistantAttributesDto.setTemperature("24.0");
                     homeAssistantConsumption.setAttributes(homeAssistantAttributesDto);
 
-                    if (baseConsumptionTimes[0] < calcInitBaseConsumptionCycles()) {
+                    if (baseConsumptionTimes[0] < constsUtils.calcInitBaseConsumptionCycles()) {
                         // Returned in case of readBaseConsumption()
                         homeAssistantConsumption.setState("0.00");
                         baseConsumptionTimes[0]++;
                     } else {
-                        if (initHvacDeviceCycles[0] <= calcHvacDeviceCyclesForNextInit()) {
+                        if (initHvacDeviceCycles[0] <= constsUtils.calcHvacDeviceCyclesForNextInit()) {
                             homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0])));
                             initHvacDeviceCycles[0]++;
                         } else {
@@ -214,7 +216,7 @@ public class InitCycleTest {
                                                     getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) +
                                                             getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0] + 1))
                             );
-                            if (initHvacDeviceCycles[0] == calcInitHvacDeviceCycles() - 1) {
+                            if (initHvacDeviceCycles[0] == constsUtils.calcInitHvacDeviceCycles() - 1) {
                                 // In case we're calling getSetTemp for the next device
                                 consumptionCalculatedForDevices[0]++;
                                 initHvacDeviceCycles[0] = 0;
@@ -240,16 +242,19 @@ public class InitCycleTest {
         );
     }
 
-    private int calcInitBaseConsumptionCycles(){
-        return 1;// HVAC_BC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
-    }
-
-    private int calcInitHvacDeviceCycles(){
-        return 4;// HVAC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
-    }
-
-    private int calcHvacDeviceCyclesForNextInit(){
-        return calcInitHvacDeviceCycles() / 2;
+    private void configureMockConsts(boolean mockTiming) {
+        when(constsUtils.calcInitHvacDeviceCycles()).thenReturn(4);
+        when(constsUtils.calcHvacDeviceCyclesForNextInit()).thenReturn(2);
+        when(constsUtils.calcInitBaseConsumptionCycles()).thenReturn(1);
+        if (mockTiming) {
+            when(constsUtils.getHvacInitializationSleepTimeMillis()).thenReturn(0);
+            when(constsUtils.getHvacInitializationDurationMinutes()).thenReturn(1);
+            when(constsUtils.getSyncHomeAssistantEntitiesLockTimeout()).thenReturn(1000);
+        } else {
+            when(constsUtils.getHvacInitializationSleepTimeMillis()).thenReturn(30*1000);
+            when(constsUtils.getHvacInitializationDurationMinutes()).thenReturn(20);
+            when(constsUtils.getSyncHomeAssistantEntitiesLockTimeout()).thenReturn(30000);
+        }
     }
 
     private double getConsumptionForDevice(int entitiesNumber, int index) {
@@ -283,7 +288,10 @@ public class InitCycleTest {
         return consumption;
     }
 
-    private void configureMockServices(int entitiesNumber){
+    private void configureMockServices(int entitiesNumber, boolean mockTiming){
+        configureCoupledInitMockServices(entitiesNumber);
+        configureMockConsts(mockTiming);
+
         when(homeAssistantRestAPIGateway.getAllHomeAssistantEntities())
                 .thenReturn(getMockHomeAssistanEntitiesDto(entitiesNumber));
         when(homeAssistantWSAPIGateway.syncEntityAreas(anyList(), any())).then(

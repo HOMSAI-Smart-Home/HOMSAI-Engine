@@ -1,6 +1,6 @@
 package app.homsai.engine.forecast.domain.services.cache;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.forecast.application.http.converters.ForecastMapper;

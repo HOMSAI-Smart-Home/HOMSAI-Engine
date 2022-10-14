@@ -1,6 +1,6 @@
 package app.homsai.engine.entities.domain.services;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
 import app.homsai.engine.entities.domain.models.*;
 import app.homsai.engine.entities.domain.repositories.EntitiesQueriesRepository;

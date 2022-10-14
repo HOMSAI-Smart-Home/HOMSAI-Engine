@@ -1,6 +1,7 @@
 package app.homsai.engine.pvoptimizer.domain.services;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
+import app.homsai.engine.common.domain.utils.constants.ConstsUtils;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.entities.domain.models.SampledSignal;
@@ -17,11 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import static app.homsai.engine.common.domain.utils.Consts.*;
+import static app.homsai.engine.common.domain.utils.constants.Consts.*;
 
 @Service
 public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsService {
@@ -42,6 +42,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
     @Autowired
     PVOptimizerCommandsRepository pvOptimizerCommandsRepository;
+    
+    @Autowired
+    ConstsUtils constsUtils;
 
     @Override
     @Async("threadPoolTaskExecutor")
@@ -66,7 +69,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                 nextHvacDeviceSetTemp = hvacDeviceInitInfo.get(INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP);
             }catch (Exception e){
                 e.printStackTrace();
-                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_DURATION_MINUTES*60, hvacDevice.getEntityId()+": error on communication", null);
+                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationDurationMinutes()*60, hvacDevice.getEntityId()+": error on communication", null);
             }
             Double hvacNetDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossDeviceConsumption, baseConsumption);
 
@@ -107,15 +110,15 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent cmd off to: "+hvacDevice.getEntityId(), null);
         }
         logger.info("waiting 30s to ensure devices turn off");
-        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000, "waiting 30s to ensure devices turn off", null);
-        Thread.sleep(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS);
-        for(int i = 0; i < calcInitBaseConsumptionCycles(); i++){
+        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "waiting 30s to ensure devices turn off", null);
+        Thread.sleep(constsUtils.getHvacInitializationSleepTimeMillis());
+        for(int i = 0; i < constsUtils.calcInitBaseConsumptionCycles(); i++){
             HomeAssistantEntityDto climatePowerEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(meterEntityId);
             Double value = HOME_ASSISTANT_WATT.equals(climatePowerEntityDto.getAttributes().getUnitOfMeasurement())? Double.parseDouble(climatePowerEntityDto.getState()) : Double.parseDouble(climatePowerEntityDto.getState()) * 1000;
             baseConsumption.addEntry(value);
             logger.info("base consumption: "+value);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000, "base consumption: "+value, null);
-            Thread.sleep(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS);
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "base consumption: "+value, null);
+            Thread.sleep(constsUtils.getHvacInitializationSleepTimeMillis());
         }
         return baseConsumption.getAverage();
     }
@@ -145,18 +148,18 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
         if (oldSetTempFromPreviousIteraction == null) {
             sendHomeAssistantInitCommads(hvacDevice, climateEntityId, type, hvacMode);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000, "sent cmd cooling to: " + climateEntityId + '\n' + "waiting 30s to init", null);
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "sent cmd cooling to: " + climateEntityId + '\n' + "waiting 30s to init", null);
         }
 
-        for(int i = 0; i < calcInitHvacDeviceCycles(); i++){
+        for(int i = 0; i < constsUtils.calcInitHvacDeviceCycles(); i++){
             HomeAssistantEntityDto climatePowerEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(meterEntityId);
             Double value = HOME_ASSISTANT_WATT.equals(climatePowerEntityDto.getAttributes().getUnitOfMeasurement())? Double.parseDouble(climatePowerEntityDto.getState()) : Double.parseDouble(climatePowerEntityDto.getState()) * 1000;
             logger.info("climate consumption: "+value);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000, "climate gross consumption: "+value, null);
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "climate gross consumption: "+value, null);
 
             boolean isNextHvacDeviceStartingPhase = false;
 
-            if (hvacDeviceList.size() == 1 || i < calcHvacDeviceCyclesForNextInit()) {
+            if (hvacDeviceList.size() == 1 || i < constsUtils.calcHvacDeviceCyclesForNextInit()) {
                 climateConsumption.addEntry(value);
             } else if (hvacDeviceList.size() > 1) {
                 if (!nextHvacDeviceStarted) {
@@ -176,7 +179,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             }
 
             if (!isNextHvacDeviceStartingPhase) {
-                Thread.sleep(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS);
+                Thread.sleep(constsUtils.getHvacInitializationSleepTimeMillis());
             }
         }
 
@@ -205,7 +208,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, hvacMode);
         logger.info("sent cmd cooling to: "+climateEntityId);
         logger.info("waiting 30s to init");
-        Thread.sleep(HVAC_INITIALIZATION_SLEEP_TIME_MILLIS);
+        Thread.sleep(constsUtils.getHvacInitializationSleepTimeMillis());
     }
 
     private void sendHomeAssistantOffCommands(String climateEntityId, Double oldSetTemp) {
@@ -215,18 +218,6 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(climateEntityId, oldSetTemp);
         logger.info("finish "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "finish "+climateEntityId, null);
-    }
-
-    private int calcInitHvacDeviceCycles(){
-        return  HVAC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
-    }
-
-    private int calcHvacDeviceCyclesForNextInit(){
-        return calcInitHvacDeviceCycles() / 2;
-    }
-
-    private int calcInitBaseConsumptionCycles(){
-        return  HVAC_BC_INITIALIZATION_DURATION_MINUTES * 60 / (HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000);
     }
 
     private double getSetTemp(String entityId){
@@ -240,9 +231,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
     @Override
     public Double calculateInitTime(Integer deviceSize) {
-        return (HVAC_BC_INITIALIZATION_DURATION_MINUTES.doubleValue() * 60D + HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000) +
-                deviceSize * (HVAC_INITIALIZATION_DURATION_MINUTES.doubleValue() * 60D + HVAC_INITIALIZATION_SLEEP_TIME_MILLIS / 1000)
-                + HVAC_INITIALIZATION_INFRA_TIME_DURATION_MILLIS / 1000 * (deviceSize-1);
+        return (constsUtils.getHvacBcInitializationDurationMinutes().doubleValue() * 60D + constsUtils.getHvacInitializationSleepTimeMillis() / 1000) +
+                deviceSize * (constsUtils.getHvacInitializationDurationMinutes().doubleValue() * 60D + constsUtils.getHvacInitializationSleepTimeMillis() / 1000)
+                + constsUtils.getHvacInitializationInfraTimeDurationMillis() / 1000 * (deviceSize-1);
     }
 
     @Override

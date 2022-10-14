@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static app.homsai.engine.common.domain.utils.Consts.HOME_INFO_UUID;
+import static app.homsai.engine.common.domain.utils.constants.Consts.HOME_INFO_UUID;
 
 /**
  * Created by Giacomo Agostini on 17/01/17.

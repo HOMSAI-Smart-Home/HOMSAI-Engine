@@ -1,4 +1,4 @@
-package app.homsai.engine.common.domain.utils;
+package app.homsai.engine.common.domain.utils.constants;
 
 public class Consts {
 

@@ -1,6 +1,6 @@
 package app.homsai.engine.pvoptimizer.application.services;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.pvoptimizer.application.http.dtos.*;
 import app.homsai.engine.pvoptimizer.domain.services.PVOptimizerQueriesService;
 import app.homsai.engine.pvoptimizer.domain.services.cache.HomsaiOptimizerHVACDeviceInitializationCacheService;

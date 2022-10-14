@@ -3,7 +3,7 @@ package app.homsai.engine.pvoptimizer.domain.models;
 import java.time.Instant;
 import java.util.List;
 
-import static app.homsai.engine.common.domain.utils.Consts.HVAC_MODE_SUMMER_ID;
+import static app.homsai.engine.common.domain.utils.constants.Consts.HVAC_MODE_SUMMER_ID;
 
 public class OptimizerHVACDevice {
 
