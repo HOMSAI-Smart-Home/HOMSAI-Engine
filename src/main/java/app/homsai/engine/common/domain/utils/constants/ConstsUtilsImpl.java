@@ -23,11 +23,6 @@ public class ConstsUtilsImpl implements ConstsUtils {
     }
 
     @Override
-    public Integer getHvacInitializationInfraTimeDurationMillis() {
-        return HVAC_INITIALIZATION_INFRA_TIME_DURATION_MILLIS;
-    }
-
-    @Override
     public Integer getHvacInitializationDurationMinutes() {
         return HVAC_INITIALIZATION_DURATION_MINUTES;
     }

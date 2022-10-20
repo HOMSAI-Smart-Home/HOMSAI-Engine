@@ -8,8 +8,6 @@ public interface ConstsUtils {
 
     Integer getHvacInitializationSleepTimeMillis();
 
-    Integer getHvacInitializationInfraTimeDurationMillis();
-
     Integer getHvacInitializationDurationMinutes();
 
     Integer getHvacBcInitializationDurationMinutes();

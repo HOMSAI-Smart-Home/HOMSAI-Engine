@@ -18,8 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static app.homsai.engine.common.domain.utils.constants.Consts.*;
 
@@ -54,23 +53,31 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         logger.info("average base consumption: {}", baseConsumption);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average base consumption: "+baseConsumption, null);
 
+        LinkedHashMap<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfos = new LinkedHashMap<>();
         Double nextHvacDeviceSetTemp = null;
         for(HVACDevice hvacDevice : hvacDeviceList){
-            Double hvacGrossDeviceConsumption = 0D;
-            Double hvacGrossCoupledDeviceConsumption = 0D;
             try {
                 HashMap<String, Double> hvacDeviceInitInfo =
                         readHvacDeviceConsumption(hvacDevice, hvacDeviceList, type, hvacFunction, nextHvacDeviceSetTemp);
-                hvacGrossDeviceConsumption = hvacDeviceInitInfo.get(INIT_HVAC_DEVICE_COMSUMPTION);
-                hvacGrossCoupledDeviceConsumption =
-                        hvacDeviceInitInfo.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) != 0D ?
-                                hvacDeviceInitInfo.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) :
-                                hvacDeviceInitInfo.get(INIT_HVAC_DEVICE_COMSUMPTION);
                 nextHvacDeviceSetTemp = hvacDeviceInitInfo.get(INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP);
+                hvacDeviceInitInfos.put(hvacDevice, hvacDeviceInitInfo);
             }catch (Exception e){
                 e.printStackTrace();
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationDurationMinutes()*60, hvacDevice.getEntityId()+": error on communication", null);
             }
+        }
+
+        for (Map.Entry<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfo: hvacDeviceInitInfos.entrySet()) {
+            HVACDevice hvacDevice = hvacDeviceInitInfo.getKey();
+            HashMap<String, Double> info = hvacDeviceInitInfo.getValue();
+
+            Double hvacGrossDeviceConsumption = info.get(INIT_HVAC_DEVICE_COMSUMPTION);
+            Double hvacGrossCoupledDeviceConsumption =
+                    info.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) != 0D ?
+                            info.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) -
+                                    getNextHvacDevicePowerConsumption(hvacDevice.getEntityId(), hvacDeviceInitInfos) :
+                            info.get(INIT_HVAC_DEVICE_COMSUMPTION);
+
             Double hvacNetDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossDeviceConsumption, baseConsumption);
 
             Double hvacNetCoupledDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossCoupledDeviceConsumption, baseConsumption);
@@ -86,7 +93,34 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": under threshold, discarded", null);
             }
         }
+
         homsaiOptimizerHVACDeviceInitializationCacheService.endHvacDeviceInit();
+    }
+
+    private Double getNextHvacDevicePowerConsumption(
+            String hvacDeviceEntityId, LinkedHashMap<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfos) {
+        boolean foundKey = false;
+        boolean foundPC = false;
+        Double powerConsumption = 0D;
+        for (Map.Entry<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfo: hvacDeviceInitInfos.entrySet()) {
+            if (foundKey) {
+                powerConsumption = hvacDeviceInitInfo.getValue().get(INIT_HVAC_DEVICE_COMSUMPTION);
+                foundPC = true;
+                break;
+            }
+            if (hvacDeviceInitInfo.getKey().getEntityId().equals(hvacDeviceEntityId)) {
+                foundKey = true;
+            }
+        }
+
+        if (foundKey && !foundPC) {
+            // It means that is the last entity and the method have to return the first device PC
+            Iterator<Map.Entry<HVACDevice, HashMap<String, Double>>> iterator =
+                    hvacDeviceInitInfos.entrySet().iterator();
+            powerConsumption = iterator.next().getValue().get(INIT_HVAC_DEVICE_COMSUMPTION);
+        }
+
+        return powerConsumption;
     }
 
     private Double handleNetConsumption(HVACDevice hvacDevice, Double grossConsumption, Double baseConsumption) {
@@ -231,9 +265,13 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
     @Override
     public Double calculateInitTime(Integer deviceSize) {
-        return (constsUtils.getHvacBcInitializationDurationMinutes().doubleValue() * 60D + constsUtils.getHvacInitializationSleepTimeMillis() / 1000) +
-                deviceSize * (constsUtils.getHvacInitializationDurationMinutes().doubleValue() * 60D + constsUtils.getHvacInitializationSleepTimeMillis() / 1000)
-                + constsUtils.getHvacInitializationInfraTimeDurationMillis() / 1000 * (deviceSize-1);
+        Double readBaseConsumptionSeconds = (constsUtils.calcInitBaseConsumptionCycles() + 1) * constsUtils.getHvacInitializationSleepTimeMillis().doubleValue() / 1000;
+        // In readHvacDeviceConsumption:
+        // First device: sendInitCommands for itself (sleep) + (sleep * calcInitHvacDeviceCycles)
+        // For all others: (sleep * calcInitHvacDeviceCycles)
+        Double readHvacDeviceConsumptionSeconds = constsUtils.getHvacInitializationSleepTimeMillis().doubleValue() / 1000 * (1 + constsUtils.calcInitHvacDeviceCycles());
+
+        return readBaseConsumptionSeconds + deviceSize * readHvacDeviceConsumptionSeconds;
     }
 
     @Override

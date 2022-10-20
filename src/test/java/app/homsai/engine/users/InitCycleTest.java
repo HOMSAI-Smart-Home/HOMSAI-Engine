@@ -109,7 +109,7 @@ public class InitCycleTest {
 
     @Test
     public void whenAskForEstimatedTime_thenReadRightTime() {
-        configureMockServices(9, true);
+        configureMockServices(9, false);
         String urlHvacInitEstimatedTimeSummer = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
                 .queryParam("type", Consts.PV_OPTIMIZATION_MODE_SUMMER)
@@ -117,7 +117,7 @@ public class InitCycleTest {
                 .toUriString();
 
         ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTime = restTemplate.getForEntity(urlHvacInitEstimatedTimeSummer, HvacOptimizerDeviceInitializationEstimatedDto.class);
-        assertThat(initEstimatedTime.getBody().getTotalTimeSeconds()).isEqualTo(420);
+        assertThat(initEstimatedTime.getBody().getTotalTimeSeconds()).isEqualTo(1110);
         String urlHvacInitEstimatedTimeWinter = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
                 .queryParam("type", Consts.PV_OPTIMIZATION_MODE_WINTER)
@@ -125,7 +125,7 @@ public class InitCycleTest {
                 .toUriString();
 
         ResponseEntity<HvacOptimizerDeviceInitializationEstimatedDto> initEstimatedTimeWinter = restTemplate.getForEntity(urlHvacInitEstimatedTimeWinter, HvacOptimizerDeviceInitializationEstimatedDto.class);
-        assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(360);
+        assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(960);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class InitCycleTest {
                 HVACDeviceDto nextHVACDeviceDto =
                         index == hvacDeviceDtos.size() - 1 ? hvacDeviceDtos.get(0) : hvacDeviceDtos.get(index + 1);
                 assertThat(hvacDeviceDto.getCoupledPowerConsumption()).isEqualTo(
-                        hvacDeviceDto.getPowerConsumption() + nextHVACDeviceDto.getPowerConsumption()
+                        hvacDeviceDto.getPowerConsumption() - nextHVACDeviceDto.getPowerConsumption() / 2
                 );
             }
         }
@@ -214,7 +214,7 @@ public class InitCycleTest {
                                             entitiesNumber == 1 ?
                                                     getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) :
                                                     getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) +
-                                                            getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0] + 1))
+                                                            (getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0] + 1) / 2))
                             );
                             if (initHvacDeviceCycles[0] == constsUtils.calcInitHvacDeviceCycles() - 1) {
                                 // In case we're calling getSetTemp for the next device
