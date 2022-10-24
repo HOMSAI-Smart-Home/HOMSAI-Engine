@@ -39,7 +39,7 @@ public class ConstsUtilsImpl implements ConstsUtils {
 
     @Override
     public int calcHvacDeviceCyclesForNextInit() {
-        return calcInitHvacDeviceCycles() / 2;
+        return (calcInitHvacDeviceCycles() / 2);
     }
 
     @Override

@@ -10,6 +10,7 @@ import app.homsai.engine.homeassistant.application.services.HomeAssistantCommand
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
+import app.homsai.engine.pvoptimizer.domain.models.InitConsumptionObj;
 import app.homsai.engine.pvoptimizer.domain.repositories.PVOptimizerCommandsRepository;
 import app.homsai.engine.pvoptimizer.domain.services.cache.HomsaiOptimizerHVACDeviceInitializationCacheService;
 import org.slf4j.Logger;
@@ -53,41 +54,45 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         logger.info("average base consumption: {}", baseConsumption);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average base consumption: "+baseConsumption, null);
 
-        LinkedHashMap<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfos = new LinkedHashMap<>();
+        List<InitConsumptionObj> initConsumptionObjList = new LinkedList<>();
         Double nextHvacDeviceSetTemp = null;
         for(HVACDevice hvacDevice : hvacDeviceList){
             try {
-                HashMap<String, Double> hvacDeviceInitInfo =
+                InitConsumptionObj initConsumptionObj =
                         readHvacDeviceConsumption(hvacDevice, hvacDeviceList, type, hvacFunction, nextHvacDeviceSetTemp);
-                nextHvacDeviceSetTemp = hvacDeviceInitInfo.get(INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP);
-                hvacDeviceInitInfos.put(hvacDevice, hvacDeviceInitInfo);
+                nextHvacDeviceSetTemp = initConsumptionObj.getNextOldSetTemp();
+                initConsumptionObjList.add(initConsumptionObj);
             }catch (Exception e){
                 e.printStackTrace();
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationDurationMinutes()*60, hvacDevice.getEntityId()+": error on communication", null);
+                sendHomeAssistantOffCommands(hvacDevice.getEntityId(), nextHvacDeviceSetTemp);
             }
         }
+        for (int i = 0; i<initConsumptionObjList.size(); i++) {
+            InitConsumptionObj initConsumptionObj = initConsumptionObjList.get(i);
+            HVACDevice hvacDevice = initConsumptionObj.getHvacDevice();
 
-        for (Map.Entry<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfo: hvacDeviceInitInfos.entrySet()) {
-            HVACDevice hvacDevice = hvacDeviceInitInfo.getKey();
-            HashMap<String, Double> info = hvacDeviceInitInfo.getValue();
+            Double hvacGrossSingleDeviceConsumption = initConsumptionObj.getSingleDeviceConsumption();
+            Double hvacNetDeviceConsumption = hvacGrossSingleDeviceConsumption - baseConsumption;
 
-            Double hvacGrossDeviceConsumption = info.get(INIT_HVAC_DEVICE_COMSUMPTION);
-            Double hvacGrossCoupledDeviceConsumption =
-                    info.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) != 0D ?
-                            info.get(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION) -
-                                    getNextHvacDevicePowerConsumption(hvacDevice.getEntityId(), hvacDeviceInitInfos) :
-                            info.get(INIT_HVAC_DEVICE_COMSUMPTION);
+            Double hvacGrossCoupledDeviceConsumption = initConsumptionObj.getCoupledDeviceConsumption();
+            Double hvacNetCoupledDeviceConsumption;
+            if(hvacGrossCoupledDeviceConsumption == 0D)
+                hvacNetCoupledDeviceConsumption = hvacNetDeviceConsumption;
+            else {
+                int cIndex = Math.floorMod(i - 1,  initConsumptionObjList.size());
+                InitConsumptionObj initConsumptionCDevice = initConsumptionObjList.get(cIndex);
+                hvacNetCoupledDeviceConsumption = initConsumptionCDevice.getCoupledDeviceConsumption() - initConsumptionCDevice.getSingleDeviceConsumption();
+            }
 
-            Double hvacNetDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossDeviceConsumption, baseConsumption);
-
-            Double hvacNetCoupledDeviceConsumption = handleNetConsumption(hvacDevice, hvacGrossCoupledDeviceConsumption, baseConsumption);
+            if(hvacNetCoupledDeviceConsumption < 0) hvacNetCoupledDeviceConsumption = 0D;
 
             if(hvacNetDeviceConsumption >= HVAC_INITIALIZATION_WATT_THRESHOLD){
                 hvacDevice.setPowerConsumption(hvacNetDeviceConsumption);
                 hvacDevice.setCoupledPowerConsumption(hvacNetCoupledDeviceConsumption);
                 pvOptimizerCommandsRepository.saveHvacDevice(hvacDevice);
-                logger.info("{}: successfully saved", hvacDevice.getEntityId());
-                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": successfully saved", hvacDevice);
+                logger.info("{}: successfully saved: single {}, coupled {}", hvacDevice.getEntityId(), hvacNetDeviceConsumption, hvacNetCoupledDeviceConsumption);
+                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": successfully saved: single "+hvacNetDeviceConsumption+", coupled "+hvacNetCoupledDeviceConsumption, hvacDevice);
             } else {
                 logger.info("{}: under threshold, discarded", hvacDevice.getEntityId());
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": under threshold, discarded", null);
@@ -97,40 +102,6 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         homsaiOptimizerHVACDeviceInitializationCacheService.endHvacDeviceInit();
     }
 
-    private Double getNextHvacDevicePowerConsumption(
-            String hvacDeviceEntityId, LinkedHashMap<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfos) {
-        boolean foundKey = false;
-        boolean foundPC = false;
-        Double powerConsumption = 0D;
-        for (Map.Entry<HVACDevice, HashMap<String, Double>> hvacDeviceInitInfo: hvacDeviceInitInfos.entrySet()) {
-            if (foundKey) {
-                powerConsumption = hvacDeviceInitInfo.getValue().get(INIT_HVAC_DEVICE_COMSUMPTION);
-                foundPC = true;
-                break;
-            }
-            if (hvacDeviceInitInfo.getKey().getEntityId().equals(hvacDeviceEntityId)) {
-                foundKey = true;
-            }
-        }
-
-        if (foundKey && !foundPC) {
-            // It means that is the last entity and the method have to return the first device PC
-            Iterator<Map.Entry<HVACDevice, HashMap<String, Double>>> iterator =
-                    hvacDeviceInitInfos.entrySet().iterator();
-            powerConsumption = iterator.next().getValue().get(INIT_HVAC_DEVICE_COMSUMPTION);
-        }
-
-        return powerConsumption;
-    }
-
-    private Double handleNetConsumption(HVACDevice hvacDevice, Double grossConsumption, Double baseConsumption) {
-        Double hvacNetDeviceConsumption = grossConsumption - baseConsumption;
-        logger.info("{}: average gross climate consumption: {}", hvacDevice.getEntityId(), grossConsumption);
-        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average gross consumption: "+grossConsumption, null);
-        logger.info("{}: average net climate device consumption: {}", hvacDevice.getEntityId(), hvacNetDeviceConsumption);
-        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "average net consumption: "+hvacNetDeviceConsumption, null);
-        return hvacNetDeviceConsumption;
-    }
 
     private Double readBaseConsumption(List<HVACDevice> hvacDeviceList, Integer type) throws InterruptedException, HvacPowerMeterIdNotSet {
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
@@ -157,13 +128,12 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         return baseConsumption.getAverage();
     }
 
-    private HashMap<String, Double> readHvacDeviceConsumption(
+    private InitConsumptionObj readHvacDeviceConsumption(
             HVACDevice hvacDevice,
             List<HVACDevice> hvacDeviceList,
             Integer type,
             String hvacMode,
             Double oldSetTempFromPreviousIteraction) throws InterruptedException, HvacPowerMeterIdNotSet {
-        HashMap<String, Double> map = new HashMap<>();
         SampledSignal climateConsumption = new SampledSignal();
         SampledSignal coupledClimateConsumption = new SampledSignal();
 
@@ -182,23 +152,16 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
         if (oldSetTempFromPreviousIteraction == null) {
             sendHomeAssistantInitCommads(hvacDevice, climateEntityId, type, hvacMode);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "sent cmd cooling to: " + climateEntityId + '\n' + "waiting 30s to init", null);
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent cmd cooling to: " + climateEntityId + '\n' + "waiting 30s to init", null);
         }
 
         for(int i = 0; i < constsUtils.calcInitHvacDeviceCycles(); i++){
-            HomeAssistantEntityDto climatePowerEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(meterEntityId);
-            Double value = HOME_ASSISTANT_WATT.equals(climatePowerEntityDto.getAttributes().getUnitOfMeasurement())? Double.parseDouble(climatePowerEntityDto.getState()) : Double.parseDouble(climatePowerEntityDto.getState()) * 1000;
-            logger.info("climate consumption: "+value);
-            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "climate gross consumption: "+value, null);
-
             boolean isNextHvacDeviceStartingPhase = false;
 
             if (hvacDeviceList.size() == 1 || i < constsUtils.calcHvacDeviceCyclesForNextInit()) {
-                climateConsumption.addEntry(value);
+                climateConsumption.addEntry(readDeviceInstantConsumption(meterEntityId));
             } else if (hvacDeviceList.size() > 1) {
                 if (!nextHvacDeviceStarted) {
-                    climateConsumption.addEntry(value);
-
                     int currentHvacDeviceIndex = hvacDeviceList.indexOf(hvacDevice);
                     HVACDevice nextHvacDevice =
                             currentHvacDeviceIndex == hvacDeviceList.size() - 1 ? hvacDeviceList.get(0) : hvacDeviceList.get(currentHvacDeviceIndex + 1);
@@ -207,8 +170,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                     sendHomeAssistantInitCommads(nextHvacDevice, nextClimateEntityId, type, hvacMode);
                     isNextHvacDeviceStartingPhase = true;
                     nextHvacDeviceStarted = true;
+                    coupledClimateConsumption.addEntry(readDeviceInstantConsumption((meterEntityId)));
                 } else {
-                    coupledClimateConsumption.addEntry(value);
+                    coupledClimateConsumption.addEntry(readDeviceInstantConsumption(meterEntityId));
                 }
             }
 
@@ -222,12 +186,20 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         if (hvacDeviceList.indexOf(hvacDevice) == hvacDeviceList.size() -1) {
             sendHomeAssistantOffCommands(nextClimateEntityId, nextOldSetTemp);
         }
+        InitConsumptionObj initConsumptionObj = new InitConsumptionObj();
+        initConsumptionObj.setHvacDevice(hvacDevice);
+        initConsumptionObj.setSingleDeviceConsumption(climateConsumption.getAverage());
+        initConsumptionObj.setCoupledDeviceConsumption(coupledClimateConsumption.getAverage());
+        initConsumptionObj.setNextOldSetTemp(nextOldSetTemp);
+        return initConsumptionObj;
+    }
 
-        map.put(INIT_HVAC_DEVICE_COMSUMPTION, climateConsumption.getAverage());
-        map.put(INIT_COUPLED_HVAC_DEVICE_COMSUMPTION, coupledClimateConsumption.getAverage());
-        map.put(INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP, nextOldSetTemp);
-
-        return map;
+    private Double readDeviceInstantConsumption(String meterEntityId){
+        HomeAssistantEntityDto climatePowerEntityDto = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(meterEntityId);
+        Double value = HOME_ASSISTANT_WATT.equals(climatePowerEntityDto.getAttributes().getUnitOfMeasurement())? Double.parseDouble(climatePowerEntityDto.getState()) : Double.parseDouble(climatePowerEntityDto.getState()) * 1000;
+        logger.info("climate consumption: "+value);
+        homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationSleepTimeMillis() / 1000, "climate gross consumption: "+value, null);
+        return value;
     }
 
     private void sendHomeAssistantInitCommads(
@@ -246,6 +218,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     }
 
     private void sendHomeAssistantOffCommands(String climateEntityId, Double oldSetTemp) {
+        if(oldSetTemp == null) oldSetTemp = 23D;
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
         logger.info("sent "+oldSetTemp+"° to: "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent "+oldSetTemp+"° to: "+climateEntityId, null);

@@ -70,11 +70,11 @@ public class InitCycleTest {
     private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
     private final String readHVACDevicesEndpoint = "/entities/homsai/hvac";
 
-
+/*
     @Test
     public void whenStartHVACInit_thenReadRightStatus() throws InterruptedException {
 
-        configureMockServices(9, false);
+        configureMockServices(9, true);
         // Check right init values
         ResponseEntity<HvacOptimizerDeviceInitializationCacheDto> preInitStatus = restTemplate.getForEntity(env.getProperty("server.contextPath") + getStatusEndpoint, HvacOptimizerDeviceInitializationCacheDto.class);
         assertThat(preInitStatus.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -109,7 +109,7 @@ public class InitCycleTest {
 
     @Test
     public void whenAskForEstimatedTime_thenReadRightTime() {
-        configureMockServices(9, false);
+        configureMockServices(9, true);
         String urlHvacInitEstimatedTimeSummer = UriComponentsBuilder.fromHttpUrl("http://localhost:" + this.port)
                 .path(env.getProperty("server.contextPath")+getInitEstimatedTime)
                 .queryParam("type", Consts.PV_OPTIMIZATION_MODE_SUMMER)
@@ -128,18 +128,21 @@ public class InitCycleTest {
         assertThat(initEstimatedTimeWinter.getBody().getTotalTimeSeconds()).isEqualTo(960);
     }
 
+*/
+
+
+    @Test
+    public void whenStartHVACInit_thenReadRightTwoDevicesValues() throws InterruptedException {
+        callInitAPI(3);
+    }
+
     @Test
     public void whenStartHVACInit_thenReadRightSingleDeviceValues() throws InterruptedException {
         callInitAPI(1);
     }
 
     @Test
-    public void whenStartHVACInit_thenReadRightTwoDeviceValues() throws InterruptedException {
-        callInitAPI(2);
-    }
-
-    @Test
-    public void whenStartHVACInit_thenReadRightDeviceValues() throws InterruptedException {
+    public void whenStartHVACInit_thenReadRightDevicesValues() throws InterruptedException {
         callInitAPI(6);
     }
 
@@ -169,15 +172,24 @@ public class InitCycleTest {
             assertThat(hvacDeviceDtos.get(0).getCoupledPowerConsumption()).isEqualTo(
                     hvacDeviceDtos.get(0).getPowerConsumption()
             );
-        } else {
-            for (HVACDeviceDto hvacDeviceDto : hvacDeviceDtos) {
-                int index = hvacDeviceDtos.indexOf(hvacDeviceDto);
-                HVACDeviceDto nextHVACDeviceDto =
-                        index == hvacDeviceDtos.size() - 1 ? hvacDeviceDtos.get(0) : hvacDeviceDtos.get(index + 1);
-                assertThat(hvacDeviceDto.getCoupledPowerConsumption()).isEqualTo(
-                        hvacDeviceDto.getPowerConsumption() - nextHVACDeviceDto.getPowerConsumption() / 2
-                );
-            }
+        }
+        if(hvacDeviceDtos.size() == 3){
+            assertThat(hvacDeviceDtos.get(0).getPowerConsumption()).isEqualTo(511.08);
+            assertThat(hvacDeviceDtos.get(0).getCoupledPowerConsumption()).isEqualTo(5.94);
+            assertThat(hvacDeviceDtos.get(1).getPowerConsumption()).isEqualTo(956.66);
+            assertThat(hvacDeviceDtos.get(1).getCoupledPowerConsumption()).isEqualTo(321.80);
+            assertThat(hvacDeviceDtos.get(2).getPowerConsumption()).isEqualTo(1412.04);
+            assertThat(hvacDeviceDtos.get(2).getCoupledPowerConsumption()).isEqualTo(595.20);
+        }if(hvacDeviceDtos.size() == 6) {
+            assertThat(hvacDeviceDtos.get(1).getPowerConsumption()).isEqualTo(956.66);
+            assertThat(hvacDeviceDtos.get(1).getCoupledPowerConsumption()).isEqualTo(321.80);
+            assertThat(hvacDeviceDtos.get(2).getPowerConsumption()).isEqualTo(1412.04);
+            assertThat(hvacDeviceDtos.get(2).getCoupledPowerConsumption()).isEqualTo(595.20);
+            assertThat(hvacDeviceDtos.get(3).getPowerConsumption()).isEqualTo(300);
+            assertThat(hvacDeviceDtos.get(3).getCoupledPowerConsumption()).isEqualTo(5.94);
+            assertThat(hvacDeviceDtos.get(0).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(0).getCoupledPowerConsumption());
+            assertThat(hvacDeviceDtos.get(4).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(4).getCoupledPowerConsumption());
+            assertThat(hvacDeviceDtos.get(5).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(5).getCoupledPowerConsumption());
         }
     }
 
@@ -189,7 +201,7 @@ public class InitCycleTest {
         // e le restanti con il device i-esimo e il successivo ON
 
         final int[] baseConsumptionTimes = {0};
-        final int[] consumptionCalculatedForDevices = {0};
+        final int[] deviceIndex = {0};
         final int[] initHvacDeviceCycles = {0};
 
         when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue(contains("sensor.hvac"))).then(
@@ -202,23 +214,23 @@ public class InitCycleTest {
 
                     if (baseConsumptionTimes[0] < constsUtils.calcInitBaseConsumptionCycles()) {
                         // Returned in case of readBaseConsumption()
-                        homeAssistantConsumption.setState("0.00");
+                        homeAssistantConsumption.setState("52.20");
                         baseConsumptionTimes[0]++;
                     } else {
-                        if (initHvacDeviceCycles[0] <= constsUtils.calcHvacDeviceCyclesForNextInit()) {
-                            homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0])));
+                        if (initHvacDeviceCycles[0] < constsUtils.calcHvacDeviceCyclesForNextInit()) {
+                            homeAssistantConsumption.setState(String.valueOf(getConsumptionForDevice(entitiesNumber, deviceIndex[0])));
                             initHvacDeviceCycles[0]++;
                         } else {
-                            homeAssistantConsumption.setState(
-                                    String.valueOf(
-                                            entitiesNumber == 1 ?
-                                                    getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) :
-                                                    getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0]) +
-                                                            (getConsumptionForDevice(entitiesNumber, consumptionCalculatedForDevices[0] + 1) / 2))
-                            );
+                            Double consumption;
+                            if(entitiesNumber == 1)
+                                consumption = getConsumptionForDevice(entitiesNumber, deviceIndex[0]);
+                            else {
+                                consumption = getConsumptionForDevice(entitiesNumber, deviceIndex[0]+1);
+                            }
+                            homeAssistantConsumption.setState(String.valueOf(consumption));
                             if (initHvacDeviceCycles[0] == constsUtils.calcInitHvacDeviceCycles() - 1) {
                                 // In case we're calling getSetTemp for the next device
-                                consumptionCalculatedForDevices[0]++;
+                                deviceIndex[0]+=2;
                                 initHvacDeviceCycles[0] = 0;
                             } else {
                                 initHvacDeviceCycles[0]++;
@@ -259,26 +271,42 @@ public class InitCycleTest {
 
     private double getConsumptionForDevice(int entitiesNumber, int index) {
         double consumption = 0.00;
-
-        index = index == entitiesNumber ? 0 : index;
         switch (index) {
             case 0:
-                consumption = 700;
+                consumption = 563.28;
                 break;
             case 1:
-                consumption = 200;
+                consumption = 885.08;
                 break;
             case 2:
-                consumption = 300;
+                consumption = 1008.86;
                 break;
             case 3:
-                consumption = 400;
+                consumption = 1604.06;
                 break;
             case 4:
-                consumption = 500;
+                consumption = 1464.24;
                 break;
             case 5:
-                consumption = 600;
+                consumption = 1470.18;
+                break;
+            case 6:
+                consumption = 352.20;
+                break;
+            case 7:
+                consumption = 752.20;
+                break;
+            case 8:
+                consumption = 452.20;
+                break;
+            case 9:
+                consumption = 952.20;
+                break;
+            case 10:
+                consumption = 552.20;
+                break;
+            case 11:
+                consumption = 1063.28;
                 break;
             default:
                 consumption = 0.00;
@@ -363,10 +391,11 @@ public class InitCycleTest {
             case 1:
                 entityDtos = Collections.singletonList(homeAssistantClimateWinter1);
                 break;
-            case 2:
+            case 3:
                 entityDtos = Arrays.asList(
                         homeAssistantClimateWinter1,
-                        homeAssistantClimateWinter2
+                        homeAssistantClimateWinter2,
+                        homeAssistantClimateWinterSummer1
                 );
                 break;
             case 6:

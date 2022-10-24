@@ -51,7 +51,8 @@ public class HVACDeviceDto {
     }
 
     public Double getPowerConsumption() {
-        return powerConsumption;
+        if(this.powerConsumption == null) return null;
+        return (double)Math.round(this.powerConsumption * 100d) / 100d;
     }
 
     public void setPowerConsumption(Double powerConsumption) {
@@ -59,7 +60,8 @@ public class HVACDeviceDto {
     }
 
     public Double getCoupledPowerConsumption() {
-        return coupledPowerConsumption;
+        if(this.coupledPowerConsumption == null) return null;
+        return (double)Math.round(this.coupledPowerConsumption * 100d) / 100d;
     }
 
     public void setCoupledPowerConsumption(Double coupledPowerConsumption) {

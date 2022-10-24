@@ -18,8 +18,8 @@ public class Consts {
 
     public static final Integer HVAC_INITIALIZATION_SLEEP_TIME_MILLIS = 30*1000;
 
-    public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 20;
-    public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5;
+    public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 30; //30
+    public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5; //5
     public static final Integer HVAC_INITIALIZATION_WATT_THRESHOLD = 200;
     public static final int HVAC_MODE_WINTER_ID = 0;
     public static final int HVAC_MODE_SUMMER_ID = 1;
@@ -33,7 +33,4 @@ public class Consts {
     public static final String EUR_UNIT = "EU";
     public static final String US_UNIT = "US";
 
-    public static final String INIT_HVAC_DEVICE_COMSUMPTION = "hvaCDeviceConsumption";
-    public static final String INIT_COUPLED_HVAC_DEVICE_COMSUMPTION = "coupledHvaCDeviceConsumption";
-    public static final String INIT_NEXT_HVAC_DEVICE_OLD_SET_TEMP = "nextHvaCDeviceOldSetTemp";
 }
