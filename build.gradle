@@ -21,7 +21,7 @@ plugins {
 }
 
 group = 'app.homsai'
-version = '0.8.3-S650V4'
+version = '0.8.3'
 sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
