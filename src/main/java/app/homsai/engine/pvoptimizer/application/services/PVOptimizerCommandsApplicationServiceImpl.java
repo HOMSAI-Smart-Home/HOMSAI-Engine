@@ -2,7 +2,7 @@ package app.homsai.engine.pvoptimizer.application.services;
 
 import app.homsai.engine.common.domain.exceptions.BadRequestException;
 import app.homsai.engine.common.domain.models.ErrorCodes;
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static app.homsai.engine.common.domain.utils.Consts.*;
-import static app.homsai.engine.common.domain.utils.Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION;
+import static app.homsai.engine.common.domain.utils.constants.Consts.*;
+import static app.homsai.engine.common.domain.utils.constants.Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION;
 
 
 @Service

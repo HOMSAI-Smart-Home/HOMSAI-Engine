@@ -3,7 +3,7 @@ package app.homsai.engine.pvoptimizer.domain.models;
 import java.time.Instant;
 import java.util.List;
 
-import static app.homsai.engine.common.domain.utils.Consts.HVAC_MODE_SUMMER_ID;
+import static app.homsai.engine.common.domain.utils.constants.Consts.HVAC_MODE_SUMMER_ID;
 
 public class OptimizerHVACDevice {
 
@@ -22,6 +22,8 @@ public class OptimizerHVACDevice {
     private List<OptimizerHVACInterval> intervals;
 
     private Double powerConsumption;
+
+    private Double coupledPowerConsumption;
 
     private Double actualPowerConsumption;
 
@@ -115,6 +117,14 @@ public class OptimizerHVACDevice {
     public void setPowerConsumption(Double powerConsumption) {
         this.powerConsumption = powerConsumption;
         this.consumptionArray = new DoubleCircularArray(30, powerConsumption);
+    }
+
+    public Double getCoupledPowerConsumption() {
+        return coupledPowerConsumption;
+    }
+
+    public void setCoupledPowerConsumption(Double coupledPowerConsumption) {
+        this.coupledPowerConsumption = coupledPowerConsumption;
     }
 
     public Double getActualPowerConsumption() {

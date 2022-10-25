@@ -1,6 +1,7 @@
 package app.homsai.engine.pvoptimizer.domain.services;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
+import app.homsai.engine.common.domain.utils.constants.ConstsUtils;
 import app.homsai.engine.entities.application.services.EntitiesCommandsApplicationService;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.models.HomeInfo;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static app.homsai.engine.common.domain.utils.Consts.*;
+import static app.homsai.engine.common.domain.utils.constants.Consts.*;
 
 @Service
 public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
@@ -50,6 +51,9 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
 
     @Autowired
     PVOptimizerMapper pvoptimizerMapper;
+
+    @Autowired
+    ConstsUtils constsUtils;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -91,8 +95,8 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
         hvacOptimizationPVRequestDto.setPhotovoltaicPowerMeterValue(solarProductionPower);
         hvacOptimizationPVRequestDto.setStoragePowerMeterValue(storagePower);
 
-        Integer minimumIdleMinutes = HVAC_PV_OPTIMIZATION_MINIMUM_IDLE_MINUTES;
-        Integer minimumExecutionMinutes = HVAC_PV_OPTIMIZATION_MINIMUM_EXECUTION_MINUTES;
+        Integer minimumIdleMinutes = constsUtils.getHvacPvOptimizationMinimumIdleMinutes();
+        Integer minimumExecutionMinutes = constsUtils.getHvacPvOptimizationMinimumExecutionMinutes();
         HVACEquipment currentHVACEquipment = homeInfo.getOptimizerMode() == null ||
                 homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
                 homeInfo.getCurrentSummerHVACEquipment() : homeInfo.getCurrentWinterHVACEquipment();

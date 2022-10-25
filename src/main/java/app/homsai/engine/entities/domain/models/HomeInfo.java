@@ -1,9 +1,8 @@
 package app.homsai.engine.entities.domain.models;
 
 import app.homsai.engine.common.domain.models.BaseEntity;
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.time.Instant;

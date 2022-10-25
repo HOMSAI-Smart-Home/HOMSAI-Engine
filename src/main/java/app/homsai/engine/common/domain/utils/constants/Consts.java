@@ -1,4 +1,4 @@
-package app.homsai.engine.common.domain.utils;
+package app.homsai.engine.common.domain.utils.constants;
 
 public class Consts {
 
@@ -17,10 +17,9 @@ public class Consts {
     public static final int HVAC_PV_OPTIMIZATION_MINIMUM_EXECUTION_MINUTES = 25;
 
     public static final Integer HVAC_INITIALIZATION_SLEEP_TIME_MILLIS = 30*1000;
-    public static final Integer HVAC_INITIALIZATION_INFRA_TIME_DURATION_MILLIS = 5*60*1000;
 
-    public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 20;
-    public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5;
+    public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 30; //30
+    public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5; //5
     public static final Integer HVAC_INITIALIZATION_WATT_THRESHOLD = 200;
     public static final int HVAC_MODE_WINTER_ID = 0;
     public static final int HVAC_MODE_SUMMER_ID = 1;
@@ -33,4 +32,5 @@ public class Consts {
     public static final String HOME_ASSISTANT_EUR_UNIT = "EUR";
     public static final String EUR_UNIT = "EU";
     public static final String US_UNIT = "US";
+
 }

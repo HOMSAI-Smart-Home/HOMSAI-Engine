@@ -18,6 +18,9 @@ public class HVACDeviceDto {
     @JsonProperty("power_consumption")
     private Double powerConsumption;
 
+    @JsonProperty("coupled_power_consumption")
+    private Double coupledPowerConsumption;
+
     @JsonProperty("area")
     private AreaDto area;
 
@@ -48,11 +51,21 @@ public class HVACDeviceDto {
     }
 
     public Double getPowerConsumption() {
-        return powerConsumption;
+        if(this.powerConsumption == null) return null;
+        return (double)Math.round(this.powerConsumption * 100d) / 100d;
     }
 
     public void setPowerConsumption(Double powerConsumption) {
         this.powerConsumption = powerConsumption;
+    }
+
+    public Double getCoupledPowerConsumption() {
+        if(this.coupledPowerConsumption == null) return null;
+        return (double)Math.round(this.coupledPowerConsumption * 100d) / 100d;
+    }
+
+    public void setCoupledPowerConsumption(Double coupledPowerConsumption) {
+        this.coupledPowerConsumption = coupledPowerConsumption;
     }
 
     public AreaDto getArea() {

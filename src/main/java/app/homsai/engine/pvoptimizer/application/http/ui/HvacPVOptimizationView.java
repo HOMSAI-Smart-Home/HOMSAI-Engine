@@ -2,7 +2,7 @@ package app.homsai.engine.pvoptimizer.application.http.ui;
 
 import app.homsai.engine.common.application.http.ui.components.CustomErrorDialog;
 import app.homsai.engine.common.application.http.ui.components.MainLayout;
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.common.domain.utils.EnText;
 import app.homsai.engine.entities.application.services.EntitiesQueriesApplicationService;
 import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;

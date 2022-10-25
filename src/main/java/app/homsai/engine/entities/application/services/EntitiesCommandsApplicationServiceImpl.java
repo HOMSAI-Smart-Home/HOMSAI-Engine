@@ -1,5 +1,6 @@
 package app.homsai.engine.entities.application.services;
 
+import app.homsai.engine.common.domain.utils.constants.ConstsUtils;
 import app.homsai.engine.entities.application.http.converters.EntitiesMapper;
 import app.homsai.engine.entities.application.http.dtos.HomsaiEntitiesHistoricalStateDto;
 import app.homsai.engine.entities.domain.exceptions.AreaNotFoundException;
@@ -36,6 +37,8 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
     @Autowired
     EntitiesMapper entitiesMapper;
 
+    @Autowired
+    ConstsUtils constsUtils;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -53,7 +56,7 @@ public class EntitiesCommandsApplicationServiceImpl implements EntitiesCommandsA
         Object lock = new Object();
         homeAssistantQueriesApplicationService.syncEntityAreas(haEntitySavedList, lock);
         synchronized (lock) {
-            lock.wait(30000);
+            lock.wait(constsUtils.getSyncHomeAssistantEntitiesLockTimeout());
         }
         Integer homsaiEntitiesCount = entitiesCommandsService.syncHomsaiEntities();
         logger.info("synchronized "+haEntitySavedList.size()+ " Home Assistant entities and "+homsaiEntitiesCount+ " Homsai entities");

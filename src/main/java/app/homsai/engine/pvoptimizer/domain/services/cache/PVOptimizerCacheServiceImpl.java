@@ -1,6 +1,6 @@
 package app.homsai.engine.pvoptimizer.domain.services.cache;
 
-import app.homsai.engine.common.domain.utils.Consts;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.entities.domain.services.cache.HomsaiEntityShowCacheService;
 import app.homsai.engine.entities.application.http.dtos.AreaDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static app.homsai.engine.common.domain.utils.Consts.HOME_ASSISTANT_WATT;
+import static app.homsai.engine.common.domain.utils.constants.Consts.HOME_ASSISTANT_WATT;
 
 
 @Service
@@ -114,6 +114,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             optimizerHVACDevice.setStartTime(null);
             optimizerHVACDevice.setEndTime(Instant.EPOCH);
             optimizerHVACDevice.setPowerConsumption(hvacDeviceDto.getPowerConsumption());
+            optimizerHVACDevice.setCoupledPowerConsumption(hvacDeviceDto.getCoupledPowerConsumption());
             optimizerHVACDevice.setIntervals(pvoptimizerMapper.convertToDtoIntervals(hvacDeviceDto.getIntervals()));
             if(hvacDeviceDto.getEnabled() == null)
                 optimizerHVACDevice.setEnabled(false);
