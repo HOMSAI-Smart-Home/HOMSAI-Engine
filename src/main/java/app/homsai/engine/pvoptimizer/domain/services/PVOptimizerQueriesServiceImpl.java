@@ -26,8 +26,8 @@ public class PVOptimizerQueriesServiceImpl implements PVOptimizerQueriesService 
 
     @Override
     @Transactional
-    public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
-        return pvOptimizerQueriesRepository.findOneHvacDeviceByEntityId(entityId);
+    public HVACDevice findOneHvacDeviceByEntityIdAndType(String entityId, Integer type) {
+        return pvOptimizerQueriesRepository.findOneHvacDeviceByEntityIdAndType(entityId, type);
     }
 
     @Override

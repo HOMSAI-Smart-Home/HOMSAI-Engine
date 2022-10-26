@@ -3,8 +3,6 @@ package app.homsai.engine.pvoptimizer.infrastructure.repositories;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.repositories.PVOptimizerQueriesRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +30,8 @@ public class PVOptimizerQueriesRepositoryImpl implements PVOptimizerQueriesRepos
 
     @Override
     @Transactional
-    public HVACDevice findOneHvacDeviceByEntityId(String entityId) {
-        return hvacDeviceQueriesJpaRepository.findOneByEntityId(entityId);
+    public HVACDevice findOneHvacDeviceByEntityIdAndType(String entityId, Integer type) {
+        return hvacDeviceQueriesJpaRepository.findOneByEntityIdAndType(entityId, type);
     }
 
     @Override

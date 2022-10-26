@@ -144,7 +144,9 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
 
     @Override
     public HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException {
-        HVACDevice hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityId(hvacDeviceEntityId);
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        Integer type = homeInfo.getOptimizerMode() != null ? homeInfo.getOptimizerMode() : HVAC_MODE_WINTER_ID;
+        HVACDevice hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityIdAndType(hvacDeviceEntityId, type);
         Boolean enabledValue = hvacDeviceSettingDto.getEnabled();
         Boolean autoMode = hvacDeviceSettingDto.getManual();
         Double desiredTemperature = hvacDeviceSettingDto.getSetTemperature();

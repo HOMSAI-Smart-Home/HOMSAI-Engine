@@ -1,7 +1,9 @@
 package app.homsai.engine.pvoptimizer.application.http.ui.components;
 
 import app.homsai.engine.common.domain.utils.EnText;
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.entities.domain.models.Area;
+import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import app.homsai.engine.pvoptimizer.domain.models.HvacDeviceInterval;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
@@ -28,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.Collections;
+
+import static app.homsai.engine.common.domain.utils.constants.Consts.HVAC_MODE_WINTER_ID;
 
 @SpringComponent
 @UIScope
@@ -116,7 +120,9 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
         else
             entityId = h.getEntityId();
         error.setText(null);
-        hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityId(entityId);
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
+        Integer type = homeInfo.getOptimizerMode() != null ? homeInfo.getOptimizerMode() : HVAC_MODE_WINTER_ID;
+        hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityIdAndType(entityId, type);
         area = hvacDevice.getArea();
         cancel.setVisible(true);
         auto.setValue(!pvoptimizerCacheService.getHvacDevicesCache().get(entityId).isManual());

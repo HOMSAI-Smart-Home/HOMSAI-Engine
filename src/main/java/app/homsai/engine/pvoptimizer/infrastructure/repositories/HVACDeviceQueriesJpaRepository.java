@@ -12,5 +12,5 @@ public interface HVACDeviceQueriesJpaRepository
         extends SoftDeletesRepository<HVACDevice, String> {
 
     @Transactional
-    HVACDevice findOneByEntityId(String entityId);
+    HVACDevice findOneByEntityIdAndType(String entityId, Integer type);
 }
