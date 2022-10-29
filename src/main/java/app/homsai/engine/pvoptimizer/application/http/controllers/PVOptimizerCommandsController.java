@@ -24,7 +24,7 @@ public class PVOptimizerCommandsController {
 
     @RequestMapping(value = "/entities/homsai/hvac/init", method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException {
+    public ResponseEntity initHVACDevices(@RequestParam(value = "type", required = true) Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException, BadHomeInfoException {
         return ResponseEntity.status(HttpStatus.OK).body(pvOptimizerCommandsApplicationService.initHVACDevices(type));
     }
 

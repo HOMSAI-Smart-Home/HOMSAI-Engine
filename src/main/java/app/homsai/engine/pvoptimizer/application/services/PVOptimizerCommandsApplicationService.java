@@ -14,7 +14,7 @@ import java.util.List;
 public interface PVOptimizerCommandsApplicationService {
 
     @Transactional
-    HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException;
+    HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException, BadHomeInfoException;
 
     Integer getHvacDeviceInitTimeSeconds(Integer type);
 

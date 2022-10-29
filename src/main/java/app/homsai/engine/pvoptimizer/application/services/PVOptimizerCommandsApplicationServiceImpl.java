@@ -70,7 +70,7 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
 
     @Override
     @Transactional
-    public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException {
+    public HVACDeviceInitDto initHVACDevices(Integer type) throws InterruptedException, HvacPowerMeterIdNotSet, ClimateEntityNotFoundException, BadHomeInfoException {
         entitiesCommandsApplicationService.syncHomeAssistantEntities();
         HomeInfo homeInfo = entitiesQueriesApplicationService.getHomeInfo();
         if(homeInfo.getHvacPowerMeterId(type) == null)

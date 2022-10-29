@@ -2,9 +2,11 @@ package app.homsai.engine.pvoptimizer.domain.services;
 
 import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.common.domain.utils.constants.ConstsUtils;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.entities.domain.models.HomeInfo;
 import app.homsai.engine.entities.domain.models.SampledSignal;
+import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
 import app.homsai.engine.entities.domain.services.EntitiesQueriesService;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantCommandsApplicationService;
 import app.homsai.engine.homeassistant.application.services.HomeAssistantQueriesApplicationService;
@@ -35,6 +37,9 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     EntitiesQueriesService entitiesQueriesService;
 
     @Autowired
+    EntitiesCommandsService entitiesCommandsService;
+
+    @Autowired
     HomeAssistantCommandsApplicationService homeAssistantCommandsApplicationService;
 
     @Autowired
@@ -48,7 +53,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
 
     @Override
     @Async("threadPoolTaskExecutor")
-    public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet {
+    public void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet, BadHomeInfoException {
         homsaiOptimizerHVACDeviceInitializationCacheService.startHvacDeviceInit(calculateInitTime(hvacDeviceList.size()).intValue(), type);
         Double baseConsumption = readBaseConsumption(hvacDeviceList, type);
         logger.info("average base consumption: {}", baseConsumption);
@@ -100,6 +105,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
         }
 
         homsaiOptimizerHVACDeviceInitializationCacheService.endHvacDeviceInit();
+        entitiesCommandsService.enableOptimizer(type);
     }
 
 

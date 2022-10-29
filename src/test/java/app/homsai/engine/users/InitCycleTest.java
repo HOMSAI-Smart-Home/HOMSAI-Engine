@@ -9,6 +9,7 @@ import app.homsai.engine.homeassistant.gateways.HomeAssistantWSAPIGateway;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantAttributesDto;
 import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HVACDeviceDto;
+import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsDto;
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacOptimizerDeviceInitializationCacheDto;
 import app.homsai.engine.entities.application.services.EntitiesScheduledApplicationService;
 import app.homsai.engine.homeassistant.gateways.HomeAssistantRestAPIGateway;
@@ -69,6 +70,8 @@ public class InitCycleTest {
     private final String getStatusEndpoint = "/entities/homsai/hvac/init/status";
     private final String getInitEstimatedTime = "/entities/homsai/hvac/init/estimated";
     private final String readHVACDevicesEndpoint = "/entities/homsai/hvac";
+    private final String readHomeSettingsEndpoint = "/entities/homsai/home/settings";
+
 
 /*
     @Test
@@ -191,6 +194,10 @@ public class InitCycleTest {
             assertThat(hvacDeviceDtos.get(4).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(4).getCoupledPowerConsumption());
             assertThat(hvacDeviceDtos.get(5).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(5).getCoupledPowerConsumption());
         }
+
+        ResponseEntity<HomeHvacSettingsDto> newHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
+        assertThat(newHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerEnabled()).isEqualTo(true);
     }
 
     private void configureCoupledInitMockServices(int entitiesNumber) {

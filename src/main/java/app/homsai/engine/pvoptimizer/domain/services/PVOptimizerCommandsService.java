@@ -1,5 +1,6 @@
 package app.homsai.engine.pvoptimizer.domain.services;
 
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.entities.domain.exceptions.HvacPowerMeterIdNotSet;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import org.springframework.scheduling.annotation.Async;
@@ -10,7 +11,7 @@ public interface PVOptimizerCommandsService {
 
 
     @Async("threadPoolTaskExecutor")
-    void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet;
+    void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet, BadHomeInfoException;
 
     Double calculateInitTime(Integer deviceSize);
 

@@ -36,4 +36,6 @@ public interface EntitiesCommandsService {
 
 
     Area updateArea(Area area);
+
+    void enableOptimizer(Integer type) throws BadHomeInfoException;
 }

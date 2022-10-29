@@ -181,6 +181,13 @@ public class EntitiesCommandsServiceImpl implements EntitiesCommandsService {
         return entitiesCommandsRepository.saveArea(area);
     }
 
+    @Override
+    public void enableOptimizer(Integer type) throws BadHomeInfoException {
+        HomeInfo homeInfo = entitiesQueriesRepository.getHomeInfo();
+        homeInfo.setOptimizerMode(type);
+        homeInfo.setPvOptimizationsEnabled(true);
+        updateHomeInfo(homeInfo);
+    }
 
 
     private class AverageObject{

@@ -5,6 +5,7 @@ import app.homsai.engine.common.application.http.ui.components.CustomErrorDialog
 import app.homsai.engine.common.application.http.ui.components.MainLayout;
 import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.common.domain.utils.EnText;
+import app.homsai.engine.entities.domain.exceptions.BadHomeInfoException;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerCommandsApplicationService;
 import app.homsai.engine.pvoptimizer.domain.exceptions.ClimateEntityNotFoundException;
 import app.homsai.engine.pvoptimizer.domain.services.cache.HomsaiOptimizerHVACDeviceInitializationCacheService;
@@ -95,7 +96,7 @@ public class HvacDevicesInitView extends VerticalLayout {
                     pvOptimizerCommandsApplicationService.initHVACDevices(Consts.PV_OPTIMIZATION_MODE_WINTER);
                     startInitButton.setEnabled(false);
                     startInitButton.setText("Initialization in progress...");
-                } catch (InterruptedException | ClimateEntityNotFoundException ex) {
+                } catch (InterruptedException | ClimateEntityNotFoundException | BadHomeInfoException ex) {
                     ex.printStackTrace();
                 } catch (HvacPowerMeterIdNotSet ex) {
                     d1.close();
