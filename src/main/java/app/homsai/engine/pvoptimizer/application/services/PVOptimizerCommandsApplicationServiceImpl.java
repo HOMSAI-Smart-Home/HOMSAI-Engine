@@ -18,6 +18,7 @@ import app.homsai.engine.homeassistant.gateways.dto.rest.HomeAssistantEntityDto;
 import app.homsai.engine.pvoptimizer.application.http.converters.PVOptimizerMapper;
 import app.homsai.engine.pvoptimizer.application.http.dtos.*;
 import app.homsai.engine.pvoptimizer.domain.exceptions.ClimateEntityNotFoundException;
+import app.homsai.engine.pvoptimizer.domain.exceptions.HvacEntityNotFoundException;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.models.HvacDeviceInterval;
@@ -143,7 +144,7 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
 
 
     @Override
-    public HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException {
+    public HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException, HvacEntityNotFoundException {
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         Integer type = homeInfo.getOptimizerMode() != null ? homeInfo.getOptimizerMode() : HVAC_MODE_WINTER_ID;
         HVACDevice hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityIdAndType(hvacDeviceEntityId, type);
@@ -155,7 +156,10 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
         hvacDevice.setEnabled(enabledValue);
         if(pvOptimizerCacheService.getHvacDevicesCache().get(hvacDevice.getEntityId()) != null)
             pvOptimizerCacheService.getHvacDevicesCache().get(hvacDevice.getEntityId()).setManual(autoMode);
-        hvacDevice.getArea().setDesiredSummerTemperature(desiredTemperature);
+        if(type == HVAC_MODE_SUMMER_ID)
+            hvacDevice.getArea().setDesiredSummerTemperature(desiredTemperature);
+        else
+            hvacDevice.getArea().setDesiredWinterTemperature(desiredTemperature);
         if(startTimeValue != null && endTimeValue != null) {
             HvacDeviceInterval hvacInterval = new HvacDeviceInterval(startTimeValue, endTimeValue);
             List<HvacDeviceInterval> hvacDeviceIntervalList = new ArrayList<>();

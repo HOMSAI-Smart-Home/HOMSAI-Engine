@@ -1,5 +1,6 @@
 package app.homsai.engine.pvoptimizer.infrastructure.repositories;
 
+import app.homsai.engine.pvoptimizer.domain.exceptions.HvacEntityNotFoundException;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import app.homsai.engine.pvoptimizer.domain.models.HVACEquipment;
 import app.homsai.engine.pvoptimizer.domain.repositories.PVOptimizerQueriesRepository;
@@ -30,8 +31,11 @@ public class PVOptimizerQueriesRepositoryImpl implements PVOptimizerQueriesRepos
 
     @Override
     @Transactional
-    public HVACDevice findOneHvacDeviceByEntityIdAndType(String entityId, Integer type) {
-        return hvacDeviceQueriesJpaRepository.findOneByEntityIdAndType(entityId, type);
+    public HVACDevice findOneHvacDeviceByEntityIdAndType(String entityId, Integer type) throws HvacEntityNotFoundException {
+        HVACDevice hvacDevice = hvacDeviceQueriesJpaRepository.findOneByEntityIdAndType(entityId, type);
+        if(hvacDevice == null)
+            throw new HvacEntityNotFoundException(entityId);
+        return hvacDevice;
     }
 
     @Override

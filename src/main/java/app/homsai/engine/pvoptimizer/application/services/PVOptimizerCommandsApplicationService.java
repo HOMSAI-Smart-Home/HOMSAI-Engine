@@ -18,7 +18,7 @@ public interface PVOptimizerCommandsApplicationService {
 
     Integer getHvacDeviceInitTimeSeconds(Integer type);
 
-    HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException;
+    HvacDeviceSettingDto updateHvacDeviceSetting(String hvacDeviceEntityId, HvacDeviceSettingDto hvacDeviceSettingDto) throws BadIntervalsException, HvacEntityNotFoundException;
 
     HomeHvacSettingsDto updateHomeHvacSettings(HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto) throws BadRequestException, BadHomeInfoException;
 }

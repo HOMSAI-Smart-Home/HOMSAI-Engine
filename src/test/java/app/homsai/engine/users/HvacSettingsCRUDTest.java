@@ -49,7 +49,6 @@ public class HvacSettingsCRUDTest {
     HomeAssistantRestAPIGateway homeAssistantRestAPIGateway;
 
 
-    @Test
     public void whenUpdateHvacSettings_thenReadRightValues() {
         configureMockServices();
 
@@ -57,7 +56,7 @@ public class HvacSettingsCRUDTest {
         HvacDeviceSettingDto hvacDeviceSettingDto = new HvacDeviceSettingDto();
         hvacDeviceSettingDto.setEnabled(false);
         hvacDeviceSettingDto.setManual(true);
-        hvacDeviceSettingDto.setSetTemperature(30.0);
+        hvacDeviceSettingDto.setSetTemperature(28.0);
         hvacDeviceSettingDto.setStartTime(LocalTime.of(10, 0));
         hvacDeviceSettingDto.setEndTime(LocalTime.of(15, 0));
         HttpEntity<HvacDeviceSettingDto> request = new HttpEntity<>(hvacDeviceSettingDto);
@@ -76,7 +75,7 @@ public class HvacSettingsCRUDTest {
         assertThat(Objects.requireNonNull(newSettings.getBody()).isManual()).isTrue();
         assertThat(Objects.requireNonNull(newSettings.getBody()).getAreaId()).isEqualTo("area1");
         assertThat(Objects.requireNonNull(newSettings.getBody()).getCurrentTemperature()).isNull();
-        assertThat(Objects.requireNonNull(newSettings.getBody()).getSetTemperature()).isEqualTo(30.0);
+        assertThat(Objects.requireNonNull(newSettings.getBody()).getSetTemperature()).isEqualTo(28.0);
         assertThat(Objects.requireNonNull(newSettings.getBody()).getIntervals().get(0).getStartTime()).isEqualToIgnoringSeconds(LocalTime.of(10, 0));
         assertThat(Objects.requireNonNull(newSettings.getBody()).getIntervals().get(0).getEndTime()).isEqualToIgnoringSeconds(LocalTime.of(15, 0));
 
@@ -134,6 +133,8 @@ public class HvacSettingsCRUDTest {
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getCurrentSummerHVACEquipment().getUuid()).isEqualTo(summerEquipmentUuid);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getCurrentWinterHVACEquipment().getUuid()).isEqualTo(winterEquipmentUuid);
 
+        whenUpdateHvacSettings_thenReadRightValues();
+
         homeHvacSettingsUpdateDto.setOptimizerEnabled(null);
         homeHvacSettingsUpdateDto.setSetTemperature(null);
         request = new HttpEntity<>(homeHvacSettingsUpdateDto);
@@ -152,6 +153,9 @@ public class HvacSettingsCRUDTest {
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
                         request, HomeHvacSettingsDto.class);
         assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+
+        whenUpdateHvacSettings_thenReadRightValues();
 
     }
 

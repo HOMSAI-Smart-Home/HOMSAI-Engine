@@ -4,6 +4,7 @@ import app.homsai.engine.common.domain.utils.EnText;
 import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.entities.domain.models.Area;
 import app.homsai.engine.entities.domain.models.HomeInfo;
+import app.homsai.engine.pvoptimizer.domain.exceptions.HvacEntityNotFoundException;
 import app.homsai.engine.pvoptimizer.domain.models.HVACDevice;
 import app.homsai.engine.pvoptimizer.domain.models.HvacDeviceInterval;
 import app.homsai.engine.entities.domain.services.EntitiesCommandsService;
@@ -122,7 +123,11 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
         error.setText(null);
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         Integer type = homeInfo.getOptimizerMode() != null ? homeInfo.getOptimizerMode() : HVAC_MODE_WINTER_ID;
-        hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityIdAndType(entityId, type);
+        try {
+            hvacDevice = pvOptimizerQueriesService.findOneHvacDeviceByEntityIdAndType(entityId, type);
+        } catch (HvacEntityNotFoundException e) {
+            e.printStackTrace();
+        }
         area = hvacDevice.getArea();
         cancel.setVisible(true);
         auto.setValue(!pvoptimizerCacheService.getHvacDevicesCache().get(entityId).isManual());

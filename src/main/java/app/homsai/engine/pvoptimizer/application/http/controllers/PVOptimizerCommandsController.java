@@ -9,6 +9,7 @@ import app.homsai.engine.pvoptimizer.application.http.dtos.HomeHvacSettingsUpdat
 import app.homsai.engine.pvoptimizer.application.http.dtos.HvacDeviceSettingDto;
 import app.homsai.engine.pvoptimizer.application.services.PVOptimizerCommandsApplicationService;
 import app.homsai.engine.pvoptimizer.domain.exceptions.ClimateEntityNotFoundException;
+import app.homsai.engine.pvoptimizer.domain.exceptions.HvacEntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,7 +33,7 @@ public class PVOptimizerCommandsController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity editHvacDeviceSettings(@RequestBody HvacDeviceSettingDto hvacDeviceSettingDto,
-                                                 @PathVariable("entityId") String entityUuid) throws BadIntervalsException {
+                                                 @PathVariable("entityId") String entityUuid) throws BadIntervalsException, HvacEntityNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(pvOptimizerCommandsApplicationService.updateHvacDeviceSetting(entityUuid, hvacDeviceSettingDto));
     }
 

@@ -115,8 +115,11 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 logger.info("[HVAC Optimizer] HVAC devices to turn on: " + hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn().size());
             }
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn()){
-                Integer setTemp = hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature().intValue() - HVAC_THRESHOLD_TEMPERATURE.intValue();
-                homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(hvacDeviceEntityId, setTemp.doubleValue());
+                Double setTemp =
+                        homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
+                                hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature() - HVAC_THRESHOLD_TEMPERATURE:
+                                hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature() + HVAC_THRESHOLD_TEMPERATURE;
+                homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(hvacDeviceEntityId, setTemp);
 
                 String hvacDeviceFunction = homeInfo.getOptimizerMode() == null ||
                         homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
