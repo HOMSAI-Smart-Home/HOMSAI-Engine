@@ -173,7 +173,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                     HVACDevice nextHvacDevice =
                             currentHvacDeviceIndex == hvacDeviceList.size() - 1 ? hvacDeviceList.get(0) : hvacDeviceList.get(currentHvacDeviceIndex + 1);
                     nextClimateEntityId = nextHvacDevice.getEntityId();
-                    nextOldSetTemp = getSetTemp(climateEntityId);
+                    nextOldSetTemp = getSetTemp(nextClimateEntityId);
                     sendHomeAssistantInitCommads(nextHvacDevice, nextClimateEntityId, type, hvacMode);
                     isNextHvacDeviceStartingPhase = true;
                     nextHvacDeviceStarted = true;
@@ -233,10 +233,10 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
     private void sendHomeAssistantOffCommands(String climateEntityId, Double oldSetTemp, List<HVACDevice> hvacDeviceList) {
         if(oldSetTemp == null) oldSetTemp = 23D;
         HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
-        homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
-        logger.info("sent "+oldSetTemp+"° to: "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent "+oldSetTemp+"° to: "+climateEntityId, null);
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(climateEntityId, oldSetTemp);
+        homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+        logger.info("sent "+oldSetTemp+"° to: "+climateEntityId);
         logger.info("finish "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "finish "+climateEntityId, null);
         if(homeInfo.getHvacSwitchEntityId() != null && noClimateDeviceIsOn(hvacDeviceList)) {
