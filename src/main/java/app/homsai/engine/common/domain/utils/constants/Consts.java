@@ -17,6 +17,7 @@ public class Consts {
     public static final int HVAC_PV_OPTIMIZATION_MINIMUM_IDLE_MINUTES = 25;
     public static final int HVAC_PV_OPTIMIZATION_MINIMUM_EXECUTION_MINUTES = 25;
 
+    public static final Double HVAC_INITIALIZATION_MIN_CONSUMPTION = 250D;
     public static final Integer HVAC_INITIALIZATION_SLEEP_TIME_MILLIS = 30*1000;
 
     public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 30; //30

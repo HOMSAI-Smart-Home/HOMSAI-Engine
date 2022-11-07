@@ -91,7 +91,8 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
                 hvacNetCoupledDeviceConsumption = initConsumptionCDevice.getCoupledDeviceConsumption() - initConsumptionCDevice.getSingleDeviceConsumption();
             }
 
-            if(hvacNetCoupledDeviceConsumption < 0) hvacNetCoupledDeviceConsumption = 0D;
+            if(hvacNetCoupledDeviceConsumption < Consts.HVAC_INITIALIZATION_MIN_CONSUMPTION)
+                hvacNetCoupledDeviceConsumption = Consts.HVAC_INITIALIZATION_MIN_CONSUMPTION;
 
             if(hvacNetDeviceConsumption >= HVAC_INITIALIZATION_WATT_THRESHOLD){
                 hvacDevice.setPowerConsumption(hvacNetDeviceConsumption);
