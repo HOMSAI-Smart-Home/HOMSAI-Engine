@@ -73,6 +73,9 @@ public class InitCycleTest {
     private final String readHomeSettingsEndpoint = "/entities/homsai/home/settings";
 
 
+    private List<HomeAssistantEntityDto> entityDtos;
+
+
 /*
     @Test
     public void whenStartHVACInit_thenReadRightStatus() throws InterruptedException {
@@ -345,6 +348,37 @@ public class InitCycleTest {
                     return 0;
                 }
         );
+        /*when(homeAssistantRestAPIGateway.sendHomeAssistantClimateHVACMode(anyString(), anyString())).then(
+                (Answer<HomeAssistantEntityDto>) i -> {
+                    String entityId = (String) i.getArguments()[0];
+                    String hvacFunction = (String) i.getArguments()[1];
+                    for(HomeAssistantEntityDto homeAssistantEntityDto : entityDtos){
+                        if(homeAssistantEntityDto.getEntityId().equals(entityId)) {
+                            homeAssistantEntityDto.setState(hvacFunction);
+                            return homeAssistantEntityDto;
+                        }
+                    }
+                    return null;
+                }
+        );
+        */
+        when(homeAssistantRestAPIGateway.sendHomeAssistantClimateHVACMode(anyString(), anyString())).then(
+                (Answer<HomeAssistantEntityDto>) i -> {
+                    String entityId = (String) i.getArguments()[0];
+                    String hvacFunction = (String) i.getArguments()[1];
+                    for(HomeAssistantEntityDto homeAssistantEntityDto : entityDtos){
+                        if(homeAssistantEntityDto.getEntityId().equals(entityId)) {
+                            homeAssistantEntityDto.setState("cool");
+                            if(hvacFunction.equals("off"))
+                                homeAssistantEntityDto.getAttributes().setHvacAction("idle");
+                            else
+                                homeAssistantEntityDto.getAttributes().setHvacAction(hvacFunction);
+                            return homeAssistantEntityDto;
+                        }
+                    }
+                    return null;
+                }
+        );
     }
 
     private List<HomeAssistantEntityDto> getMockHomeAssistanEntitiesDto(int entitiesNumber) {
@@ -382,7 +416,7 @@ public class InitCycleTest {
         homeAssistantClimateWinterSummer3.setEntityId("climate.clima8");
         homeAssistantClimateWinterSummer4.setEntityId("climate.clima9");
 
-        List<HomeAssistantEntityDto> entityDtos = Arrays.asList(
+        entityDtos = Arrays.asList(
                 homeAssistantClimateWinter1,
                 homeAssistantClimateWinter2,
                 homeAssistantClimateSummer1,

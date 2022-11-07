@@ -20,4 +20,6 @@ public interface HomeAssistantRestAPIGateway {
     HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String entityId, Double temperature);
 
     List<HomeAssistantHistoryDto> getHomeAssistantHistoryState(Instant startDatetime, Instant endDatetime, String entityId);
+
+    HomeAssistantEntityDto sendHomeAssistantSwitchMode(String entityId, boolean on);
 }

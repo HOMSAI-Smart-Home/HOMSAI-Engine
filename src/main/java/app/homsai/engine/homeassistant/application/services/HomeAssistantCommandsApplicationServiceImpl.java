@@ -21,4 +21,9 @@ public class HomeAssistantCommandsApplicationServiceImpl implements HomeAssistan
         return homeAssistantCommandsService.sendHomeAssistantClimateTemperature( climateEntityId, temperature);
     }
 
+    @Override
+    public HomeAssistantEntityDto sendHomeAssistantSwitchMode(String hvacSwitchEntityId, boolean on) {
+        return homeAssistantCommandsService.sendHomeAssistantSwitchMode(hvacSwitchEntityId, on);
+    }
+
 }

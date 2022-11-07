@@ -10,4 +10,6 @@ public interface HomeAssistantCommandsApplicationService {
     HomeAssistantEntityDto sendHomeAssistantClimateHVACMode(String climateEntityId, String homeAssistantHvacDeviceOffFunction);
 
     HomeAssistantEntityDto sendHomeAssistantClimateTemperature(String climateEntityId, Double temperature);
+
+    HomeAssistantEntityDto sendHomeAssistantSwitchMode(String hvacSwitchEntityId, boolean on);
 }

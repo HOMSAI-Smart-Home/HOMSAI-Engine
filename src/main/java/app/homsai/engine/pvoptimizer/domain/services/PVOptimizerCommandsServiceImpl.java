@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static app.homsai.engine.common.domain.utils.constants.Consts.*;
 
@@ -70,7 +71,7 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             }catch (Exception e){
                 e.printStackTrace();
                 homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(constsUtils.getHvacInitializationDurationMinutes()*60, hvacDevice.getEntityId()+": error on communication", null);
-                sendHomeAssistantOffCommands(hvacDevice.getEntityId(), nextHvacDeviceSetTemp);
+                sendHomeAssistantOffCommands(hvacDevice.getEntityId(), nextHvacDeviceSetTemp, hvacDeviceList);
             }
         }
         for (int i = 0; i<initConsumptionObjList.size(); i++) {
@@ -187,10 +188,10 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             }
         }
 
-        sendHomeAssistantOffCommands(climateEntityId, oldSetTemp);
+        sendHomeAssistantOffCommands(climateEntityId, oldSetTemp, hvacDeviceList);
 
         if (hvacDeviceList.indexOf(hvacDevice) == hvacDeviceList.size() -1) {
-            sendHomeAssistantOffCommands(nextClimateEntityId, nextOldSetTemp);
+            sendHomeAssistantOffCommands(nextClimateEntityId, nextOldSetTemp, hvacDeviceList);
         }
         InitConsumptionObj initConsumptionObj = new InitConsumptionObj();
         initConsumptionObj.setHvacDevice(hvacDevice);
@@ -214,23 +215,57 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             Integer type,
             String hvacMode) throws InterruptedException {
         Double initSetTemp = type == HVAC_MODE_WINTER_ID ? hvacDevice.getMaxTemp() : hvacDevice.getMinTemp();
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(climateEntityId, initSetTemp);
         logger.info("sent "+initSetTemp+"° to: "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent "+initSetTemp+"° to: "+climateEntityId, null);
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, hvacMode);
+        if(homeInfo.getHvacSwitchEntityId() != null) {
+            homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), true);
+            logger.info("sent on to switch "+homeInfo.getHvacSwitchEntityId());
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent on to switch "+homeInfo.getHvacSwitchEntityId(), null);
+        }
         logger.info("sent cmd cooling to: "+climateEntityId);
         logger.info("waiting 30s to init");
         Thread.sleep(constsUtils.getHvacInitializationSleepTimeMillis());
     }
 
-    private void sendHomeAssistantOffCommands(String climateEntityId, Double oldSetTemp) {
+    private void sendHomeAssistantOffCommands(String climateEntityId, Double oldSetTemp, List<HVACDevice> hvacDeviceList) {
         if(oldSetTemp == null) oldSetTemp = 23D;
+        HomeInfo homeInfo = entitiesQueriesService.findHomeInfo();
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(climateEntityId, Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
         logger.info("sent "+oldSetTemp+"° to: "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent "+oldSetTemp+"° to: "+climateEntityId, null);
         homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(climateEntityId, oldSetTemp);
         logger.info("finish "+climateEntityId);
         homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "finish "+climateEntityId, null);
+        if(homeInfo.getHvacSwitchEntityId() != null && noClimateDeviceIsOn(hvacDeviceList)) {
+            homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), false);
+            logger.info("sent off to switch "+homeInfo.getHvacSwitchEntityId());
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, "sent off to switch "+homeInfo.getHvacSwitchEntityId(), null);
+        }
+    }
+
+    @Override
+    public boolean noClimateDeviceIsOn(List<HVACDevice> hvacDeviceList) {
+        List<HomeAssistantEntityDto> homeAssistantClimateEntityDtoList = homeAssistantQueriesApplicationService.getHomeAssistantEntities("climate")
+                .stream().filter(
+                        homeAssistantEntityDto ->
+                                hvacDeviceList.stream().
+                                        map(HVACDevice::getEntityId)
+                                        .collect(Collectors.toList())
+                                        .contains(homeAssistantEntityDto.getEntityId()))
+                .collect(Collectors.toList());
+        for(HomeAssistantEntityDto homeAssistantEntityDto : homeAssistantClimateEntityDtoList){
+            if(homeAssistantEntityDto.getAttributes() != null && homeAssistantEntityDto.getAttributes().getHvacAction() != null)
+                if(!HOME_ASSISTANT_HVAC_DEVICE_IDLE_FUNCTION.equals(homeAssistantEntityDto.getAttributes().getHvacAction()))
+                    return false;
+                else
+                    continue;
+            if(!HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(homeAssistantEntityDto.getState()))
+                return false;
+        }
+        return true;
     }
 
     private double getSetTemp(String entityId){

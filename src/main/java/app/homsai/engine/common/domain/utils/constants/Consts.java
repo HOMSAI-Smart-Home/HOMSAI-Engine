@@ -8,6 +8,7 @@ public class Consts {
     public static final String HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION = "heat";
     public static final String HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION = "cool";
     public static final String HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION = "off";
+    public static final String HOME_ASSISTANT_HVAC_DEVICE_IDLE_FUNCTION = "idle";
 
     public static final String HOME_ASSISTANT_WATT = "W";
 

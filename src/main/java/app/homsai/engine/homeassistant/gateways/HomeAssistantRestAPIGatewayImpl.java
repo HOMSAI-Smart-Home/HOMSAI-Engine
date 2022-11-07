@@ -132,4 +132,23 @@ public class HomeAssistantRestAPIGatewayImpl implements HomeAssistantRestAPIGate
     }
 
 
+    @Override
+    public HomeAssistantEntityDto sendHomeAssistantSwitchMode(String entityId, boolean on) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl+SET_ENTITY_STATE.replace("{context}", "switch").replace("{command}", "turn_"))
+                .encode()
+                .toUriString();
+        if(on) url += "on";
+        else url += "off";
+        HomeAssistantSwitchModeDto homeAssistantSwitchModeDto = new HomeAssistantSwitchModeDto();
+        homeAssistantSwitchModeDto.setEntityId(entityId);
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add("Authorization", "Bearer "+token);
+        ResponseEntity<String> homeAssistantResponse =
+                restTemplate
+                        .exchange(url, HttpMethod.POST,  new HttpEntity<>(homeAssistantSwitchModeDto, headers), String.class);
+        return null;
+    }
+
+
 }

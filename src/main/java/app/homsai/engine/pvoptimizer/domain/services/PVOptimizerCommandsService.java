@@ -13,6 +13,8 @@ public interface PVOptimizerCommandsService {
     @Async("threadPoolTaskExecutor")
     void initHomsaiHvacDevices(List<HVACDevice> hvacDeviceList, Integer type, String hvacFunction) throws InterruptedException, HvacPowerMeterIdNotSet, BadHomeInfoException;
 
+    boolean noClimateDeviceIsOn(List<HVACDevice> hvacDeviceList);
+
     Double calculateInitTime(Integer deviceSize);
 
     void deleteFromHvacDevicesByType(Integer type);

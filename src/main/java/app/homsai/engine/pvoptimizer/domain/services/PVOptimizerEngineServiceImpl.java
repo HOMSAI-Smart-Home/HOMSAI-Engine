@@ -19,6 +19,7 @@ import app.homsai.engine.pvoptimizer.domain.services.cache.PVOptimizerCacheServi
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -48,6 +49,12 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
 
     @Autowired
     EntitiesCommandsApplicationService entitiesCommandsApplicationService;
+
+    @Autowired
+    PVOptimizerCommandsService pvOptimizerCommandsService;
+
+    @Autowired
+    PVOptimizerQueriesService pvOptimizerQueriesService;
 
     @Autowired
     PVOptimizerMapper pvoptimizerMapper;
@@ -130,6 +137,8 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(hvacDeviceFunction);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setStartTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned on: "+hvacDeviceEntityId);
+                if(homeInfo.getHvacSwitchEntityId() != null)
+                    homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), true);
             }
         } else
             logger.info("[HVAC Optimizer] HVAC devices to turn on: 0");
@@ -145,6 +154,8 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setEndTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned off: "+hvacDeviceEntityId+", current consumption: "+oldConsumption);
+                if(homeInfo.getHvacSwitchEntityId() != null && pvOptimizerCommandsService.noClimateDeviceIsOn(pvOptimizerQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), null).getContent()))
+                    homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), false);
             }
         } else
             logger.info("[HVAC Optimizer] HVAC devices to turn off: 0");
