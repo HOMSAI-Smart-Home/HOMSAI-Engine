@@ -17,12 +17,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static app.homsai.engine.common.domain.utils.constants.Consts.HOME_ASSISTANT_WATT;
+import static app.homsai.engine.common.domain.utils.constants.Consts.*;
 
 
 @Service
@@ -182,19 +183,23 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
             HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
-            if(!optimizerHVACDevice.getActive() && !Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
-                optimizerHVACDevice.setActive(true);
-                optimizerHVACDevice.setHvacMode(
-                        homeInfo.getOptimizerMode() == null || homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
-                                Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION :
-                                Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION);
-                optimizerHVACDevice.setStartTime(Instant.now());
-                optimizerHVACDevice.setManual(true);
-            } else if(optimizerHVACDevice.getActive() && Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(hvacDeviceEntity.getState())){
-                optimizerHVACDevice.setActive(false);
-                optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
-                optimizerHVACDevice.setEndTime(Instant.now());
-                optimizerHVACDevice.setManual(true);
+            if (!optimizerHVACDevice.getActive() && checkIfDeviceIsActive(hvacDeviceEntity)) {
+                if(optimizerHVACDevice.getEndTime() != null && Instant.now().isAfter(optimizerHVACDevice.getEndTime().plus(10, ChronoUnit.MINUTES))) {
+                    optimizerHVACDevice.setActive(true);
+                    optimizerHVACDevice.setHvacMode(
+                            homeInfo.getOptimizerMode() == null || homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
+                                    Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION :
+                                    Consts.HOME_ASSISTANT_HVAC_DEVICE_HEATING_FUNCTION);
+                    optimizerHVACDevice.setStartTime(Instant.now());
+                    optimizerHVACDevice.setManual(true);
+                }
+            } else if (optimizerHVACDevice.getActive() && !checkIfDeviceIsActive(hvacDeviceEntity)) {
+                if(optimizerHVACDevice.getStartTime() != null && Instant.now().isAfter(optimizerHVACDevice.getStartTime().plus(10, ChronoUnit.MINUTES))) {
+                    optimizerHVACDevice.setActive(false);
+                    optimizerHVACDevice.setHvacMode(Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+                    optimizerHVACDevice.setEndTime(Instant.now());
+                    optimizerHVACDevice.setManual(true);
+                }
             }
             if(optimizerHVACDevice.getActive())
                 active++;
@@ -205,6 +210,12 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
             if(optimizerHVACDevice != null && optimizerHVACDevice.getActive())
                 optimizerHVACDevice.setActualPowerConsumption(currentClimateConsumption);
         }
+    }
+
+    private boolean checkIfDeviceIsActive(HomeAssistantEntityDto homeAssistantEntityDto){
+        if(homeAssistantEntityDto.getAttributes() != null && homeAssistantEntityDto.getAttributes().getHvacAction() != null)
+            return !HOME_ASSISTANT_HVAC_DEVICE_IDLE_FUNCTION.equals(homeAssistantEntityDto.getAttributes().getHvacAction()) && !HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(homeAssistantEntityDto.getAttributes().getHvacAction());
+        return !HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(homeAssistantEntityDto.getState());
     }
 
 

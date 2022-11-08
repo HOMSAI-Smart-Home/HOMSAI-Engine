@@ -12,7 +12,7 @@ public class Consts {
 
     public static final String HOME_ASSISTANT_WATT = "W";
 
-    public static final int HVAC_PV_OPTIMIZATION_UPDATE_TIMEDELTA_MINUTES = 1;
+    public static final int HVAC_PV_OPTIMIZATION_UPDATE_TIMEDELTA_MINUTES = 5;
     public static final int HVAC_PV_OPTIMIZATION_REQUEST_TIMEDELTA_MINUTES = 15;
     public static final int HVAC_PV_OPTIMIZATION_MINIMUM_IDLE_MINUTES = 25;
     public static final int HVAC_PV_OPTIMIZATION_MINIMUM_EXECUTION_MINUTES = 25;
