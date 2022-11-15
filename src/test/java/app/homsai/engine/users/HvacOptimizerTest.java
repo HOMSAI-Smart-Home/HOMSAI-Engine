@@ -17,6 +17,7 @@ import app.homsai.engine.pvoptimizer.gateways.PVOptimizerHomsaiAIServiceGateway;
 import app.homsai.engine.pvoptimizer.gateways.dtos.HvacDevicesOptimizationPVResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -60,8 +61,10 @@ public class HvacOptimizerTest {
     @Autowired
     PVOptimizerCacheService pvOptimizerCacheService;
 
+    private Boolean switchOn = null;
 
-    @Test
+
+    //@Test
     public void whenAIServiceTurnsOnDevices_thenReadRightStates() {
         HashMap<Integer, List<String>> hvacModes = new HashMap<>();
         List<String> devicesToTurnOn = new ArrayList<>();
@@ -76,7 +79,7 @@ public class HvacOptimizerTest {
         hvacModes.put(Consts.HVAC_MODE_WINTER_ID, devicesToTurnOn);
         configureMockHomeAssistantGateway();
         hvacModes.forEach((hvacMode, devices) -> {
-            configureMockAIServiceGateway(devices);
+            configureMockAIServiceGatewayToTurnOn(devices);
             enableOptimizer(hvacMode);
             pvOptimizerEngineService.updateHvacDeviceOptimizationCache();
             pvOptimizerEngineService.updateHvacDeviceOptimizationStatus();
@@ -102,7 +105,7 @@ public class HvacOptimizerTest {
         });
     }
 
-    @Test
+    //@Test
     public void whenSwitchOptimizerMode_thenReadRightStatesAndInvalidateCache() {
         final String summerEquipmentUuid = "f98c301b-6ff2-41ba-b5df-f0e2e00e96c8";
         final String hvacSwitchEntityId = "entityID";
@@ -148,19 +151,100 @@ public class HvacOptimizerTest {
         assertThat(optimizerHVACDeviceDtos).hasSize(3);
     }
 
+    @Test
+    public void whenThereAreNoDeviceOn_thenTurnOffSwitch() {
+        assertThat(this.switchOn).isNull();
+        List<String> devicesToTurnOn = new ArrayList<>();
+        devicesToTurnOn.add("climate.area2");
+        devicesToTurnOn.add("climate.area3");
+        devicesToTurnOn.add("climate.area4");
+        configureMockHomeAssistantGateway();
+        configureMockHomeAssistantGatewayForSwitch();
+        configureMockAIServiceGatewayToTurnOn(devicesToTurnOn);
+        enableOptimizer(Consts.HVAC_MODE_SUMMER_ID);
+        pvOptimizerEngineService.updateHvacDeviceOptimizationCache();
+        pvOptimizerEngineService.updateHvacDeviceOptimizationStatus();
+
+        ResponseEntity<OptimizerHVACDeviceDto[]> optimizedDevicesResponse =
+                restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint,
+                        OptimizerHVACDeviceDto[].class);
+        assertThat(optimizedDevicesResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        OptimizerHVACDeviceDto[] optimizerHVACDeviceDtos = optimizedDevicesResponse.getBody();
+        assertThat(optimizerHVACDeviceDtos).isNotNull();
+        for (OptimizerHVACDeviceDto optimizerHVACDeviceDto : optimizerHVACDeviceDtos) {
+            assertThat(optimizerHVACDeviceDto.getType()).isNotNull().isEqualTo(Consts.HVAC_MODE_SUMMER_ID);
+            if (devicesToTurnOn.contains(optimizerHVACDeviceDto.getEntityId()))
+                assertThat(optimizerHVACDeviceDto.getHvacMode()).isEqualTo(Consts.HOME_ASSISTANT_HVAC_DEVICE_CONDITIONING_FUNCTION);
+        }
+        assertThat(this.switchOn).isNotNull();
+        assertThat(this.switchOn).isTrue();
+
+        List<String> devicesToTurnOff = new ArrayList<>();
+        devicesToTurnOff.add("climate.area2");
+        devicesToTurnOff.add("climate.area3");
+        configureMockAIServiceGatewayToTurnOff(devicesToTurnOff);
+        pvOptimizerEngineService.updateHvacDeviceOptimizationCache();
+        pvOptimizerEngineService.updateHvacDeviceOptimizationStatus();
+
+        optimizedDevicesResponse =
+                restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint,
+                        OptimizerHVACDeviceDto[].class);
+        assertThat(optimizedDevicesResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        optimizerHVACDeviceDtos = optimizedDevicesResponse.getBody();
+        assertThat(optimizerHVACDeviceDtos).isNotNull();
+        for (OptimizerHVACDeviceDto optimizerHVACDeviceDto : optimizerHVACDeviceDtos) {
+            assertThat(optimizerHVACDeviceDto.getType()).isNotNull().isEqualTo(Consts.HVAC_MODE_SUMMER_ID);
+            if (devicesToTurnOff.contains(optimizerHVACDeviceDto.getEntityId()))
+                assertThat(optimizerHVACDeviceDto.getHvacMode()).isEqualTo(Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+        }
+        assertThat(this.switchOn).isNotNull();
+        assertThat(this.switchOn).isTrue();
+
+        devicesToTurnOff = new ArrayList<>();
+        devicesToTurnOff.add("climate.area4");
+        configureMockAIServiceGatewayToTurnOff(devicesToTurnOff);
+        pvOptimizerEngineService.updateHvacDeviceOptimizationCache();
+        pvOptimizerEngineService.updateHvacDeviceOptimizationStatus();
+
+        optimizedDevicesResponse =
+                restTemplate.getForEntity(env.getProperty("server.contextPath") + readSettingsEndpoint,
+                        OptimizerHVACDeviceDto[].class);
+        assertThat(optimizedDevicesResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        optimizerHVACDeviceDtos = optimizedDevicesResponse.getBody();
+        assertThat(optimizerHVACDeviceDtos).isNotNull();
+        for (OptimizerHVACDeviceDto optimizerHVACDeviceDto : optimizerHVACDeviceDtos) {
+            assertThat(optimizerHVACDeviceDto.getType()).isNotNull().isEqualTo(Consts.HVAC_MODE_SUMMER_ID);
+            if (devicesToTurnOff.contains(optimizerHVACDeviceDto.getEntityId()))
+                assertThat(optimizerHVACDeviceDto.getHvacMode()).isEqualTo(Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+        }
+        assertThat(this.switchOn).isNotNull();
+        assertThat(this.switchOn).isFalse();
+
+        disableOptimizer();
+    }
+
 
     private void enableOptimizer(Integer optimizerMode) {
+
+        ResponseEntity<HomeHvacSettingsDto> newHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
+        assertThat(newHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
+
         HomeHvacSettingsUpdateDto homeHvacSettingsUpdateDto = new HomeHvacSettingsUpdateDto();
         homeHvacSettingsUpdateDto.setOptimizerEnabled(true);
         homeHvacSettingsUpdateDto.setOptimizerMode(optimizerMode);
         homeHvacSettingsUpdateDto.setSetTemperature(30.0);
+        if(newHvacSettings.getBody().getCurrentWinterHVACEquipment() != null)
+            homeHvacSettingsUpdateDto.setCurrentWinterHVACEquipmentUuid(newHvacSettings.getBody().getCurrentWinterHVACEquipment().getUuid());
+        if(newHvacSettings.getBody().getCurrentSummerHVACEquipment() != null)
+            homeHvacSettingsUpdateDto.setCurrentSummerHVACEquipmentUuid(newHvacSettings.getBody().getCurrentSummerHVACEquipment().getUuid());
+        homeHvacSettingsUpdateDto.setHvacSwitchEntityId(newHvacSettings.getBody().getHvacSwitchEntityId());
         HttpEntity<HomeHvacSettingsUpdateDto> request = new HttpEntity<>(homeHvacSettingsUpdateDto);
         ResponseEntity<HomeHvacSettingsDto> updateSettingsResponse  =
                 restTemplate.postForEntity(env.getProperty("server.contextPath") + updateHomeSettingsEndpoint,
                         request, HomeHvacSettingsDto.class);
         assertThat(updateSettingsResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        ResponseEntity<HomeHvacSettingsDto> newHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
+        newHvacSettings = restTemplate.getForEntity(env.getProperty("server.contextPath") + readHomeSettingsEndpoint, HomeHvacSettingsDto.class);
         assertThat(newHvacSettings.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getSetTemperature()).isEqualTo(30);
         assertThat(Objects.requireNonNull(newHvacSettings.getBody()).getOptimizerEnabled()).isTrue();
@@ -225,9 +309,25 @@ public class HvacOptimizerTest {
         when(homeAssistantRestAPIGateway.syncHomeAssistantEntityValue("climate.area9")).thenReturn(climateHomeAssistantEntityDto);
     }
 
-    private void configureMockAIServiceGateway(List<String> devicesToTurnOn){
+    public void configureMockHomeAssistantGatewayForSwitch(){
+        when(homeAssistantRestAPIGateway.sendHomeAssistantSwitchMode(anyString(), anyBoolean())).then(
+                (Answer<HomeAssistantEntityDto>) i -> {
+                    switchOn = (Boolean) i.getArguments()[1];
+                    return null;
+                }
+        );
+    }
+
+    private void configureMockAIServiceGatewayToTurnOn(List<String> devicesToTurnOn){
         HvacDevicesOptimizationPVResponseDto hvacDevicesOptimizationPVResponseDto = new HvacDevicesOptimizationPVResponseDto();
         hvacDevicesOptimizationPVResponseDto.setDevicesToTurnOn(devicesToTurnOn);
+
+        when(PVOptimizerHomsaiAIServiceGateway.getHvacDevicesOptimizationPV(any())).thenReturn(hvacDevicesOptimizationPVResponseDto);
+    }
+
+    private void configureMockAIServiceGatewayToTurnOff(List<String> devicesToTurnOff){
+        HvacDevicesOptimizationPVResponseDto hvacDevicesOptimizationPVResponseDto = new HvacDevicesOptimizationPVResponseDto();
+        hvacDevicesOptimizationPVResponseDto.setDevicesToTurnOff(devicesToTurnOff);
 
         when(PVOptimizerHomsaiAIServiceGateway.getHvacDevicesOptimizationPV(any())).thenReturn(hvacDevicesOptimizationPVResponseDto);
     }

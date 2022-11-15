@@ -152,9 +152,11 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setEndTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned off: "+hvacDeviceEntityId+", current consumption: "+oldConsumption);
-                if(homeInfo.getHvacSwitchEntityId() != null && pvOptimizerCommandsService.noClimateDeviceIsOn(pvOptimizerQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), null).getContent()))
-                    homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), false);
             }
+            if(homeInfo.getHvacSwitchEntityId() != null &&
+                    (/*pvOptimizerCommandsService.noClimateDeviceIsOn(pvOptimizerQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), null).getContent()) ||*/
+                            hvacDeviceHashMap.values().stream().noneMatch(OptimizerHVACDevice::getActive)))
+                homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), false);
         } else
             logger.info("[HVAC Optimizer] HVAC devices to turn off: 0");
     }
