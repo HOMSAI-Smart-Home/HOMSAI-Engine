@@ -181,7 +181,7 @@ public class InitCycleTest {
         }
         if(hvacDeviceDtos.size() == 3){
             assertThat(hvacDeviceDtos.get(0).getPowerConsumption()).isEqualTo(511.08);
-            assertThat(hvacDeviceDtos.get(0).getCoupledPowerConsumption()).isEqualTo(5.94);
+            assertThat(hvacDeviceDtos.get(0).getCoupledPowerConsumption()).isEqualTo(Consts.HVAC_INITIALIZATION_MIN_CONSUMPTION);
             assertThat(hvacDeviceDtos.get(1).getPowerConsumption()).isEqualTo(956.66);
             assertThat(hvacDeviceDtos.get(1).getCoupledPowerConsumption()).isEqualTo(321.80);
             assertThat(hvacDeviceDtos.get(2).getPowerConsumption()).isEqualTo(1412.04);
@@ -192,7 +192,7 @@ public class InitCycleTest {
             assertThat(hvacDeviceDtos.get(2).getPowerConsumption()).isEqualTo(1412.04);
             assertThat(hvacDeviceDtos.get(2).getCoupledPowerConsumption()).isEqualTo(595.20);
             assertThat(hvacDeviceDtos.get(3).getPowerConsumption()).isEqualTo(300);
-            assertThat(hvacDeviceDtos.get(3).getCoupledPowerConsumption()).isEqualTo(5.94);
+            assertThat(hvacDeviceDtos.get(3).getCoupledPowerConsumption()).isEqualTo(Consts.HVAC_INITIALIZATION_MIN_CONSUMPTION);
             assertThat(hvacDeviceDtos.get(0).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(0).getCoupledPowerConsumption());
             assertThat(hvacDeviceDtos.get(4).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(4).getCoupledPowerConsumption());
             assertThat(hvacDeviceDtos.get(5).getPowerConsumption()).isEqualTo(hvacDeviceDtos.get(5).getCoupledPowerConsumption());

@@ -64,7 +64,7 @@ public class HvacOptimizerTest {
     private Boolean switchOn = null;
 
 
-    //@Test
+    @Test
     public void whenAIServiceTurnsOnDevices_thenReadRightStates() {
         HashMap<Integer, List<String>> hvacModes = new HashMap<>();
         List<String> devicesToTurnOn = new ArrayList<>();
@@ -73,7 +73,7 @@ public class HvacOptimizerTest {
         devicesToTurnOn.add("climate.area4");
         hvacModes.put(Consts.HVAC_MODE_SUMMER_ID, devicesToTurnOn);
         devicesToTurnOn = new ArrayList<>();
-        devicesToTurnOn.add("climate.area7");
+        devicesToTurnOn.add("climate.area1");
         devicesToTurnOn.add("climate.area8");
         devicesToTurnOn.add("climate.area9");
         hvacModes.put(Consts.HVAC_MODE_WINTER_ID, devicesToTurnOn);
@@ -105,7 +105,7 @@ public class HvacOptimizerTest {
         });
     }
 
-    //@Test
+    @Test
     public void whenSwitchOptimizerMode_thenReadRightStatesAndInvalidateCache() {
         final String summerEquipmentUuid = "f98c301b-6ff2-41ba-b5df-f0e2e00e96c8";
         final String hvacSwitchEntityId = "entityID";
