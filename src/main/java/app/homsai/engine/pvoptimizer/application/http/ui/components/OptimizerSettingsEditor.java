@@ -59,11 +59,12 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
     HorizontalLayout actions = new HorizontalLayout(save, cancel);
 
     @Autowired
-    public OptimizerSettingsEditor(EntitiesQueriesService entitiesQueriesService, EntitiesCommandsService entitiesCommandsService, PVOptimizerCacheService pvoptimizerCacheService, PVOptimizerCommandsService pvOptimizerCommandsService) {
+    public OptimizerSettingsEditor(EntitiesQueriesService entitiesQueriesService, EntitiesCommandsService entitiesCommandsService, PVOptimizerCacheService pvoptimizerCacheService, PVOptimizerCommandsService pvOptimizerCommandsService, PVOptimizerQueriesService pvOptimizerQueriesService) {
         this.entitiesQueriesService = entitiesQueriesService;
         this.entitiesCommandsService = entitiesCommandsService;
         this.pvoptimizerCacheService = pvoptimizerCacheService;
         this.pvOptimizerCommandsService = pvOptimizerCommandsService;
+        this.pvOptimizerQueriesService = pvOptimizerQueriesService;
         HorizontalLayout checkboxes = new HorizontalLayout(enabled, auto);
         add(checkboxes, setTemp, startTime, endTime, error, actions);
 
@@ -88,7 +89,7 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
             LocalTime endTimeValue = endTime.getValue();
             hvacDevice.setEnabled(enabledValue);
             pvoptimizerCacheService.getHvacDevicesCache().get(hvacDevice.getEntityId()).setManual(!autoMode);
-            hvacDevice.getArea().setDesiredSummerTemperature(Double.parseDouble(desiredTemperature));
+            hvacDevice.getArea().setDesiredWinterTemperature(Double.parseDouble(desiredTemperature));
             if(startTimeValue != null && endTimeValue != null) {
                 LocalTime start = startTimeValue.minusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
                 LocalTime end = endTimeValue.minusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
@@ -132,10 +133,10 @@ public class OptimizerSettingsEditor extends VerticalLayout implements KeyNotifi
         cancel.setVisible(true);
         auto.setValue(!pvoptimizerCacheService.getHvacDevicesCache().get(entityId).isManual());
         enabled.setValue(hvacDevice.getEnabled());
-        if(hvacDevice.getArea().getDesiredSummerTemperature() != null)
-            setTemp.setValue(hvacDevice.getArea().getDesiredSummerTemperature().toString());
+        if(hvacDevice.getArea().getDesiredWinterTemperature() != null)
+            setTemp.setValue(hvacDevice.getArea().getDesiredWinterTemperature().toString());
         else
-            setTemp.setValue(entitiesQueriesService.getHomeArea().getDesiredSummerTemperature().toString());
+            setTemp.setValue(entitiesQueriesService.getHomeArea().getDesiredWinterTemperature().toString());
         if(hvacDevice.getIntervals().size() > 0) {
             LocalTime start = hvacDevice.getIntervals().get(0).getStartTime().plusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
             LocalTime end = hvacDevice.getIntervals().get(0).getEndTime().plusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
