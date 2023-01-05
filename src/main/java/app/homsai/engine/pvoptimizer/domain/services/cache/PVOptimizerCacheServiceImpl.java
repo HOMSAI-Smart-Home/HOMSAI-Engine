@@ -182,9 +182,12 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                         .orElse(null);
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
-            String hvacMode = getHvacMode(optimizerHVACDevice.getEntityId());
-            optimizerHVACDevice.setHvacMode(hvacMode);
-            /*HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
+            HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
+            if(optimizerHVACDevice.getActive())
+                optimizerHVACDevice.setHvacMode(hvacDeviceEntity.getState());
+            else
+                optimizerHVACDevice.setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+            /*
             if (!optimizerHVACDevice.getActive() && checkIfDeviceIsActive(hvacDeviceEntity)) {
                 if(optimizerHVACDevice.getEndTime() != null && Instant.now().isAfter(optimizerHVACDevice.getEndTime().plus(10, ChronoUnit.MINUTES))) {
                     optimizerHVACDevice.setActive(true);
