@@ -182,7 +182,9 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                         .orElse(null);
             if(setTemperature == null) setTemperature=homeSetTemperature;
             optimizerHVACDevice.setSetTemperature(setTemperature);
-            HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
+            String hvacMode = getHvacMode(optimizerHVACDevice.getEntityId());
+            optimizerHVACDevice.setHvacMode(hvacMode);
+            /*HomeAssistantEntityDto hvacDeviceEntity = homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(optimizerHVACDevice.getEntityId());
             if (!optimizerHVACDevice.getActive() && checkIfDeviceIsActive(hvacDeviceEntity)) {
                 if(optimizerHVACDevice.getEndTime() != null && Instant.now().isAfter(optimizerHVACDevice.getEndTime().plus(10, ChronoUnit.MINUTES))) {
                     optimizerHVACDevice.setActive(true);
@@ -200,7 +202,7 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
                     optimizerHVACDevice.setEndTime(Instant.now());
                     optimizerHVACDevice.setManual(true);
                 }
-            }
+            }*/
             if(optimizerHVACDevice.getActive())
                 active++;
         }
@@ -216,6 +218,15 @@ public class PVOptimizerCacheServiceImpl implements PVOptimizerCacheService {
         if(homeAssistantEntityDto.getAttributes() != null && homeAssistantEntityDto.getAttributes().getHvacAction() != null)
             return !HOME_ASSISTANT_HVAC_DEVICE_IDLE_FUNCTION.equals(homeAssistantEntityDto.getAttributes().getHvacAction()) && !HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(homeAssistantEntityDto.getAttributes().getHvacAction());
         return !HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION.equals(homeAssistantEntityDto.getState());
+    }
+
+    private String getHvacMode(String entityId){
+        try {
+            return homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(entityId).getState();
+        } catch (Exception e){
+            e.printStackTrace();
+            return HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION;
+        }
     }
 
 

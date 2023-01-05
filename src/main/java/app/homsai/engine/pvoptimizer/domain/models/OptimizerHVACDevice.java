@@ -1,5 +1,7 @@
 package app.homsai.engine.pvoptimizer.domain.models;
 
+import app.homsai.engine.common.domain.utils.constants.Consts;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -36,6 +38,10 @@ public class OptimizerHVACDevice {
     private boolean manual;
 
     private String hvacMode;
+
+    private String oldHvacMode;
+
+    private Double oldSetTemp;
 
     private DoubleCircularArray consumptionArray;
 
@@ -196,5 +202,25 @@ public class OptimizerHVACDevice {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getOldHvacMode() {
+        if(oldHvacMode != null)
+            return oldHvacMode;
+        return Consts.HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION;
+    }
+
+    public void setOldHvacMode(String oldHvacMode) {
+        this.oldHvacMode = oldHvacMode;
+    }
+
+    public Double getOldSetTemp() {
+        if(oldSetTemp != null)
+            return oldSetTemp;
+        return 22D;
+    }
+
+    public void setOldSetTemp(Double oldSetTemp) {
+        this.oldSetTemp = oldSetTemp;
     }
 }

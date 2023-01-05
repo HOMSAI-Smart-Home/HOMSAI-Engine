@@ -120,6 +120,11 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
                 logger.info("[HVAC Optimizer] HVAC devices to turn on: " + hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn().size());
             }
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOn()){
+                Double oldSetTemp = getSetTemp(hvacDeviceEntityId);
+                String oldHvacMode = getHvacMode(hvacDeviceEntityId);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setOldSetTemp(oldSetTemp);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setOldHvacMode(oldHvacMode);
+
                 Double setTemp =
                         homeInfo.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID ?
                                 hvacDeviceHashMap.get(hvacDeviceEntityId).getSetTemperature() - HVAC_THRESHOLD_TEMPERATURE:
@@ -147,17 +152,35 @@ public class PVOptimizerEngineServiceImpl implements PVOptimizerEngineService {
             }
             for(String hvacDeviceEntityId : hvacDevicesOptimizationPVResponseDto.getDevicesToTurnOff()){
                 Double oldConsumption = hvacDeviceHashMap.get(hvacDeviceEntityId).getActualPowerConsumption();
-                homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+                homeAssistantCommandsApplicationService.sendHomeAssistantClimateTemperature(hvacDeviceEntityId, hvacDeviceHashMap.get(hvacDeviceEntityId).getOldSetTemp());
+                homeAssistantCommandsApplicationService.sendHomeAssistantClimateHVACMode(hvacDeviceEntityId, hvacDeviceHashMap.get(hvacDeviceEntityId).getOldHvacMode());
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setActive(false);
-                hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION);
+                hvacDeviceHashMap.get(hvacDeviceEntityId).setHvacMode(hvacDeviceHashMap.get(hvacDeviceEntityId).getOldHvacMode());
                 hvacDeviceHashMap.get(hvacDeviceEntityId).setEndTime(Instant.now());
                 logger.info("[HVAC Optimizer] HVAC device turned off: "+hvacDeviceEntityId+", current consumption: "+oldConsumption);
             }
-            if(homeInfo.getHvacSwitchEntityId() != null &&
-                    (/*pvOptimizerCommandsService.noClimateDeviceIsOn(pvOptimizerQueriesService.findAllHomsaiHvacDevices(Pageable.unpaged(), null).getContent()) ||*/
-                            hvacDeviceHashMap.values().stream().noneMatch(OptimizerHVACDevice::getActive)))
+            if(homeInfo.getHvacSwitchEntityId() != null && hvacDeviceHashMap.values().stream().noneMatch(OptimizerHVACDevice::getActive)) //ToDo bug: homsai turn off even if there are working HVAC devices, it considers only devices activated by itself
                 homeAssistantCommandsApplicationService.sendHomeAssistantSwitchMode(homeInfo.getHvacSwitchEntityId(), false);
         } else
             logger.info("[HVAC Optimizer] HVAC devices to turn off: 0");
+    }
+
+
+    private double getSetTemp(String entityId){
+        try {
+            return Double.parseDouble(homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(entityId).getAttributes().getTemperature());
+        } catch (Exception e){
+            e.printStackTrace();
+            return 24D;
+        }
+    }
+
+    private String getHvacMode(String entityId){
+        try {
+            return homeAssistantQueriesApplicationService.syncHomeAssistantEntityValue(entityId).getState();
+        } catch (Exception e){
+            e.printStackTrace();
+            return HOME_ASSISTANT_HVAC_DEVICE_OFF_FUNCTION;
+        }
     }
 }
