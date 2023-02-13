@@ -151,8 +151,12 @@ public class ForecastCacheServiceImpl implements ForecastCacheService{
             return;
         List<HomeAssistantHistoryDto> pvProductionHistoricalStates = homeAssistantQueriesApplicationService.getHomeAssistantHistoryState(startDate, endDate, pvProductionSensorId);
         List<HomeAssistantHistoryDto> consumptionHistoricalStates = homeAssistantQueriesApplicationService.getHomeAssistantHistoryState(startDate, endDate, generalPowerMeterId);
-        getProductionConsumptionCacheInstance().setPvProductionHistoricalStates(forecastMapper.convertFromHomeAssistantHistoryDto(pvProductionHistoricalStates));
-        getProductionConsumptionCacheInstance().setConsumptionHistoricalStates(forecastMapper.convertFromHomeAssistantHistoryDto(consumptionHistoricalStates));
+        getProductionConsumptionCacheInstance().setPvProductionHistoricalStates(forecastMapper.convertFromHomeAssistantHistoryDtoToHistoricalPower(pvProductionHistoricalStates));
+        getProductionConsumptionCacheInstance().getPvProductionHistoricalStates().get(0).setLastChanged(startDate);
+        getProductionConsumptionCacheInstance().getPvProductionHistoricalStates().get(0).setLastUpdated(startDate.toString());
+        getProductionConsumptionCacheInstance().setConsumptionHistoricalStates(forecastMapper.convertFromHomeAssistantHistoryDtoToHistoricalPower(consumptionHistoricalStates));
+        getProductionConsumptionCacheInstance().getConsumptionHistoricalStates().get(0).setLastChanged(startDate);
+        getProductionConsumptionCacheInstance().getConsumptionHistoricalStates().get(0).setLastUpdated(startDate.toString());
     }
 
 

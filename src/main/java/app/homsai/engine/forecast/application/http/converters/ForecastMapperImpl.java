@@ -1,5 +1,6 @@
 package app.homsai.engine.forecast.application.http.converters;
 
+import app.homsai.engine.common.domain.utils.constants.Consts;
 import app.homsai.engine.forecast.domain.models.HistoricalSensorState;
 import app.homsai.engine.forecast.domain.models.PVBalance;
 import app.homsai.engine.forecast.gateways.dtos.PVBalanceDto;
@@ -9,12 +10,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +37,26 @@ public class ForecastMapperImpl implements ForecastMapper{
             return null;
         return optimizedGeneralPowerMeterData.stream()
                 .map(homeAssistantHistoryDto -> modelMapper.map(homeAssistantHistoryDto, HistoricalSensorState.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HistoricalSensorState> convertFromHomeAssistantHistoryDtoToHistoricalPower(List<HomeAssistantHistoryDto> powerMeterData) {
+        if(powerMeterData == null)
+            return null;
+        Double multiplier = powerMeterData.get(0).getAttributes().getUnitOfMeasurement().equals(Consts.HOME_ASSISTANT_WATT)?
+                0.001 :
+                1;
+        return powerMeterData.stream()
+                .map((homeAssistantHistoryDto) ->
+                {
+                    HistoricalSensorState historicalSensorState =  modelMapper.map(homeAssistantHistoryDto, HistoricalSensorState.class);
+                    try {
+                        historicalSensorState.setState(String.valueOf(Double.parseDouble(historicalSensorState.getState()) * multiplier));
+                    }catch (Exception e){}
+                    return historicalSensorState;
+                }
+                )
                 .collect(Collectors.toList());
     }
 

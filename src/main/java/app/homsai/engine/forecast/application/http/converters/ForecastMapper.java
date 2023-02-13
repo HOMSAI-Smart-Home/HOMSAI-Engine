@@ -16,5 +16,7 @@ public interface ForecastMapper {
 
     List<HistoricalSensorState> convertFromHomeAssistantHistoryDto(List<HomeAssistantHistoryDto> optimizedGeneralPowerMeterData);
 
+    List<HistoricalSensorState> convertFromHomeAssistantHistoryDtoToHistoricalPower(List<HomeAssistantHistoryDto> powerMeterData);
+
     List<HistoricalSensorState> convertToHistoricalSensorState(List<PVForecastQueriesDto> pvForecast);
 }
