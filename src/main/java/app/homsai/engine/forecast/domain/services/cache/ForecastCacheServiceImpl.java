@@ -131,6 +131,8 @@ public class ForecastCacheServiceImpl implements ForecastCacheService{
         Instant endDate = Instant.now().truncatedTo(ChronoUnit.DAYS).minusSeconds(OffsetDateTime.now().getOffset().getTotalSeconds());
         Instant startDate = endDate.minus(7, ChronoUnit.DAYS);
         List<HomeAssistantHistoryDto> generalConsumptionHistory = homeAssistantQueriesApplicationService.getHomeAssistantHistoryState(startDate, endDate, generalPowerMeterId);
+        generalConsumptionHistory.get(0).setLastChanged(startDate);
+        generalConsumptionHistory.get(0).setLastUpdated(startDate);
         ConsumptionForecastRequestDto consumptionForecastRequestDto = new ConsumptionForecastRequestDto();
         consumptionForecastRequestDto.setConsumptionMeterData(generalConsumptionHistory);
         List<HomeAssistantHistoryDto> consumptionForecast = forecastHomsaiAIServiceGateway.getConsumptionForecast(consumptionForecastRequestDto, forecastDays);
