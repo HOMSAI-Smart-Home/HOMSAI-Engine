@@ -94,16 +94,17 @@ public class PVOptimizerCommandsServiceImpl implements PVOptimizerCommandsServic
             if(hvacNetCoupledDeviceConsumption < Consts.HVAC_INITIALIZATION_MIN_CONSUMPTION)
                 hvacNetCoupledDeviceConsumption = Consts.HVAC_INITIALIZATION_MIN_CONSUMPTION;
 
-            if(hvacNetDeviceConsumption >= HVAC_INITIALIZATION_WATT_THRESHOLD){
-                hvacDevice.setPowerConsumption(hvacNetDeviceConsumption);
-                hvacDevice.setCoupledPowerConsumption(hvacNetCoupledDeviceConsumption);
-                pvOptimizerCommandsRepository.saveHvacDevice(hvacDevice);
-                logger.info("{}: successfully saved: single {}, coupled {}", hvacDevice.getEntityId(), hvacNetDeviceConsumption, hvacNetCoupledDeviceConsumption);
-                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": successfully saved: single "+hvacNetDeviceConsumption+", coupled "+hvacNetCoupledDeviceConsumption, hvacDevice);
+            if(hvacNetDeviceConsumption < HVAC_INITIALIZATION_WATT_THRESHOLD){
+                hvacNetDeviceConsumption = HVAC_INITIALIZATION_WATT_DEFAULT;
+                hvacNetCoupledDeviceConsumption = HVAC_INITIALIZATION_WATT_DEFAULT_COUPLED;
             } else {
-                logger.info("{}: under threshold, discarded", hvacDevice.getEntityId());
-                homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": under threshold, discarded", null);
+                logger.info("{}: under threshold, defaulted to {}W ({}W coupled)", hvacDevice.getEntityId(), HVAC_INITIALIZATION_WATT_DEFAULT, HVAC_INITIALIZATION_WATT_DEFAULT_COUPLED);
             }
+            hvacDevice.setPowerConsumption(hvacNetDeviceConsumption);
+            hvacDevice.setCoupledPowerConsumption(hvacNetCoupledDeviceConsumption);
+            pvOptimizerCommandsRepository.saveHvacDevice(hvacDevice);
+            logger.info("{}: successfully saved: single {}, coupled {}", hvacDevice.getEntityId(), hvacNetDeviceConsumption, hvacNetCoupledDeviceConsumption);
+            homsaiOptimizerHVACDeviceInitializationCacheService.onProgress(0, hvacDevice.getEntityId()+": successfully saved: single "+hvacNetDeviceConsumption+", coupled "+hvacNetCoupledDeviceConsumption, hvacDevice);
         }
 
         homsaiOptimizerHVACDeviceInitializationCacheService.endHvacDeviceInit();

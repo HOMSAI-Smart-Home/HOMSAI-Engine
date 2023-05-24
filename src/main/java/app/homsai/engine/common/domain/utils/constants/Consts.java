@@ -23,6 +23,8 @@ public class Consts {
     public static final Integer HVAC_INITIALIZATION_DURATION_MINUTES = 30; //30
     public static final Integer HVAC_BC_INITIALIZATION_DURATION_MINUTES = 5; //5
     public static final Integer HVAC_INITIALIZATION_WATT_THRESHOLD = 200;
+    public static final Double HVAC_INITIALIZATION_WATT_DEFAULT = 500D;
+    public static final Double HVAC_INITIALIZATION_WATT_DEFAULT_COUPLED = 250D;
     public static final int HVAC_MODE_WINTER_ID = 0;
     public static final int HVAC_MODE_SUMMER_ID = 1;
 
