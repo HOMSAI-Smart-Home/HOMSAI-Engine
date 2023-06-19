@@ -187,6 +187,11 @@ public class PVOptimizerCommandsApplicationServiceImpl implements PVOptimizerCom
             invalidateCache = true;
         }
 
+        if (homeHvacSettingsUpdateDto.getOptimizerEnabled() != null &&
+                !Objects.equals(homeHvacSettingsUpdateDto.getOptimizerEnabled(), homeInfo.getPvOptimizationsEnabled())) {
+            invalidateCache = true;
+        }
+
         if(homeHvacSettingsUpdateDto.getOptimizerMode() == null ||
                 homeHvacSettingsUpdateDto.getOptimizerMode() == Consts.HVAC_MODE_SUMMER_ID) {
             area.setDesiredSummerTemperature(homeHvacSettingsUpdateDto.getSetTemperature());

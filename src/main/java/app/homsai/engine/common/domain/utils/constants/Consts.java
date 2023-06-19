@@ -31,7 +31,7 @@ public class Consts {
     public static final int PV_OPTIMIZATION_MODE_WINTER = 0;
     public static final int PV_OPTIMIZATION_MODE_SUMMER = 1;
 
-    public static final Double HVAC_THRESHOLD_TEMPERATURE = 2D;
+    public static final Double HVAC_THRESHOLD_TEMPERATURE = 0D;
 
     public static final String HOME_ASSISTANT_EUR_UNIT = "EUR";
     public static final String EUR_UNIT = "EU";
